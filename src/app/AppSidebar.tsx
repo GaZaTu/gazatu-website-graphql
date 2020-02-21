@@ -42,7 +42,7 @@ const AppSidebar: React.FC = () => {
     }
   }, [isTriviaAdmin, trivia.invalidateCounts])
 
-  const [triviaCountsResult,,, reloadTriviaCounts] = useQuery<Query>({
+  const [triviaCountsResult, , , reloadTriviaCounts] = useQuery<Query>({
     query: triviaCountsQuery,
   })
 
@@ -70,7 +70,7 @@ const AppSidebar: React.FC = () => {
   return (
     <React.Fragment>
       <List dense>
-        <NavLink href="/" color="inherit" underline="none">
+        <NavLink exact href="/" replaceQueryParams force color="inherit" underline="none">
           <ListItem button>
             <ListItemIcon>
               <HomeIcon />
@@ -85,22 +85,22 @@ const AppSidebar: React.FC = () => {
       <List dense subheader={(
         <ListSubheader>Trivia</ListSubheader>
       )}>
-        <NavLink href="/trivia/questions/new" color="inherit" underline="none">
+        <NavLink exact href="/trivia/questions/new" replaceQueryParams force color="inherit" underline="none">
           <ListItem button>
             <ListItemText primary="Submit Question" />
           </ListItem>
         </NavLink>
-        <NavLink href="/trivia/questions" replaceQueryParams force color="inherit" underline="none">
+        <NavLink exact href="/trivia/questions" replaceQueryParams force color="inherit" underline="none">
           <ListItem button>
             <ListItemText primary="Questions" />
           </ListItem>
         </NavLink>
-        <NavLink href="/trivia/categories/new" color="inherit" underline="none">
+        <NavLink exact href="/trivia/categories/new" replaceQueryParams force color="inherit" underline="none">
           <ListItem button>
             <ListItemText primary="Submit Category" />
           </ListItem>
         </NavLink>
-        <NavLink href="/trivia/categories" color="inherit" underline="none">
+        <NavLink exact href="/trivia/categories" replaceQueryParams force color="inherit" underline="none">
           <ListItem button>
             <ListItemText primary="Categories" />
           </ListItem>
@@ -108,35 +108,35 @@ const AppSidebar: React.FC = () => {
 
         {isTriviaAdmin && (
           <React.Fragment>
-            <NavLink href="/trivia/reports" color="inherit" underline="none">
+            <NavLink exact href="/trivia/reports" replaceQueryParams force color="inherit" underline="none">
               <ListItem button>
                 <Badge badgeContent={triviaCountsResult?.triviaCounts?.reportsCount} color="primary" invisible={triviaCountsResult?.triviaCounts?.reportsCount === undefined}>
                   <ListItemText primary="Reports" />
                 </Badge>
               </ListItem>
             </NavLink>
-            <NavLink href="/trivia/questions" queryParams={{ reported: true }} replaceQueryParams force color="inherit" underline="none">
+            <NavLink exact href="/trivia/questions" queryParams={{ reported: true }} replaceQueryParams force color="inherit" underline="none">
               <ListItem button>
                 <Badge badgeContent={triviaCountsResult?.triviaCounts?.reportedQuestionsCount} color="primary" invisible={triviaCountsResult?.triviaCounts?.reportedQuestionsCount === undefined}>
                   <ListItemText primary="Reported Questions" />
                 </Badge>
               </ListItem>
             </NavLink>
-            <NavLink href="/trivia/questions" queryParams={{ dangling: true }} replaceQueryParams force color="inherit" underline="none">
+            <NavLink exact href="/trivia/questions" queryParams={{ dangling: true }} replaceQueryParams force color="inherit" underline="none">
               <ListItem button>
                 <Badge badgeContent={triviaCountsResult?.triviaCounts?.danglingQuestionsCount} color="primary" invisible={triviaCountsResult?.triviaCounts?.danglingQuestionsCount === undefined}>
                   <ListItemText primary="Dangling Questions" />
                 </Badge>
               </ListItem>
             </NavLink>
-            <NavLink href="/trivia/questions" queryParams={{ verified: false, dangling: false }} replaceQueryParams force color="inherit" underline="none">
+            <NavLink exact href="/trivia/questions" queryParams={{ verified: false, dangling: false }} replaceQueryParams force color="inherit" underline="none">
               <ListItem button>
                 <Badge badgeContent={triviaCountsResult?.triviaCounts?.unverifiedQuestionsCount} color="primary" invisible={triviaCountsResult?.triviaCounts?.unverifiedQuestionsCount === undefined}>
                   <ListItemText primary="Unverified Questions" />
                 </Badge>
               </ListItem>
             </NavLink>
-            <NavLink href="/trivia/categories" queryParams={{ verified: false }} replaceQueryParams force color="inherit" underline="none">
+            <NavLink exact href="/trivia/categories" queryParams={{ verified: false }} replaceQueryParams force color="inherit" underline="none">
               <ListItem button>
                 <Badge badgeContent={triviaCountsResult?.triviaCounts?.unverifiedCategoriesCount} color="primary" invisible={triviaCountsResult?.triviaCounts?.unverifiedCategoriesCount === undefined}>
                   <ListItemText primary="Unverified Categories" />
@@ -151,7 +151,7 @@ const AppSidebar: React.FC = () => {
         <List dense subheader={(
           <ListSubheader>Users</ListSubheader>
         )}>
-          <NavLink href="/users" color="inherit" underline="none">
+          <NavLink exact href="/users" replaceQueryParams force color="inherit" underline="none">
             <ListItem button>
               <ListItemText primary="Users" />
             </ListItem>
@@ -162,7 +162,7 @@ const AppSidebar: React.FC = () => {
       <List dense subheader={(
         <ListSubheader>Meta</ListSubheader>
       )}>
-        <NavLink href="/meta/graphiql" color="inherit" underline="none">
+        <NavLink exact href="/meta/graphiql" replaceQueryParams force color="inherit" underline="none">
           <ListItem button>
             <ListItemText primary="GraphiQL" />
           </ListItem>

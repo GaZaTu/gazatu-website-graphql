@@ -1,5 +1,6 @@
 import React from 'react'
 import { navigate, getBasepath } from './hookrouter'
+import { objectToQueryString } from './hookrouter/queryParams'
 
 interface Props extends React.HTMLProps<HTMLAnchorElement> {
   exact?: boolean
@@ -29,7 +30,14 @@ const setNavLinkProps = (props: Props) => {
       ? getBasepath() + props.href
       : props.href
 
-  const active = (props.exact || true) ? (window.location.pathname === href) : (window.location.pathname.startsWith(href || ''))
+  const active = (() => {
+    if (exact) {
+      return (window.location.pathname === href) && (window.location.search.slice(1) === objectToQueryString(queryParams ?? {}))
+    } else {
+      return window.location.pathname.startsWith(href || '')
+    }
+  })()
+
   const className = `${props.className || ''} ${active ? (activeClass || 'active') : ''}`
 
   return { ...nativeProps, href, onClick, className } as { href?: string, onClick?: () => any, className?: string }
