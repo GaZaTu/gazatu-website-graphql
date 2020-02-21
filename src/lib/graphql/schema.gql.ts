@@ -118,6 +118,7 @@ export interface TriviaCounts {
   unverifiedCategoriesCount?: number;
   reportsCount?: number;
   reportedQuestionsCount?: number;
+  danglingQuestionsCount?: number;
 }
 export interface TriviaQuestion {
   __typename?: 'TriviaQuestion';

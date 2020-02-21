@@ -33,6 +33,7 @@ const AppSidebar: React.FC = () => {
             unverifiedCategoriesCount
             reportsCount
             reportedQuestionsCount
+            danglingQuestionsCount
           }
         }
       `
@@ -121,7 +122,14 @@ const AppSidebar: React.FC = () => {
                 </Badge>
               </ListItem>
             </NavLink>
-            <NavLink href="/trivia/questions" queryParams={{ verified: false }} replaceQueryParams force color="inherit" underline="none">
+            <NavLink href="/trivia/questions" queryParams={{ dangling: true }} replaceQueryParams force color="inherit" underline="none">
+              <ListItem button>
+                <Badge badgeContent={triviaCountsResult?.triviaCounts?.danglingQuestionsCount} color="primary" invisible={triviaCountsResult?.triviaCounts?.danglingQuestionsCount === undefined}>
+                  <ListItemText primary="Dangling Questions" />
+                </Badge>
+              </ListItem>
+            </NavLink>
+            <NavLink href="/trivia/questions" queryParams={{ verified: false, dangling: false }} replaceQueryParams force color="inherit" underline="none">
               <ListItem button>
                 <Badge badgeContent={triviaCountsResult?.triviaCounts?.unverifiedQuestionsCount} color="primary" invisible={triviaCountsResult?.triviaCounts?.unverifiedQuestionsCount === undefined}>
                   <ListItemText primary="Unverified Questions" />

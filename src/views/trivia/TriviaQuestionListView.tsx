@@ -33,8 +33,8 @@ const TriviaQuestionListView: React.FC = () => {
   useDrawerWithoutPadding()
 
   const query = graphql`
-    query Query($after: String, $before: String, $first: Int, $last: Int, $search: String, $sortField: String, $sortDirection: SortDirection, $verified: Boolean, $disabled: Boolean, $reported: Boolean) {
-      triviaQuestions(after: $after, before: $before, first: $first, last: $last, search: $search, sortField: $sortField, sortDirection: $sortDirection, verified: $verified, disabled: $disabled, reported: $reported) {
+    query Query($after: String, $before: String, $first: Int, $last: Int, $search: String, $sortField: String, $sortDirection: SortDirection, $verified: Boolean, $disabled: Boolean, $reported: Boolean, $dangling: Boolean) {
+      triviaQuestions(after: $after, before: $before, first: $first, last: $last, search: $search, sortField: $sortField, sortDirection: $sortDirection, verified: $verified, disabled: $disabled, reported: $reported, dangling: $dangling) {
         ${relayConnectionFragment(graphql`
           fragment Fragment on TriviaQuestion {
             id
@@ -56,7 +56,7 @@ const TriviaQuestionListView: React.FC = () => {
     }
   `
 
-  const [{ verified, disabled, reported }] = useQueryParams()
+  const [{ verified, disabled, reported, dangling }] = useQueryParams()
   const [isTriviaAdmin] = useAuthorization('trivia-admin')
   const [variables, setVariables] = useState({
     search: undefined as string | undefined,
@@ -65,6 +65,7 @@ const TriviaQuestionListView: React.FC = () => {
     verified: undefined as boolean | undefined,
     disabled: false as boolean | undefined,
     reported: undefined as boolean | undefined,
+    dangling: undefined as boolean | undefined,
   })
 
   React.useEffect(() => {
@@ -73,8 +74,9 @@ const TriviaQuestionListView: React.FC = () => {
       verified,
       disabled,
       reported,
+      dangling,
     }))
-  }, [setVariables, verified, disabled, reported])
+  }, [setVariables, verified, disabled, reported, dangling])
 
   const [[data, error, loading, retry], [count, page, paginateForwards, paginateBackwards]] = useRelayConnectionQuery<TriviaQuestion>({
     query,
