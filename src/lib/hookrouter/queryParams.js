@@ -30,7 +30,7 @@ export const getQueryParams = () => Object.assign({}, queryParamObject);
  * @param {string} inStr
  * @return {object}
  */
-const queryStringToObject = (inStr) => {
+export const queryStringToObject = (inStr) => {
 	const p = new URLSearchParams(inStr);
 	let result = {};
 	for (let param of p) {
@@ -44,7 +44,7 @@ const queryStringToObject = (inStr) => {
  * @param {object} inObj
  * @return {string}
  */
-const objectToQueryString = (inObj) => {
+export const objectToQueryString = (inObj) => {
 	const qs = new URLSearchParams();
 	Object.entries(inObj).forEach(([key, value]) => value !== undefined ? qs.append(key, value) : null);
 	return qs.toString();
