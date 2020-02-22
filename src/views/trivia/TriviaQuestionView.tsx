@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect } from 'react'
 import useDocumentAndDrawerTitle from '../../lib/useDocumentAndDrawerTitle'
-import { makeStyles, createStyles, Toolbar, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton, useMediaQuery, useTheme, Typography } from '@material-ui/core'
+import { makeStyles, createStyles, Toolbar, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton, useMediaQuery, useTheme, Typography, TextField } from '@material-ui/core'
 import useAuthorization from '../../lib/useAuthorization'
 import { useSnackbar } from 'notistack'
 import { graphql } from '../../lib/graphql'
@@ -17,6 +17,7 @@ import { Query, Mutation, TriviaReport } from '../../lib/graphql/schema.gql'
 // import { SubscriptionClient } from 'subscriptions-transport-ws'
 import ProgressButton from '../../lib/mui/ProgressButton'
 import Delete from '@material-ui/icons/Delete'
+import FormAutocomplete from '../../lib/mui/FormAutocomplete'
 
 const useStyles =
   makeStyles(theme =>
@@ -266,12 +267,10 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
         </Form.Context.Consumer>
 
         <div>
-          <FormTextField select name="category" label="Category" options={data?.triviaCategories} optionId={(o: any) => o.id} className={classes.field} inputProps={{ readOnly }} required>
-            <MenuItem />
-            {data?.triviaCategories?.map((o: any) => (
-              <MenuItem key={o.id} value={o.id}>{o.name}</MenuItem>
-            ))}
-          </FormTextField>
+          <FormAutocomplete name="category" options={data?.triviaCategories ?? []} getOptionLabel={o => typeof o === 'string' ? o : o.name} autoHighlight filterSelectedOptions
+            renderInput={params => (
+              <TextField {...params} label="Category" className={classes.field} inputProps={{ ...params.inputProps, readOnly }} required />
+            )} />
         </div>
 
         <div>

@@ -8,12 +8,27 @@ type FormAutocompleteProps = AutocompleteProps<any> & {
 
 const FormAutocomplete: React.FC<FormAutocompleteProps> = props => {
   const { name, ...nativeProps } = props
-  const { customControlProps } = React.useContext(Form.Context)
-  const { value, onChange } = customControlProps(name)
-  const handleChange = (e: any, value: any) => onChange(value)
+  const { customControlProps, selectProps } = React.useContext(Form.Context)
+  const textfieldPropsObject = (() => {
+    if (nativeProps.freeSolo) {
+      const { value, onChange } = customControlProps(name)
+
+      return {
+        value,
+        onChange: (e: any, value: any) => onChange(value),
+      }
+    } else {
+      const { value, onChange } = selectProps(name, nativeProps.options!, nativeProps.getOptionLabel!)
+
+      return {
+        value,
+        onChange: (e: any, value: any) => onChange({ target: { value: value && nativeProps.getOptionLabel!(value) }} as any),
+      }
+    }
+  })()
 
   return (
-    <Autocomplete {...nativeProps} value={value} onChange={handleChange} />
+    <Autocomplete {...nativeProps} {...textfieldPropsObject} />
   )
 }
 
