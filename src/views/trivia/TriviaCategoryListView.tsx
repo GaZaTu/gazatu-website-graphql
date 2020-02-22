@@ -15,6 +15,7 @@ import useMutation from '../../lib/graphql/useMutation'
 import Check from '@material-ui/icons/Check'
 import Delete from '@material-ui/icons/Delete'
 import { dispatchReloadTriviaCounts } from '../../app/AppSidebar'
+import VerifiedUser from '@material-ui/icons/VerifiedUserOutlined'
 
 const TriviaCategoryListView: React.FC = () => {
   useDocumentAndDrawerTitle('Trivia Categories')
@@ -102,6 +103,9 @@ const TriviaCategoryListView: React.FC = () => {
           <AppTable.Column name="submitter" label="Submitter" />
           <AppTable.Column name="updatedAt" label="Update">
             {v => new Date(v).toLocaleDateString()}
+          </AppTable.Column>
+          <AppTable.Column name="verified" label="⠀">
+            {v => v && (<VerifiedUser />)}
           </AppTable.Column>
         </AppTable>
       </div>
