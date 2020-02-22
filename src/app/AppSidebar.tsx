@@ -167,6 +167,13 @@ const AppSidebar: React.FC = () => {
             <ListItemText primary="GraphiQL" />
           </ListItem>
         </NavLink>
+        {isAdmin && (
+          <NavLink exact href="/meta/event-log" replaceQueryParams force color="inherit" underline="none">
+            <ListItem button>
+              <ListItemText primary="Event-Log" />
+            </ListItem>
+          </NavLink>
+        )}
       </List>
     </React.Fragment>
   )

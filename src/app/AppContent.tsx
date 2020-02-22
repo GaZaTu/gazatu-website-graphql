@@ -7,6 +7,7 @@ import useAuthorization from '../lib/useAuthorization'
 
 const StartView = React.lazy(() => import('../views/StartView'))
 const GraphiQLView = React.lazy(() => import('../views/meta/GraphiQLView'))
+const EventLogView = React.lazy(() => import('../views/meta/EventLogView'))
 const LoginView = React.lazy(() => import('../views/LoginView'))
 const UserListView = React.lazy(() => import('../views/users/UserListView'))
 const UserView = React.lazy(() => import('../views/users/UserView'))
@@ -52,6 +53,7 @@ const AppContent: React.FC = () => {
   const adminRoleRoutes = React.useMemo(() => {
     return isAdmin && {
       '/users': () => <UserListView />,
+      '/meta/event-log': () => <EventLogView />,
       '/meta/languages': () => { },
       '/meta/languages/:id': ({ id }: any) => { },
     }
