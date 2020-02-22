@@ -135,7 +135,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedCategor
   const [isTriviaAdmin] = useAuthorization('trivia-admin')
 
   const verifyTriviaCategoriesMutation = graphql`
-    mutation Mutation($ids: [String!]!) {
+    mutation Mutation($ids: [ID!]!) {
       verifyTriviaCategories(ids: $ids) {
         count
       }
@@ -147,7 +147,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedCategor
   })
 
   const removeTriviaCategoriesMutation = graphql`
-    mutation Mutation($ids: [String!]!) {
+    mutation Mutation($ids: [ID!]!) {
       removeTriviaCategories(ids: $ids) {
         count
       }

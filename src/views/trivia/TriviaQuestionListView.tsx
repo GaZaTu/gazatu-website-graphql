@@ -252,7 +252,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
   const [isTriviaAdmin] = useAuthorization('trivia-admin')
 
   const verifyTriviaQuestionsMutation = graphql`
-    mutation Mutation($ids: [String!]!) {
+    mutation Mutation($ids: [ID!]!) {
       verifyTriviaQuestions(ids: $ids) {
         count
       }
@@ -264,7 +264,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
   })
 
   const removeTriviaQuestionsMutation = graphql`
-    mutation Mutation($ids: [String!]!) {
+    mutation Mutation($ids: [ID!]!) {
       removeTriviaQuestions(ids: $ids) {
         count
       }
@@ -335,7 +335,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
   }, [])
 
   const categorizeTriviaQuestionsMutation = graphql`
-    mutation Mutation($ids: [String!]!, $categoryId: String!) {
+    mutation Mutation($ids: [ID!]!, $categoryId: ID!) {
       categorizeTriviaQuestions(ids: $ids, categoryId: $categoryId) {
         count
       }
