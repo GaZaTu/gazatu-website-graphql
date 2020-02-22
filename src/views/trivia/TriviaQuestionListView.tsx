@@ -120,6 +120,7 @@ const TriviaQuestionListView: React.FC = () => {
       count,
       filter: false,
       rowsPerPageOptions: [20],
+      rowsPerPage: 20,
       // responsive: 'scrollMaxHeight',
       onTableChange: (action, tableState) => {
         const activeColumn = (tableState.activeColumn !== null) ? (tableState as any).columns[tableState.activeColumn] : null

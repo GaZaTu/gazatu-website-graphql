@@ -37,6 +37,7 @@ const EventLogView: React.FC = () => {
       count: data?.changes?.length,
       filter: false,
       rowsPerPageOptions: [20],
+      rowsPerPage: 20,
     }
   }, [data])
 

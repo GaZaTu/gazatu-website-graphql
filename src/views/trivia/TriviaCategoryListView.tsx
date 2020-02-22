@@ -65,6 +65,7 @@ const TriviaCategoryListView: React.FC = () => {
       count: data?.triviaCategories?.length,
       filter: false,
       rowsPerPageOptions: [20],
+      rowsPerPage: 20,
       onTableChange: (action, tableState) => {
         switch (action) {
           case 'changePage':
