@@ -245,7 +245,7 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
               <IconButton
                 type="button"
                 onClick={handleReportDialogOpen}
-                disabled={!id}
+                disabled={isNew}
               >
                 <ReportProblemIcon />
               </IconButton>
