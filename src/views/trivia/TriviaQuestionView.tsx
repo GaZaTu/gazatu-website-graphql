@@ -13,9 +13,10 @@ import FormTextField from '../../lib/mui/FormTextField'
 import SaveIcon from '@material-ui/icons/Save'
 import ReportProblemIcon from '@material-ui/icons/ReportProblem'
 import AppTable from '../../app/AppTable'
-import { Query, Mutation } from '../../lib/graphql/schema.gql'
+import { Query, Mutation, TriviaReport } from '../../lib/graphql/schema.gql'
 // import { SubscriptionClient } from 'subscriptions-transport-ws'
 import ProgressButton from '../../lib/mui/ProgressButton'
+import Delete from '@material-ui/icons/Delete'
 
 const useStyles =
   makeStyles(theme =>
@@ -227,12 +228,13 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
       try {
         await reportTriviaQuestion({ input: values })
 
+        retry()
         setReportDialogOpen(false)
       } catch (error) {
         enqueueSnackbar(`${error}`, { variant: 'error' })
       }
     }
-  }, [enqueueSnackbar, initialReportValues, reportTriviaQuestion, setReportDialogOpen])
+  }, [enqueueSnackbar, initialReportValues, reportTriviaQuestion, setReportDialogOpen, retry])
 
   return (
     <div>
@@ -318,18 +320,28 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
 
       <br />
 
-      {data?.triviaQuestion?.reports && (
-        <div>
-          <AppTable title="Reports" data={data?.triviaQuestion?.reports} options={{ pagination: false, search: false, filter: false, viewColumns: false }}>
-            <AppTable.Column name="id" options={{ display: 'excluded' }} />
-            <AppTable.Column name="message" label="Message" />
-            <AppTable.Column name="submitter" label="Submitter" />
-            <AppTable.Column name="updatedAt" label="Updated" >
-              {v => new Date(v).toLocaleDateString()}
-            </AppTable.Column>
-          </AppTable>
-        </div>
-      )}
+      {data?.triviaQuestion?.reports && (() => {
+        const tableOptions = {
+          pagination: false,
+          search: false,
+          filter: false,
+          viewColumns: false,
+          customToolbar: () => <ReportsCustomToolbar reports={data?.triviaQuestion?.reports ?? []} reload={retry} />,
+        }
+
+        return (
+          <div>
+            <AppTable title="Reports" data={data?.triviaQuestion?.reports} options={tableOptions}>
+              <AppTable.Column name="id" options={{ display: 'excluded' }} />
+              <AppTable.Column name="message" label="Message" />
+              <AppTable.Column name="submitter" label="Submitter" />
+              <AppTable.Column name="updatedAt" label="Updated" >
+                {v => new Date(v).toLocaleDateString()}
+              </AppTable.Column>
+            </AppTable>
+          </div>
+        )
+      })()}
 
       {id && (
         <Dialog open={reportDialogOpen} onClose={handleReportDialogClose} maxWidth="xl" fullScreen={fullScreenDialog}>
@@ -375,3 +387,32 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
 }
 
 export default TriviaQuestionView
+
+const ReportsCustomToolbar: React.FC<{ reload: () => void, reports: TriviaReport[] }> = props => {
+  const { reload, reports } = props
+
+  const [removeTriviaReports] = useMutation({
+    query: graphql`
+      mutation Mutation($ids: [ID!]!) {
+        removeTriviaReports(ids: $ids) {
+          count
+        }
+      }
+    `,
+  })
+
+  const handleRemoveTriviaReports = React.useMemo(() => {
+    return async () => {
+      await removeTriviaReports({ ids: reports.map(r => r.id) })
+      reload()
+    }
+  }, [reload, reports, removeTriviaReports])
+
+  return (
+    <React.Fragment>
+      <IconButton onClick={handleRemoveTriviaReports}>
+        <Delete />
+      </IconButton>
+    </React.Fragment>
+  )
+}
