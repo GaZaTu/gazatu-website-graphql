@@ -26,7 +26,7 @@ const AppToolbar: React.FC = () => {
 
   return (
     <React.Fragment>
-      <Link href="https://github.com/GaZaTu/gazatu-website" target="_blank" rel="noopener noreferrer" color="secondary" underline="none">
+      <Link href="https://github.com/GaZaTu/gazatu-website-graphql" target="_blank" rel="noopener noreferrer" color="secondary" underline="none">
         <Button color="inherit">GitHub</Button>
       </Link>
 
