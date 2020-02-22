@@ -1,3 +1,8 @@
 .App {
   height: 100vh;
 }
+
+.App-Name,
+.App-Version {
+  display: none;
+}
