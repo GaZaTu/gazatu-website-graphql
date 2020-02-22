@@ -13,7 +13,7 @@ import FormTextField from '../../lib/mui/FormTextField'
 import SaveIcon from '@material-ui/icons/Save'
 import ReportProblemIcon from '@material-ui/icons/ReportProblem'
 import AppTable from '../../app/AppTable'
-import { Query, Mutation, TriviaReport } from '../../lib/graphql/schema.gql'
+import { Query, Mutation, TriviaReport, TriviaQuestion } from '../../lib/graphql/schema.gql'
 // import { SubscriptionClient } from 'subscriptions-transport-ws'
 import ProgressButton from '../../lib/mui/ProgressButton'
 import Delete from '@material-ui/icons/Delete'
@@ -128,10 +128,17 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
     query: mutation,
   })
 
-  const initialValues = useMemo(() => {
+  const initialValues = useMemo<Partial<TriviaQuestion>>(() => {
     return {
       name: '',
-      submitter: null as string | null,
+      category: (() => {
+        const value = localStorage.getItem('previousCategory')
+        return value && JSON.parse(value)
+      })(),
+      submitter: (() => {
+        const value = localStorage.getItem('previousSubmitter')
+        return value && JSON.parse(value)
+      })(),
       language: data?.languages?.[0],
       ...(data?.triviaQuestion),
     }
@@ -142,6 +149,9 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
       try {
         const id = await saveTriviaQuestion({ input: values })
           .then(r => r.saveTriviaQuestion?.id)
+
+        localStorage.setItem('previousCategory', JSON.stringify(values.category))
+        localStorage.setItem('previousSubmitter', JSON.stringify(values.submitter))
 
         if (isNew) {
           navigate(`/trivia/questions/${id}`)
