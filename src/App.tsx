@@ -27,6 +27,8 @@ const App: React.FC = () => {
 
   return (
     <div className="App">
+      <div className="App-Name">{process.env.REACT_APP_NAME}</div>
+      <div className="App-Version">{process.env.REACT_APP_VERSION}</div>
       <AppThemeProvider>
         <GraphQLContext.Provider value={{ fetchGraphQL }}>
           <SnackbarProvider maxSnack={3}>

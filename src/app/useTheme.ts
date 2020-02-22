@@ -41,6 +41,15 @@ const useTheme = () => {
             },
           },
         },
+        MuiLink: {
+          root: {
+            '&.active': {
+              '& > *': {
+                backgroundColor: 'rgba(74, 20, 140, 0.2)',
+              },
+            },
+          },
+        },
       }
     })
   }, [paletteType])
