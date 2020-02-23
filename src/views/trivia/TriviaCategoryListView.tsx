@@ -83,7 +83,7 @@ const TriviaCategoryListView: React.FC = () => {
       selectableRows: isTriviaAdmin ? 'multiple' : 'none',
       isRowSelectable: () => isTriviaAdmin,
       onRowsSelect: (clickedRows, selectedRows) => {
-        setSelectedIndexes(selectedRows.slice(0, 10).map(r => r.dataIndex))
+        setSelectedIndexes(selectedRows.slice(0, 20).map(r => r.dataIndex))
       },
       rowsSelected: selectedIndexes,
       customToolbarSelect: () => <CustomSelectedItemsToolbar reload={retry} selectedCategories={selectedIndexes.map(i => data?.triviaCategories![i])} setSelectedIndexes={setSelectedIndexes} />,
@@ -106,7 +106,7 @@ const TriviaCategoryListView: React.FC = () => {
           </AppTable.Column>
           <AppTable.Column name="name" label="Name" />
           <AppTable.Column name="submitter" label="Submitter" />
-          <AppTable.Column name="updatedAt" label="Update">
+          <AppTable.Column name="updatedAt" label="Updated">
             {v => new Date(v).toLocaleDateString()}
           </AppTable.Column>
           <AppTable.Column name="verified" label="⠀">

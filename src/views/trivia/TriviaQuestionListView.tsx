@@ -142,7 +142,7 @@ const TriviaQuestionListView: React.FC = () => {
       selectableRows: isTriviaAdmin ? 'multiple' : 'none',
       isRowSelectable: () => isTriviaAdmin,
       onRowsSelect: (clickedRows, selectedRows) => {
-        setSelectedIndexes(selectedRows.slice(0, 10).map(r => r.dataIndex))
+        setSelectedIndexes(selectedRows.slice(0, 20).map(r => r.dataIndex))
       },
       rowsSelected: selectedIndexes,
       customToolbarSelect: () => <CustomSelectedItemsToolbar reload={retry} selectedQuestions={selectedIndexes.map(i => data![i])} setSelectedIndexes={setSelectedIndexes} />,
@@ -168,7 +168,7 @@ const TriviaQuestionListView: React.FC = () => {
           <AppTable.Column name="hint1" label="Hint 1" />
           <AppTable.Column name="hint2" label="Hint 2" />
           <AppTable.Column name="submitter" label="Submitter" />
-          <AppTable.Column name="updatedAt" label="Update">
+          <AppTable.Column name="updatedAt" label="Updated">
             {v => new Date(v).toLocaleDateString()}
           </AppTable.Column>
           <AppTable.Column name="answer" label="Answer" options={{ display: isTriviaAdmin ? undefined : 'false' }} />
@@ -176,17 +176,6 @@ const TriviaQuestionListView: React.FC = () => {
             {v => v && (<VerifiedUser />)}
           </AppTable.Column>
         </AppTable>
-
-        {/* <div>
-          {data.map(item => (
-            <pre key={item.id}>{JSON.stringify(item)}</pre>
-          ))}
-        </div>
-        <div>
-          <button onClick={paginateBackwards} disabled={loading || !paginateBackwards}>Prev</button>
-          <button onClick={paginateForwards} disabled={loading || !paginateForwards}>Next</button>
-          <button onClick={retry} disabled={loading}>Retry</button>
-        </div> */}
       </div>
     )
   } else if (error) {
