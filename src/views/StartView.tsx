@@ -2,9 +2,42 @@ import React from 'react'
 import useDocumentAndDrawerTitle from '../lib/useDocumentAndDrawerTitle'
 import FeelsDankMan from '../assets/img/FeelsDankMan.png'
 import bbFly2x from '../assets/img/bbFly2x.gif'
+import { makeStyles, createStyles } from '@material-ui/core/styles'
+
+const useStyles =
+  makeStyles(theme =>
+    createStyles({
+      FeelsDankMan: {
+        position: 'fixed',
+        bottom: 0,
+        left: '-24px',
+        [theme.breakpoints.up('sm')]: {
+          left: '214px',
+        },
+      },
+      bbFly: {
+        position: 'fixed',
+        bottom: 0,
+        left: '84px',
+        [theme.breakpoints.up('sm')]: {
+          left: '314px',
+        },
+      },
+      version: {
+        position: 'fixed',
+        bottom: 0,
+        left: '144px',
+        [theme.breakpoints.up('sm')]: {
+          left: '374px',
+        },
+      },
+    }),
+  )
 
 const StartView: React.FC = () => {
   useDocumentAndDrawerTitle('Start')
+
+  const classes = useStyles()
 
   return (
     <div>
@@ -22,8 +55,9 @@ const StartView: React.FC = () => {
       </div>
 
       <div>
-        <img className="FeelsDankMan" src={FeelsDankMan} />
-        <img className="bbFly" src={bbFly2x} />
+        <img className={classes.FeelsDankMan} src={FeelsDankMan} alt="FeelsDankMan" />
+        <img className={classes.bbFly} src={bbFly2x} alt="bbFly" />
+        <div className={classes.version}>v{process.env.REACT_APP_VERSION}</div>
       </div>
     </div>
   )

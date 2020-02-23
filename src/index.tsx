@@ -12,5 +12,11 @@ ReactDOM.render((
 ), document.getElementById('root'))
 
 serviceWorker.register({
-  onUpdate: () => window.location.reload(),
+  onUpdate: registration => {
+    if (registration?.waiting) {
+      registration.waiting.postMessage({ type: 'SKIP_WAITING' })
+    }
+
+    window.location.reload()
+  },
 })

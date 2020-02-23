@@ -11,25 +11,3 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-
-.FeelsDankMan {
-  position: fixed;
-  bottom: 0;
-  left: 214px;
-}
-
-.bbFly {
-  position: fixed;
-  bottom: 0;
-  left: 314px;
-}
-
-@media screen and (max-width: 599px) {
-  .FeelsDankMan {
-    left: -24px;
-  }
-
-  .bbFly {
-    left: 84px;
-  }
-}
