@@ -24,12 +24,16 @@ const useStyles =
         },
       },
       version: {
+        color: theme.palette.secondary.main,
         position: 'fixed',
         bottom: 0,
         left: '144px',
         [theme.breakpoints.up('sm')]: {
           left: '374px',
         },
+      },
+      link: {
+        color: theme.palette.secondary.main,
       },
     }),
   )
@@ -42,7 +46,7 @@ const StartView: React.FC = () => {
   return (
     <div>
       <div>
-        <p>API-URL for a random set of Trivia Questions: <a href={`${process.env.REACT_APP_API_URL}/trivia/questions`} target="_blank" rel="noopener noreferrer">{`${process.env.REACT_APP_API_URL}/trivia/questions`}</a></p>
+        <p>API-URL for a random set of Trivia Questions: <a href={`${process.env.REACT_APP_API_URL}/trivia/questions`} className={classes.link} target="_blank" rel="noopener noreferrer">{`${process.env.REACT_APP_API_URL}/trivia/questions`}</a></p>
         <p>Query-Parameters:</p>
         <ul>
           <li><b>shuffled</b> (true|false): enables server-side shuffle, default=true</li>
@@ -51,7 +55,7 @@ const StartView: React.FC = () => {
           <li><b>include</b> ([categoryName,...]): list of categories to include</li>
           <li><b>submitters</b> ([submitterNames,...]): list of submitters to include</li>
         </ul>
-        <p>Example: <a href={`${process.env.REACT_APP_API_URL}/trivia/questions?count=10&exclude=[Anime,Hentai]`} target="_blank" rel="noopener noreferrer">{`${process.env.REACT_APP_API_URL}/trivia/questions?count=10&exclude=[Anime,Hentai]`}</a></p>
+        <p>Example: <a href={`${process.env.REACT_APP_API_URL}/trivia/questions?count=10&exclude=[Anime,Hentai]`} className={classes.link} target="_blank" rel="noopener noreferrer">{`${process.env.REACT_APP_API_URL}/trivia/questions?count=10&exclude=[Anime,Hentai]`}</a></p>
       </div>
 
       <div>
