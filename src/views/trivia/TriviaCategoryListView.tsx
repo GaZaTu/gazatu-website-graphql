@@ -266,7 +266,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedCategor
           <DialogTitle>Merge selected categories into another</DialogTitle>
           <DialogContent>
             <div>
-              <FormAutocomplete name="target" options={triviaCategoriesResult?.triviaCategories ?? []} getOptionLabel={o => typeof o === 'string' ? o : o.name} autoHighlight filterSelectedOptions
+              <FormAutocomplete name="target" options={triviaCategoriesResult?.triviaCategories?.filter(c => !getSelectedIds().includes(c.id)) ?? []} getOptionLabel={o => typeof o === 'string' ? o : o.name} autoHighlight filterSelectedOptions
                 renderInput={params => (
                   <TextField {...params} label="Target Category" style={{ width: '100%' }} required />
                 )} />
