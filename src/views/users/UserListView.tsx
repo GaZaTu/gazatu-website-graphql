@@ -40,6 +40,7 @@ const UserListView: React.FC = () => {
       filter: false,
       rowsPerPageOptions: [20],
       rowsPerPage: 20,
+      responsive: 'scrollMaxHeight',
       customToolbar: () => <CustomToolbar />,
     }
   }, [data])
@@ -47,7 +48,7 @@ const UserListView: React.FC = () => {
   if (data) {
     return (
       <div>
-        <AppTable title="" data={data.users!} options={tableOptions}>
+        <AppTable className="fullscreen" title="" data={data.users!} options={tableOptions}>
           <AppTable.Column name="id" options={{ display: 'excluded' }} />
           <AppTable.Column name="" options={{ empty: true, filter: false, sort: false }}>
             {(_, meta) => (

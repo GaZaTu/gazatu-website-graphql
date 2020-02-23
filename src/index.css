@@ -11,3 +11,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.AppTable.fullscreen > *:nth-child(1) > *:nth-child(3) {
+  max-height: calc(100vh - 54px - 56px - 56px) !important;
+  height: calc(100vh - 54px - 56px - 56px) !important;
+}
+
+@media (min-width: 600px) {
+  .AppTable.fullscreen > *:nth-child(1) > *:nth-child(3) {
+    max-height: calc(100vh - 54px - 64px - 64px) !important;
+    height: calc(100vh - 54px - 64px - 64px) !important;
+  }
+}

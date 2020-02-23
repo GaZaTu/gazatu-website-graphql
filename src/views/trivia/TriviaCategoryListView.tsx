@@ -70,6 +70,7 @@ const TriviaCategoryListView: React.FC = () => {
       filter: false,
       rowsPerPageOptions: [20],
       rowsPerPage: 20,
+      responsive: 'scrollMaxHeight',
       onTableChange: (action, tableState) => {
         switch (action) {
           case 'changePage':
@@ -93,7 +94,7 @@ const TriviaCategoryListView: React.FC = () => {
   if (data) {
     return (
       <div>
-        <AppTable title="" data={data.triviaCategories!} options={tableOptions}>
+        <AppTable className="fullscreen" title="" data={data.triviaCategories!} options={tableOptions}>
           <AppTable.Column name="id" options={{ display: 'excluded' }} />
           <AppTable.Column name="" options={{ empty: true, filter: false, sort: false }}>
             {(_, meta) => (

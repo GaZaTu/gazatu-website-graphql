@@ -11,6 +11,7 @@ const AppTableColumn: React.FC<AppTableColumnProps> = () => {
 
 interface AppTableProps extends Omit<MUIDataTableProps, 'columns'> {
   children: React.ReactElement<AppTableColumnProps> | Array<React.ReactElement<AppTableColumnProps>> | React.ReactNode
+  className?: string
   customOptions?: {
     sortField?: string
     sortDirection?: string
@@ -18,7 +19,7 @@ interface AppTableProps extends Omit<MUIDataTableProps, 'columns'> {
 }
 
 const AppTable: React.FC<AppTableProps> = props => {
-  const { children, customOptions, ...nativeProps } = props
+  const { children, className, customOptions, ...nativeProps } = props
   const { sortField, sortDirection } = customOptions || {}
 
   const columns =
@@ -53,7 +54,9 @@ const AppTable: React.FC<AppTableProps> = props => {
   }
 
   return (
-    <MUIDataTable {...nativeProps} columns={columns} options={options} />
+    <div className={`AppTable ${className}`}>
+      <MUIDataTable {...nativeProps} columns={columns} options={options} />
+    </div>
   )
 }
 

@@ -15,6 +15,7 @@ import { Query, Mutation } from '../../lib/graphql/schema.gql'
 import AppTable from '../../app/AppTable'
 import NavLink from '../../lib/mui/NavLink'
 import OpenInBrowser from '@material-ui/icons/OpenInBrowser'
+import VerifiedUser from '@material-ui/icons/VerifiedUserOutlined'
 
 const useStyles =
   makeStyles(theme =>
@@ -67,6 +68,7 @@ const TriviaCategoryView: React.FC<Props> = ({ id }) => {
           hint1
           hint2
           answer
+          verified
         }
       }
     }
@@ -152,7 +154,7 @@ const TriviaCategoryView: React.FC<Props> = ({ id }) => {
 
       {data?.triviaCategory?.questions && (
         <div>
-          <AppTable title="Questions" data={data?.triviaCategory?.questions ?? []} options={{ filter: false, viewColumns: false }}>
+          <AppTable title="Questions" data={data?.triviaCategory?.questions ?? []} options={{ filter: false, viewColumns: false, responsive: 'scrollMaxHeight' }}>
             <AppTable.Column name="id" options={{ display: 'excluded' }} />
             <AppTable.Column name="" options={{ empty: true, filter: false, sort: false }}>
               {(_, meta) => (
@@ -167,6 +169,9 @@ const TriviaCategoryView: React.FC<Props> = ({ id }) => {
             <AppTable.Column name="hint1" label="Hint 1" />
             <AppTable.Column name="hint2" label="Hint 2" />
             <AppTable.Column name="answer" label="Answer" />
+            <AppTable.Column name="verified" label="⠀">
+              {v => v && (<VerifiedUser />)}
+            </AppTable.Column>
           </AppTable>
         </div>
       )}

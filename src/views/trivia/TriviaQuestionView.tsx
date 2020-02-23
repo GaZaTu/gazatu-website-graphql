@@ -19,6 +19,7 @@ import ProgressButton from '../../lib/mui/ProgressButton'
 import Delete from '@material-ui/icons/Delete'
 import FormAutocomplete from '../../lib/mui/FormAutocomplete'
 import VerifiedUser from '@material-ui/icons/VerifiedUserOutlined'
+import { MUIDataTableOptions } from 'mui-datatables'
 
 const useStyles =
   makeStyles(theme =>
@@ -52,6 +53,7 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
   const { enqueueSnackbar } = useSnackbar()
   const theme = useTheme()
   const classes = useStyles({})
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   const isNew = id === 'new'
   const readOnly = !isNew && !isTriviaAdmin
@@ -202,8 +204,6 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
   //   }
   // }, [id])
 
-  const fullScreenDialog = useMediaQuery(theme.breakpoints.down('sm'))
-
   const [reportDialogOpen, setReportDialogOpen] = React.useState(false)
 
   const handleReportDialogOpen = () =>
@@ -332,11 +332,12 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
       <br />
 
       {data?.triviaQuestion?.reports && (() => {
-        const tableOptions = {
+        const tableOptions: MUIDataTableOptions = {
           pagination: false,
           search: false,
           filter: false,
           viewColumns: false,
+          responsive: 'scrollMaxHeight',
           customToolbar: () => <ReportsCustomToolbar reports={data?.triviaQuestion?.reports ?? []} reload={retry} />,
         }
 
@@ -346,7 +347,7 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
               <AppTable.Column name="id" options={{ display: 'excluded' }} />
               <AppTable.Column name="message" label="Message" />
               <AppTable.Column name="submitter" label="Submitter" />
-              <AppTable.Column name="updatedAt" label="Updated" >
+              <AppTable.Column name="updatedAt" label="Updated">
                 {v => new Date(v).toLocaleDateString()}
               </AppTable.Column>
             </AppTable>
@@ -355,9 +356,9 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
       })()}
 
       {id && (
-        <Dialog open={reportDialogOpen} onClose={handleReportDialogClose} maxWidth="xl" fullScreen={fullScreenDialog}>
+        <Dialog open={reportDialogOpen} onClose={handleReportDialogClose} maxWidth="xl" fullScreen={isMobile}>
           <Form initialValues={initialReportValues} onSubmit={handleReportSubmit}>
-            <DialogTitle>Report Trivia Question</DialogTitle>
+            <DialogTitle>Submit a report for this question</DialogTitle>
             <DialogContent>
               <div>
                 <FormTextField type="text" name="message" label="Message" className={classes.field} required />

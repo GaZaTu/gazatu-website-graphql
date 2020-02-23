@@ -58,6 +58,7 @@ const TriviaQuestionListView: React.FC = () => {
 
   const [{ verified, disabled, reported, dangling }] = useQueryParams()
   const [isTriviaAdmin] = useAuthorization('trivia-admin')
+
   const [variables, setVariables] = useState({
     search: undefined as string | undefined,
     sortField: 'updatedAt' as string | undefined,
@@ -121,7 +122,7 @@ const TriviaQuestionListView: React.FC = () => {
       filter: false,
       rowsPerPageOptions: [20],
       rowsPerPage: 20,
-      // responsive: 'scrollMaxHeight',
+      responsive: 'scrollMaxHeight',
       onTableChange: (action, tableState) => {
         const activeColumn = (tableState.activeColumn !== null) ? (tableState as any).columns[tableState.activeColumn] : null
 
@@ -152,7 +153,7 @@ const TriviaQuestionListView: React.FC = () => {
   if (data) {
     return (
       <div>
-        <AppTable title="" data={data} options={tableOptions} customOptions={variables}>
+        <AppTable title="" className="fullscreen" data={data} options={tableOptions} customOptions={variables}>
           <AppTable.Column name="id" options={{ display: 'excluded' }} />
           <AppTable.Column name="" options={{ empty: true, filter: false, sort: false }}>
             {(_, meta) => (
