@@ -368,10 +368,16 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
       {isTriviaAdmin && (
         <Dialog open={changeCategoryDialogOpen} onClose={handleChangeCategoryDialogClose} maxWidth="xl">
           <Form initialValues={initialChangeCategoryValues} onSubmit={handleReportSubmit}>
-            <DialogTitle>Change Categories To</DialogTitle>
+            <DialogTitle>Change category of selected questions</DialogTitle>
             <DialogContent>
               <div>
                 <FormAutocomplete name="category" options={triviaCategoriesResult?.triviaCategories ?? []} getOptionLabel={o => typeof o === 'string' ? o : o.name} autoHighlight filterSelectedOptions
+                  renderOption={option => (
+                    <React.Fragment>
+                      <VerifiedUser style={{ marginRight: '8px' }} />
+                      <span>{option.name}</span>
+                    </React.Fragment>
+                  )}
                   renderInput={params => (
                     <TextField {...params} label="Category" style={{ width: '100%' }} required />
                   )} />

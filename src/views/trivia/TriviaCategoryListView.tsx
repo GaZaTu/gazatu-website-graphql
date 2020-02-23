@@ -267,6 +267,12 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedCategor
           <DialogContent>
             <div>
               <FormAutocomplete name="target" options={triviaCategoriesResult?.triviaCategories?.filter(c => !getSelectedIds().includes(c.id)) ?? []} getOptionLabel={o => typeof o === 'string' ? o : o.name} autoHighlight filterSelectedOptions
+                renderOption={option => (
+                  <React.Fragment>
+                    <VerifiedUser style={{ marginRight: '8px' }} />
+                    <span>{option.name}</span>
+                  </React.Fragment>
+                )}
                 renderInput={params => (
                   <TextField {...params} label="Target Category" style={{ width: '100%' }} required />
                 )} />

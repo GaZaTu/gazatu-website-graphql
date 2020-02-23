@@ -18,6 +18,7 @@ import { Query, Mutation, TriviaReport, TriviaQuestion } from '../../lib/graphql
 import ProgressButton from '../../lib/mui/ProgressButton'
 import Delete from '@material-ui/icons/Delete'
 import FormAutocomplete from '../../lib/mui/FormAutocomplete'
+import VerifiedUser from '@material-ui/icons/VerifiedUserOutlined'
 
 const useStyles =
   makeStyles(theme =>
@@ -89,6 +90,7 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
       triviaCategories(disabled: false) {
         id
         name
+        verified
       }
       languages {
         id
@@ -272,6 +274,12 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
 
         <div>
           <FormAutocomplete name="category" options={data?.triviaCategories ?? []} getOptionLabel={o => typeof o === 'string' ? o : o.name} autoHighlight filterSelectedOptions
+            renderOption={option => (
+              <React.Fragment>
+                <VerifiedUser style={{ color: (option.disabled || !option.verified) ? 'transparent' : undefined, marginRight: '8px' }} />
+                <span>{option.name}</span>
+              </React.Fragment>
+            )}
             renderInput={params => (
               <TextField {...params} label="Category" className={classes.field} inputProps={{ ...params.inputProps, readOnly }} required />
             )} />
