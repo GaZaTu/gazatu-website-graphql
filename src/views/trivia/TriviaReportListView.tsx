@@ -10,7 +10,7 @@ import useQuery from '../../lib/graphql/useQuery'
 import NavLink from '../../lib/mui/NavLink'
 import { Query } from '../../lib/graphql/schema.gql'
 
-const UserRoleListView: React.FC = () => {
+const TriviaReportListView: React.FC = () => {
   useDocumentAndDrawerTitle('Trivia Reports')
   useDrawerWithoutPadding()
 
@@ -39,6 +39,7 @@ const UserRoleListView: React.FC = () => {
       count: data?.triviaReports?.length,
       filter: false,
       rowsPerPageOptions: [20],
+      rowsPerPage: 20,
       customToolbar: () => <CustomToolbar />,
     }
   }, [data])
@@ -81,7 +82,7 @@ const UserRoleListView: React.FC = () => {
   }
 }
 
-export default UserRoleListView
+export default TriviaReportListView
 
 const CustomToolbar: React.FC = () => {
   return (

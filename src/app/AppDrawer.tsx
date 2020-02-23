@@ -10,7 +10,7 @@ import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles, useTheme, createStyles } from '@material-ui/core/styles'
 import { Store } from '../store'
-import logo from '../assets/img/gazatu-xyz-drawer2.png'
+import logo from '../assets/img/gazatu-xyz-drawer.png'
 
 const drawerWidth = 240
 

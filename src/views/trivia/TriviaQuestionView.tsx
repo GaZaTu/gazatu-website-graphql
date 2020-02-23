@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect } from 'react'
 import useDocumentAndDrawerTitle from '../../lib/useDocumentAndDrawerTitle'
-import { makeStyles, createStyles, Toolbar, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton, useMediaQuery, useTheme, Typography } from '@material-ui/core'
+import { makeStyles, createStyles, Toolbar, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton, useMediaQuery, useTheme, Typography, TextField } from '@material-ui/core'
 import useAuthorization from '../../lib/useAuthorization'
 import { useSnackbar } from 'notistack'
 import { graphql } from '../../lib/graphql'
@@ -13,9 +13,11 @@ import FormTextField from '../../lib/mui/FormTextField'
 import SaveIcon from '@material-ui/icons/Save'
 import ReportProblemIcon from '@material-ui/icons/ReportProblem'
 import AppTable from '../../app/AppTable'
-import { Query, Mutation } from '../../lib/graphql/schema.gql'
+import { Query, Mutation, TriviaReport, TriviaQuestion } from '../../lib/graphql/schema.gql'
 // import { SubscriptionClient } from 'subscriptions-transport-ws'
 import ProgressButton from '../../lib/mui/ProgressButton'
+import Delete from '@material-ui/icons/Delete'
+import FormAutocomplete from '../../lib/mui/FormAutocomplete'
 
 const useStyles =
   makeStyles(theme =>
@@ -53,19 +55,6 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
   const isNew = id === 'new'
   const readOnly = !isNew && !isTriviaAdmin
 
-  const categoriesAndLanguagesQueryFragment = graphql`
-    fragment Fragment on Query {
-      triviaCategories(disabled: false) {
-        id
-        name
-      }
-      languages {
-        id
-        name
-      }
-    }
-  `
-
   const query = graphql`
     query Query($id: ID!, $isNew: Boolean!, $isTriviaAdmin: Boolean!) {
       triviaQuestion(id: $id) @skip(if: $isNew) {
@@ -97,7 +86,14 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
           updatedAt
         }
       }
-      ...${categoriesAndLanguagesQueryFragment}
+      triviaCategories(disabled: false) {
+        id
+        name
+      }
+      languages {
+        id
+        name
+      }
     }
   `
 
@@ -126,10 +122,17 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
     query: mutation,
   })
 
-  const initialValues = useMemo(() => {
+  const initialValues = useMemo<Partial<TriviaQuestion>>(() => {
     return {
       name: '',
-      submitter: null as string | null,
+      category: (() => {
+        const value = localStorage.getItem('previousCategory')
+        return value && JSON.parse(value)
+      })(),
+      submitter: (() => {
+        const value = localStorage.getItem('previousSubmitter')
+        return value && JSON.parse(value)
+      })(),
       language: data?.languages?.[0],
       ...(data?.triviaQuestion),
     }
@@ -140,6 +143,9 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
       try {
         const id = await saveTriviaQuestion({ input: values })
           .then(r => r.saveTriviaQuestion?.id)
+
+        localStorage.setItem('previousCategory', JSON.stringify(values.category))
+        localStorage.setItem('previousSubmitter', JSON.stringify(values.submitter))
 
         if (isNew) {
           navigate(`/trivia/questions/${id}`)
@@ -227,12 +233,13 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
       try {
         await reportTriviaQuestion({ input: values })
 
+        retry()
         setReportDialogOpen(false)
       } catch (error) {
         enqueueSnackbar(`${error}`, { variant: 'error' })
       }
     }
-  }, [enqueueSnackbar, initialReportValues, reportTriviaQuestion, setReportDialogOpen])
+  }, [enqueueSnackbar, initialReportValues, reportTriviaQuestion, setReportDialogOpen, retry])
 
   return (
     <div>
@@ -264,12 +271,10 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
         </Form.Context.Consumer>
 
         <div>
-          <FormTextField select name="category" label="Category" options={data?.triviaCategories} optionId={(o: any) => o.id} className={classes.field} inputProps={{ readOnly }} required>
-            <MenuItem />
-            {data?.triviaCategories?.map((o: any) => (
-              <MenuItem key={o.id} value={o.id}>{o.name}</MenuItem>
-            ))}
-          </FormTextField>
+          <FormAutocomplete name="category" options={data?.triviaCategories ?? []} getOptionLabel={o => typeof o === 'string' ? o : o.name} autoHighlight filterSelectedOptions
+            renderInput={params => (
+              <TextField {...params} label="Category" className={classes.field} inputProps={{ ...params.inputProps, readOnly }} required />
+            )} />
         </div>
 
         <div>
@@ -318,18 +323,28 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
 
       <br />
 
-      {data?.triviaQuestion?.reports && (
-        <div>
-          <AppTable title="Reports" data={data?.triviaQuestion?.reports} options={{ pagination: false, search: false, filter: false, viewColumns: false }}>
-            <AppTable.Column name="id" options={{ display: 'excluded' }} />
-            <AppTable.Column name="message" label="Message" />
-            <AppTable.Column name="submitter" label="Submitter" />
-            <AppTable.Column name="updatedAt" label="Updated" >
-              {v => new Date(v).toLocaleDateString()}
-            </AppTable.Column>
-          </AppTable>
-        </div>
-      )}
+      {data?.triviaQuestion?.reports && (() => {
+        const tableOptions = {
+          pagination: false,
+          search: false,
+          filter: false,
+          viewColumns: false,
+          customToolbar: () => <ReportsCustomToolbar reports={data?.triviaQuestion?.reports ?? []} reload={retry} />,
+        }
+
+        return (
+          <div>
+            <AppTable title="Reports" data={data?.triviaQuestion?.reports} options={tableOptions}>
+              <AppTable.Column name="id" options={{ display: 'excluded' }} />
+              <AppTable.Column name="message" label="Message" />
+              <AppTable.Column name="submitter" label="Submitter" />
+              <AppTable.Column name="updatedAt" label="Updated" >
+                {v => new Date(v).toLocaleDateString()}
+              </AppTable.Column>
+            </AppTable>
+          </div>
+        )
+      })()}
 
       {id && (
         <Dialog open={reportDialogOpen} onClose={handleReportDialogClose} maxWidth="xl" fullScreen={fullScreenDialog}>
@@ -375,3 +390,32 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
 }
 
 export default TriviaQuestionView
+
+const ReportsCustomToolbar: React.FC<{ reload: () => void, reports: TriviaReport[] }> = props => {
+  const { reload, reports } = props
+
+  const [removeTriviaReports] = useMutation({
+    query: graphql`
+      mutation Mutation($ids: [ID!]!) {
+        removeTriviaReports(ids: $ids) {
+          count
+        }
+      }
+    `,
+  })
+
+  const handleRemoveTriviaReports = React.useMemo(() => {
+    return async () => {
+      await removeTriviaReports({ ids: reports.map(r => r.id) })
+      reload()
+    }
+  }, [reload, reports, removeTriviaReports])
+
+  return (
+    <React.Fragment>
+      <IconButton onClick={handleRemoveTriviaReports}>
+        <Delete />
+      </IconButton>
+    </React.Fragment>
+  )
+}

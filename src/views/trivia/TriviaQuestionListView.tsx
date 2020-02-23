@@ -6,7 +6,7 @@ import useDocumentAndDrawerTitle from '../../lib/useDocumentAndDrawerTitle'
 import useDrawerWithoutPadding from '../../lib/useDrawerWithoutPadding'
 import useAuthorization from '../../lib/useAuthorization'
 import AppTable from '../../app/AppTable'
-import { IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, MenuItem } from '@material-ui/core'
+import { IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@material-ui/core'
 import OpenInBrowser from '@material-ui/icons/OpenInBrowser'
 import CloudUpload from '@material-ui/icons/CloudUpload'
 import { MUIDataTableOptions } from 'mui-datatables'
@@ -23,10 +23,10 @@ import VerifiedUser from '@material-ui/icons/VerifiedUserOutlined'
 import { useQueryParams } from '../../lib/hookrouter'
 import Category from '@material-ui/icons/Category'
 import Form from '../../lib/Form'
-import FormTextField from '../../lib/mui/FormTextField'
 import ProgressButton from '../../lib/mui/ProgressButton'
 import useQuery from '../../lib/graphql/useQuery'
 import { dispatchReloadTriviaCounts } from '../../app/AppSidebar'
+import FormAutocomplete from '../../lib/mui/FormAutocomplete'
 
 const TriviaQuestionListView: React.FC = () => {
   useDocumentAndDrawerTitle('Trivia Questions')
@@ -120,6 +120,7 @@ const TriviaQuestionListView: React.FC = () => {
       count,
       filter: false,
       rowsPerPageOptions: [20],
+      rowsPerPage: 20,
       // responsive: 'scrollMaxHeight',
       onTableChange: (action, tableState) => {
         const activeColumn = (tableState.activeColumn !== null) ? (tableState as any).columns[tableState.activeColumn] : null
@@ -252,7 +253,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
   const [isTriviaAdmin] = useAuthorization('trivia-admin')
 
   const verifyTriviaQuestionsMutation = graphql`
-    mutation Mutation($ids: [String!]!) {
+    mutation Mutation($ids: [ID!]!) {
       verifyTriviaQuestions(ids: $ids) {
         count
       }
@@ -264,7 +265,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
   })
 
   const removeTriviaQuestionsMutation = graphql`
-    mutation Mutation($ids: [String!]!) {
+    mutation Mutation($ids: [ID!]!) {
       removeTriviaQuestions(ids: $ids) {
         count
       }
@@ -335,7 +336,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
   }, [])
 
   const categorizeTriviaQuestionsMutation = graphql`
-    mutation Mutation($ids: [String!]!, $categoryId: String!) {
+    mutation Mutation($ids: [ID!]!, $categoryId: ID!) {
       categorizeTriviaQuestions(ids: $ids, categoryId: $categoryId) {
         count
       }
@@ -381,12 +382,10 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
             <DialogTitle>Change Categories To</DialogTitle>
             <DialogContent>
               <div>
-                <FormTextField select name="category" label="Category" options={triviaCategoriesResult?.triviaCategories} optionId={(o: any) => o.id} style={{ width: '100%' }} required>
-                  <MenuItem />
-                  {triviaCategoriesResult?.triviaCategories?.map((o: any) => (
-                    <MenuItem key={o.id} value={o.id}>{o.name}</MenuItem>
-                  ))}
-                </FormTextField>
+                <FormAutocomplete name="category" options={triviaCategoriesResult?.triviaCategories ?? []} getOptionLabel={o => typeof o === 'string' ? o : o.name} autoHighlight filterSelectedOptions
+                  renderInput={params => (
+                    <TextField {...params} label="Category" style={{ width: '100%' }} required />
+                  )} />
               </div>
             </DialogContent>
             <DialogActions>

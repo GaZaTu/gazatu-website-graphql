@@ -38,7 +38,8 @@ const UserListView: React.FC = () => {
       serverSide: false,
       count: data?.users?.length,
       filter: false,
-      rowsPerPageOptions: [10],
+      rowsPerPageOptions: [20],
+      rowsPerPage: 20,
       customToolbar: () => <CustomToolbar />,
     }
   }, [data])
