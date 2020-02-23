@@ -3,7 +3,7 @@ import { graphql } from '../../lib/graphql/graphql'
 import useDocumentAndDrawerTitle from '../../lib/useDocumentAndDrawerTitle'
 import useDrawerWithoutPadding from '../../lib/useDrawerWithoutPadding'
 import AppTable from '../../app/AppTable'
-import { IconButton } from '@material-ui/core'
+import { IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, MenuItem } from '@material-ui/core'
 import OpenInBrowser from '@material-ui/icons/OpenInBrowser'
 import { MUIDataTableOptions } from 'mui-datatables'
 import useQuery from '../../lib/graphql/useQuery'
@@ -14,8 +14,12 @@ import useAuthorization from '../../lib/useAuthorization'
 import useMutation from '../../lib/graphql/useMutation'
 import Check from '@material-ui/icons/Check'
 import Delete from '@material-ui/icons/Delete'
+import CallMerge from '@material-ui/icons/CallMerge'
 import { dispatchReloadTriviaCounts } from '../../app/AppSidebar'
 import VerifiedUser from '@material-ui/icons/VerifiedUserOutlined'
+import Form from '../../lib/Form'
+import FormTextField from '../../lib/mui/FormTextField'
+import ProgressButton from '../../lib/mui/ProgressButton'
 
 const TriviaCategoryListView: React.FC = () => {
   useDocumentAndDrawerTitle('Trivia Categories')
@@ -139,6 +143,11 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedCategor
   const { reload, selectedCategories, setSelectedIndexes } = props
   const [isTriviaAdmin] = useAuthorization('trivia-admin')
 
+  const getSelectedIds = React.useMemo(() => {
+    return () =>
+      selectedCategories.map(q => q.id)
+  }, [selectedCategories])
+
   const verifyTriviaCategoriesMutation = graphql`
     mutation Mutation($ids: [ID!]!) {
       verifyTriviaCategories(ids: $ids) {
@@ -163,10 +172,17 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedCategor
     query: removeTriviaCategoriesMutation,
   })
 
-  const getSelectedIds = React.useMemo(() => {
-    return () =>
-      selectedCategories.map(q => q.id)
-  }, [selectedCategories])
+  const mergeTriviaCategoriesIntoMutation = graphql`
+    mutation Mutation($ids: [ID!]!, $targetId: ID!) {
+      mergeTriviaCategoriesInto(ids: $ids, targetId: $targetId) {
+        count
+      }
+    }
+  `
+
+  const [mergeTriviaCategoriesInto] = useMutation<Mutation>({
+    query: mergeTriviaCategoriesIntoMutation,
+  })
 
   const handleVerifyClick = React.useMemo(() => {
     return async () => {
@@ -188,8 +204,52 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedCategor
     }
   }, [getSelectedIds, reload, removeTriviaCategories, setSelectedIndexes])
 
+  const [mergeDialogOpen, setMergeDialogOpen] = React.useState(false)
+
+  const handleMergeDialogOpen = () =>
+    setMergeDialogOpen(true)
+
+  const handleMergeDialogClose = () =>
+    setMergeDialogOpen(false)
+
+  const triviaCategoriesQuery = React.useMemo(() => {
+    return mergeDialogOpen ? graphql`
+      query Query {
+        triviaCategories(verified: true, disabled: false) {
+          id
+          name
+        }
+      }
+    ` : undefined
+  }, [mergeDialogOpen])
+
+  const [triviaCategoriesResult] = useQuery<Query>({
+    query: triviaCategoriesQuery,
+  })
+
+  const initialMergeValues = React.useMemo(() => {
+    return {
+      target: null as { id: string } | null,
+    }
+  }, [])
+
+  const handleMergeSubmit = React.useMemo(() => {
+    return async (values: typeof initialMergeValues) => {
+      await mergeTriviaCategoriesInto({ ids: getSelectedIds(), targetId: values.target?.id })
+
+      reload()
+      setSelectedIndexes([])
+      dispatchReloadTriviaCounts()
+    }
+  }, [getSelectedIds, reload, mergeTriviaCategoriesInto, setSelectedIndexes, initialMergeValues])
+
   return (
     <div className="MuiToolbar-gutters" style={{ flex: '1 1 auto', textAlign: 'right' }}>
+      {isTriviaAdmin && (
+        <IconButton onClick={handleMergeDialogOpen}>
+          <CallMerge />
+        </IconButton>
+      )}
       {isTriviaAdmin && (
         <IconButton onClick={handleVerifyClick} title={'Verify selection'}>
           <Check />
@@ -200,6 +260,45 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedCategor
           <Delete />
         </IconButton>
       )}
+
+      <Dialog open={mergeDialogOpen} onClose={handleMergeDialogClose} maxWidth="xl">
+        <Form initialValues={initialMergeValues} onSubmit={handleMergeSubmit}>
+          <DialogTitle>Merge selected categories into another</DialogTitle>
+          <DialogContent>
+            <div>
+              <FormTextField select name="target" label="Target Category" options={triviaCategoriesResult?.triviaCategories} optionId={(o: any) => o.id} style={{ width: '100%' }} required>
+                <MenuItem />
+                {triviaCategoriesResult?.triviaCategories?.map((o: any) => (
+                  <MenuItem key={o.id} value={o.id}>{o.name}</MenuItem>
+                ))}
+              </FormTextField>
+            </div>
+          </DialogContent>
+          <DialogActions>
+            <Form.Context.Consumer>
+              {({ formState, submit, reset }) => (
+                <React.Fragment>
+                  <Button
+                    type="button"
+                    onClick={() => { reset(); handleMergeDialogClose(); }}
+                  >
+                    Cancel
+                    </Button>
+
+                  <ProgressButton
+                    type="button"
+                    onClick={submit}
+                    disabled={!formState.isSubmittable}
+                    loading={formState.isSubmitting}
+                  >
+                    Submit
+                    </ProgressButton>
+                </React.Fragment>
+              )}
+            </Form.Context.Consumer>
+          </DialogActions>
+        </Form>
+      </Dialog>
     </div>
   )
 }
