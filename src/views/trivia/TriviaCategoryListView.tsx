@@ -30,7 +30,7 @@ const TriviaCategoryListView: React.FC = () => {
   const [isTriviaAdmin] = useAuthorization('trivia-admin')
 
   const query = graphql`
-    query Query($verified: Boolean, $disabled: Boolean) {
+    query Query($isTriviaAdmin: Boolean!, $verified: Boolean, $disabled: Boolean) {
       triviaCategories(verified: $verified, disabled: $disabled) {
         id
         name
@@ -39,6 +39,7 @@ const TriviaCategoryListView: React.FC = () => {
         disabled
         createdAt
         updatedAt
+        questionsCount @include(if: $isTriviaAdmin)
       }
     }
   `
@@ -51,10 +52,11 @@ const TriviaCategoryListView: React.FC = () => {
   React.useEffect(() => {
     setVariables(variables => ({
       ...variables,
+      isTriviaAdmin,
       verified,
       disabled,
     }))
-  }, [setVariables, verified, disabled])
+  }, [setVariables, isTriviaAdmin, verified, disabled])
 
   const [data, error, loading, retry] = useQuery<Query>({
     query,
@@ -111,6 +113,7 @@ const TriviaCategoryListView: React.FC = () => {
           <AppTable.Column name="updatedAt" label="Updated">
             {v => new Date(v).toLocaleDateString()}
           </AppTable.Column>
+          {isTriviaAdmin && (<AppTable.Column name="questionsCount" label="Questions" />)}
           <AppTable.Column name="verified" label="⠀">
             {v => v && (<VerifiedUser />)}
           </AppTable.Column>
