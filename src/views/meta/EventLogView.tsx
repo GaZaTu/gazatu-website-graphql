@@ -38,13 +38,14 @@ const EventLogView: React.FC = () => {
       filter: false,
       rowsPerPageOptions: [20],
       rowsPerPage: 20,
+      responsive: 'scrollMaxHeight',
     }
   }, [data])
 
   if (data) {
     return (
       <div>
-        <AppTable title="" data={data.changes ?? []} options={tableOptions}>
+        <AppTable className="fullscreen" title="" data={data.changes ?? []} options={tableOptions}>
           <AppTable.Column name="" options={{ empty: true, filter: false, sort: false }}>
             {(_, meta) => {
               const kind = meta.rowData?.[1]

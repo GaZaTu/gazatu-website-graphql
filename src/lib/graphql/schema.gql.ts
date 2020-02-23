@@ -52,7 +52,9 @@ export interface Mutation {
   saveTriviaCategory?: TriviaCategory;
   verifyTriviaCategories?: CountResult;
   removeTriviaCategories?: CountResult;
+  mergeTriviaCategoriesInto?: CountResult;
   reportTriviaQuestion?: TriviaReport;
+  removeTriviaReports?: CountResult;
 }
 export interface NodeRef {
   id: string;
@@ -103,6 +105,7 @@ export interface TriviaCategory {
   createdAt?: DateTime;
   updatedAt?: DateTime;
   questions?: TriviaQuestion[] | null;
+  questionsCount?: number;
 }
 export interface TriviaCategoryInput {
   id?: string | null;
@@ -205,8 +208,7 @@ export interface User {
   roles?: UserRole[];
 }
 export interface UserInput {
-  username: string;
-  password: string;
+  roles: NodeRef[];
 }
 export interface UserRole {
   __typename?: 'UserRole';

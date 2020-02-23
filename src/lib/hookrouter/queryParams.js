@@ -2,14 +2,16 @@ import React from 'react';
 
 const queryParamListeners = [];
 let queryParamObject = {};
+export let previousQueryParamObject = null;
 
 export const setQueryParams = (inObj, replace = false) => {
 	if(!(inObj instanceof Object)){
 		throw new Error('Object required');
-	}
+  }
+  previousQueryParamObject = queryParamObject;
 	if(replace){
 		queryParamObject = inObj;
-	} else {
+  } else {
 		Object.assign(queryParamObject, inObj);
 	}
   const now = Date.now();

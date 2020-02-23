@@ -15,6 +15,10 @@ import { Query, Mutation } from '../../lib/graphql/schema.gql'
 import AppTable from '../../app/AppTable'
 import NavLink from '../../lib/mui/NavLink'
 import OpenInBrowser from '@material-ui/icons/OpenInBrowser'
+import VerifiedUser from '@material-ui/icons/VerifiedUserOutlined'
+import { navigateBack } from '../../lib/hookrouter/router'
+import useShowPromptDialog from '../../lib/useShowPromptDialog'
+import Delete from '@material-ui/icons/Delete'
 
 const useStyles =
   makeStyles(theme =>
@@ -46,6 +50,7 @@ const TriviaCategoryView: React.FC<Props> = ({ id }) => {
   const [, ] = useAuthorization()
   const [isTriviaAdmin] = useAuthorization('trivia-admin')
   const { enqueueSnackbar } = useSnackbar()
+  const showPromptDialog = useShowPromptDialog()
   const classes = useStyles({})
 
   const isNew = id === 'new'
@@ -67,6 +72,7 @@ const TriviaCategoryView: React.FC<Props> = ({ id }) => {
           hint1
           hint2
           answer
+          verified
         }
       }
     }
@@ -118,13 +124,56 @@ const TriviaCategoryView: React.FC<Props> = ({ id }) => {
     }
   }, [enqueueSnackbar, initialValues, isNew, retry, saveTriviaCategory])
 
+  const [removeTriviaCategory] = useMutation<Mutation>({
+    query: graphql`
+      mutation Mutation($id: ID!) {
+        removeTriviaCategories(ids: [$id]) {
+          count
+        }
+      }
+    `,
+  })
+
+  const handleRemoveClick = React.useMemo(() => {
+    return async () => {
+      try {
+        const prompt = showPromptDialog({
+          title: 'Delete this category?',
+          buttons: [{ key: 'y', label: 'YES' }, { key: 'n', label: 'NO' }],
+        })
+
+        if (await prompt !== 'y') {
+          return
+        }
+
+        await removeTriviaCategory({ id })
+        navigateBack(true)
+      } catch (error) {
+        enqueueSnackbar(`${error}`, { variant: 'error' })
+      }
+    }
+  }, [removeTriviaCategory, enqueueSnackbar, id, showPromptDialog])
+
   return (
     <div>
       <Form initialValues={initialValues} onSubmit={handleSubmit}>
         <Form.Context.Consumer>
           {({ formState, submit }) => (
             <Toolbar>
+              {data?.triviaCategory?.verified && (
+                <VerifiedUser />
+              )}
+
               <span className={classes.flexGrow1} />
+
+              {isTriviaAdmin && (
+                <IconButton
+                  type="button"
+                  onClick={handleRemoveClick}
+                >
+                  <Delete />
+                </IconButton>
+              )}
 
               <ProgressIconButton
                 type="button"
@@ -152,7 +201,7 @@ const TriviaCategoryView: React.FC<Props> = ({ id }) => {
 
       {data?.triviaCategory?.questions && (
         <div>
-          <AppTable title="Questions" data={data?.triviaCategory?.questions ?? []} options={{ filter: false, viewColumns: false }}>
+          <AppTable title="Questions" data={data?.triviaCategory?.questions ?? []} options={{ filter: false, viewColumns: false, responsive: 'scrollMaxHeight' }}>
             <AppTable.Column name="id" options={{ display: 'excluded' }} />
             <AppTable.Column name="" options={{ empty: true, filter: false, sort: false }}>
               {(_, meta) => (
@@ -167,6 +216,9 @@ const TriviaCategoryView: React.FC<Props> = ({ id }) => {
             <AppTable.Column name="hint1" label="Hint 1" />
             <AppTable.Column name="hint2" label="Hint 2" />
             <AppTable.Column name="answer" label="Answer" />
+            <AppTable.Column name="verified" label="⠀">
+              {v => v && (<VerifiedUser />)}
+            </AppTable.Column>
           </AppTable>
         </div>
       )}

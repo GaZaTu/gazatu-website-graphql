@@ -11,6 +11,7 @@ import Typography from '@material-ui/core/Typography'
 import { makeStyles, useTheme, createStyles } from '@material-ui/core/styles'
 import { Store } from '../store'
 import logo from '../assets/img/gazatu-xyz-drawer.png'
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@material-ui/core'
 
 const drawerWidth = 240
 
@@ -70,7 +71,10 @@ const AppDrawer: React.FC<AppDrawerProps> = props => {
   const classes = useStyles()
   const theme = useTheme()
   const [mobileOpen, setMobileOpen] = React.useState(false)
-  const [store] = React.useContext(Store)
+  const [store, dispatch] = React.useContext(Store)
+
+  const setPromptDialogClickedButton = (payload: string | null) =>
+    dispatch({ type: '@@DRAWER/SET_PROMPT_DIALOG_CLICKED_BUTTON', payload })
 
   const handleDrawerToggle = () =>
     setMobileOpen(!mobileOpen)
@@ -137,6 +141,21 @@ const AppDrawer: React.FC<AppDrawerProps> = props => {
         <div className={classes.toolbar} />
         {content}
       </main>
+      <Dialog open={!!store.drawer.promptDialog} onClose={() => setPromptDialogClickedButton(null)} disableBackdropClick={store.drawer.promptDialog?.disableBackdropClick}>
+        {store.drawer.promptDialog?.title && (
+          <DialogTitle>{store.drawer.promptDialog?.title}</DialogTitle>
+        )}
+        {store.drawer.promptDialog?.content && (
+          <DialogContent>
+            <p>{store.drawer.promptDialog?.content}</p>
+          </DialogContent>
+        )}
+        <DialogActions>
+          {store.drawer.promptDialog?.buttons.map(button => (
+            <Button key={button.key} type="button" onClick={() => setPromptDialogClickedButton(button.key)}>{button.label}</Button>
+          ))}
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }

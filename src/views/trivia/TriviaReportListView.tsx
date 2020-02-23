@@ -20,6 +20,7 @@ const TriviaReportListView: React.FC = () => {
         id
         question {
           id
+          question
         }
         message
         submitter
@@ -40,6 +41,7 @@ const TriviaReportListView: React.FC = () => {
       filter: false,
       rowsPerPageOptions: [20],
       rowsPerPage: 20,
+      responsive: 'scrollMaxHeight',
       customToolbar: () => <CustomToolbar />,
     }
   }, [data])
@@ -47,7 +49,7 @@ const TriviaReportListView: React.FC = () => {
   if (data) {
     return (
       <div>
-        <AppTable title="" data={data.triviaReports ?? []} options={tableOptions}>
+        <AppTable className="fullscreen" title="" data={data.triviaReports ?? []} options={tableOptions}>
           <AppTable.Column name="id" options={{ display: 'excluded' }} />
           <AppTable.Column name="question.id" options={{ display: 'excluded' }} />
           <AppTable.Column name="" options={{ empty: true, filter: false, sort: false }}>

@@ -1,11 +1,12 @@
 import React from 'react';
-import {setQueryParams} from './queryParams';
+import {setQueryParams,previousQueryParamObject} from './queryParams';
 import {interceptRoute} from './interceptor';
 
 let preparedRoutes = {};
 let stack = {};
 let componentId = 1;
 let currentPath = window.location.pathname;
+export let previousPath = null;
 let basePath = '';
 let basePathRegEx = null;
 const pathUpdaters = [];
@@ -76,6 +77,7 @@ export const navigate = (url, replace = false, queryParams = null, replaceQueryP
 		return;
 	}
 
+  previousPath = currentPath;
 	currentPath = url;
 
 	const finalURL = basePathRegEx
@@ -92,6 +94,10 @@ export const navigate = (url, replace = false, queryParams = null, replaceQueryP
 	if (queryParams) {
 		setQueryParams(queryParams, replaceQueryParams);
 	}
+};
+
+export const navigateBack = (replace = false, replaceQueryParams = true, force = false) => {
+  navigate(previousPath, replace, previousQueryParamObject, replaceQueryParams, force);
 };
 
 let customPath = '/';

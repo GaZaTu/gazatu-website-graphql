@@ -18,6 +18,10 @@ import { Query, Mutation, TriviaReport, TriviaQuestion } from '../../lib/graphql
 import ProgressButton from '../../lib/mui/ProgressButton'
 import Delete from '@material-ui/icons/Delete'
 import FormAutocomplete from '../../lib/mui/FormAutocomplete'
+import VerifiedUser from '@material-ui/icons/VerifiedUserOutlined'
+import { MUIDataTableOptions } from 'mui-datatables'
+import useShowPromptDialog from '../../lib/useShowPromptDialog'
+import { navigateBack } from '../../lib/hookrouter/router'
 
 const useStyles =
   makeStyles(theme =>
@@ -49,8 +53,10 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
   const [, ] = useAuthorization()
   const [isTriviaAdmin] = useAuthorization('trivia-admin')
   const { enqueueSnackbar } = useSnackbar()
+  const showPromptDialog = useShowPromptDialog()
   const theme = useTheme()
   const classes = useStyles({})
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   const isNew = id === 'new'
   const readOnly = !isNew && !isTriviaAdmin
@@ -89,6 +95,7 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
       triviaCategories(disabled: false) {
         id
         name
+        verified
       }
       languages {
         id
@@ -200,8 +207,6 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
   //   }
   // }, [id])
 
-  const fullScreenDialog = useMediaQuery(theme.breakpoints.down('sm'))
-
   const [reportDialogOpen, setReportDialogOpen] = React.useState(false)
 
   const handleReportDialogOpen = () =>
@@ -241,12 +246,46 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
     }
   }, [enqueueSnackbar, initialReportValues, reportTriviaQuestion, setReportDialogOpen, retry])
 
+  const [removeTriviaQuestion] = useMutation<Mutation>({
+    query: graphql`
+      mutation Mutation($id: ID!) {
+        removeTriviaQuestions(ids: [$id]) {
+          count
+        }
+      }
+    `,
+  })
+
+  const handleRemoveClick = React.useMemo(() => {
+    return async () => {
+      try {
+        const prompt = showPromptDialog({
+          title: 'Delete this question?',
+          buttons: [{ key: 'y', label: 'YES' }, { key: 'n', label: 'NO' }],
+        })
+
+        if (await prompt !== 'y') {
+          return
+        }
+
+        await removeTriviaQuestion({ id })
+        navigateBack(true)
+      } catch (error) {
+        enqueueSnackbar(`${error}`, { variant: 'error' })
+      }
+    }
+  }, [removeTriviaQuestion, enqueueSnackbar, id, showPromptDialog])
+
   return (
     <div>
       <Form initialValues={initialValues} onSubmit={handleSubmit}>
         <Form.Context.Consumer>
           {({ formState, submit }) => (
             <Toolbar>
+              {data?.triviaQuestion?.verified && (
+                <VerifiedUser />
+              )}
+
               <span className={classes.flexGrow1} />
 
               <IconButton
@@ -256,6 +295,15 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
               >
                 <ReportProblemIcon />
               </IconButton>
+
+              {isTriviaAdmin && (
+                <IconButton
+                  type="button"
+                  onClick={handleRemoveClick}
+                >
+                  <Delete />
+                </IconButton>
+              )}
 
               <ProgressIconButton
                 type="button"
@@ -272,6 +320,12 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
 
         <div>
           <FormAutocomplete name="category" options={data?.triviaCategories ?? []} getOptionLabel={o => typeof o === 'string' ? o : o.name} autoHighlight filterSelectedOptions
+            renderOption={option => (
+              <React.Fragment>
+                <VerifiedUser style={{ color: (option.disabled || !option.verified) ? 'transparent' : undefined, marginRight: '8px' }} />
+                <span>{option.name}</span>
+              </React.Fragment>
+            )}
             renderInput={params => (
               <TextField {...params} label="Category" className={classes.field} inputProps={{ ...params.inputProps, readOnly }} required />
             )} />
@@ -324,11 +378,12 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
       <br />
 
       {data?.triviaQuestion?.reports && (() => {
-        const tableOptions = {
+        const tableOptions: MUIDataTableOptions = {
           pagination: false,
           search: false,
           filter: false,
           viewColumns: false,
+          responsive: 'scrollMaxHeight',
           customToolbar: () => <ReportsCustomToolbar reports={data?.triviaQuestion?.reports ?? []} reload={retry} />,
         }
 
@@ -338,7 +393,7 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
               <AppTable.Column name="id" options={{ display: 'excluded' }} />
               <AppTable.Column name="message" label="Message" />
               <AppTable.Column name="submitter" label="Submitter" />
-              <AppTable.Column name="updatedAt" label="Updated" >
+              <AppTable.Column name="updatedAt" label="Updated">
                 {v => new Date(v).toLocaleDateString()}
               </AppTable.Column>
             </AppTable>
@@ -347,9 +402,9 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
       })()}
 
       {id && (
-        <Dialog open={reportDialogOpen} onClose={handleReportDialogClose} maxWidth="xl" fullScreen={fullScreenDialog}>
+        <Dialog open={reportDialogOpen} onClose={handleReportDialogClose} maxWidth="xl" fullScreen={isMobile}>
           <Form initialValues={initialReportValues} onSubmit={handleReportSubmit}>
-            <DialogTitle>Report Trivia Question</DialogTitle>
+            <DialogTitle>Submit a report for this question</DialogTitle>
             <DialogContent>
               <div>
                 <FormTextField type="text" name="message" label="Message" className={classes.field} required />
@@ -393,6 +448,7 @@ export default TriviaQuestionView
 
 const ReportsCustomToolbar: React.FC<{ reload: () => void, reports: TriviaReport[] }> = props => {
   const { reload, reports } = props
+  const showPromptDialog = useShowPromptDialog()
 
   const [removeTriviaReports] = useMutation({
     query: graphql`
@@ -406,10 +462,19 @@ const ReportsCustomToolbar: React.FC<{ reload: () => void, reports: TriviaReport
 
   const handleRemoveTriviaReports = React.useMemo(() => {
     return async () => {
+      const prompt = showPromptDialog({
+        title: 'Delete all reports for this question?',
+        buttons: [{ key: 'y', label: 'YES' }, { key: 'n', label: 'NO' }],
+      })
+
+      if (await prompt !== 'y') {
+        return
+      }
+
       await removeTriviaReports({ ids: reports.map(r => r.id) })
       reload()
     }
-  }, [reload, reports, removeTriviaReports])
+  }, [reload, reports, removeTriviaReports, showPromptDialog])
 
   return (
     <React.Fragment>

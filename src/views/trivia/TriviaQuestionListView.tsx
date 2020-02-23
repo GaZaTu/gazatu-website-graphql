@@ -17,7 +17,7 @@ import useMutation from '../../lib/graphql/useMutation'
 import NavLink from '../../lib/mui/NavLink'
 import { TriviaQuestion, Mutation, TriviaCategory, Query } from '../../lib/graphql/schema.gql'
 import { useSnackbar } from 'notistack'
-import Check from '@material-ui/icons/Check'
+import Check from '@material-ui/icons/VerifiedUser'
 import Delete from '@material-ui/icons/Delete'
 import VerifiedUser from '@material-ui/icons/VerifiedUserOutlined'
 import { useQueryParams } from '../../lib/hookrouter'
@@ -27,6 +27,7 @@ import ProgressButton from '../../lib/mui/ProgressButton'
 import useQuery from '../../lib/graphql/useQuery'
 import { dispatchReloadTriviaCounts } from '../../app/AppSidebar'
 import FormAutocomplete from '../../lib/mui/FormAutocomplete'
+import useShowPromptDialog from '../../lib/useShowPromptDialog'
 
 const TriviaQuestionListView: React.FC = () => {
   useDocumentAndDrawerTitle('Trivia Questions')
@@ -58,6 +59,7 @@ const TriviaQuestionListView: React.FC = () => {
 
   const [{ verified, disabled, reported, dangling }] = useQueryParams()
   const [isTriviaAdmin] = useAuthorization('trivia-admin')
+
   const [variables, setVariables] = useState({
     search: undefined as string | undefined,
     sortField: 'updatedAt' as string | undefined,
@@ -121,7 +123,7 @@ const TriviaQuestionListView: React.FC = () => {
       filter: false,
       rowsPerPageOptions: [20],
       rowsPerPage: 20,
-      // responsive: 'scrollMaxHeight',
+      responsive: 'scrollMaxHeight',
       onTableChange: (action, tableState) => {
         const activeColumn = (tableState.activeColumn !== null) ? (tableState as any).columns[tableState.activeColumn] : null
 
@@ -142,7 +144,7 @@ const TriviaQuestionListView: React.FC = () => {
       selectableRows: isTriviaAdmin ? 'multiple' : 'none',
       isRowSelectable: () => isTriviaAdmin,
       onRowsSelect: (clickedRows, selectedRows) => {
-        setSelectedIndexes(selectedRows.slice(0, 10).map(r => r.dataIndex))
+        setSelectedIndexes(selectedRows.slice(0, 20).map(r => r.dataIndex))
       },
       rowsSelected: selectedIndexes,
       customToolbarSelect: () => <CustomSelectedItemsToolbar reload={retry} selectedQuestions={selectedIndexes.map(i => data![i])} setSelectedIndexes={setSelectedIndexes} />,
@@ -152,7 +154,7 @@ const TriviaQuestionListView: React.FC = () => {
   if (data) {
     return (
       <div>
-        <AppTable title="" data={data} options={tableOptions} customOptions={variables}>
+        <AppTable title="" className="fullscreen" data={data} options={tableOptions} customOptions={variables}>
           <AppTable.Column name="id" options={{ display: 'excluded' }} />
           <AppTable.Column name="" options={{ empty: true, filter: false, sort: false }}>
             {(_, meta) => (
@@ -168,7 +170,7 @@ const TriviaQuestionListView: React.FC = () => {
           <AppTable.Column name="hint1" label="Hint 1" />
           <AppTable.Column name="hint2" label="Hint 2" />
           <AppTable.Column name="submitter" label="Submitter" />
-          <AppTable.Column name="updatedAt" label="Update">
+          <AppTable.Column name="updatedAt" label="Updated">
             {v => new Date(v).toLocaleDateString()}
           </AppTable.Column>
           <AppTable.Column name="answer" label="Answer" options={{ display: isTriviaAdmin ? undefined : 'false' }} />
@@ -176,17 +178,6 @@ const TriviaQuestionListView: React.FC = () => {
             {v => v && (<VerifiedUser />)}
           </AppTable.Column>
         </AppTable>
-
-        {/* <div>
-          {data.map(item => (
-            <pre key={item.id}>{JSON.stringify(item)}</pre>
-          ))}
-        </div>
-        <div>
-          <button onClick={paginateBackwards} disabled={loading || !paginateBackwards}>Prev</button>
-          <button onClick={paginateForwards} disabled={loading || !paginateForwards}>Next</button>
-          <button onClick={retry} disabled={loading}>Retry</button>
-        </div> */}
       </div>
     )
   } else if (error) {
@@ -251,6 +242,7 @@ const CustomToolbar: React.FC<{ reload: () => void }> = props => {
 const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestions: TriviaQuestion[], setSelectedIndexes: React.Dispatch<React.SetStateAction<number[]>> }> = props => {
   const { reload, selectedQuestions, setSelectedIndexes } = props
   const [isTriviaAdmin] = useAuthorization('trivia-admin')
+  const showPromptDialog = useShowPromptDialog()
 
   const verifyTriviaQuestionsMutation = graphql`
     mutation Mutation($ids: [ID!]!) {
@@ -288,23 +280,41 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
 
   const handleVerifyClick = React.useMemo(() => {
     return async () => {
+      const prompt = showPromptDialog({
+        title: 'Verify selected questions?',
+        buttons: [{ key: 'y', label: 'YES' }, { key: 'n', label: 'NO' }],
+      })
+
+      if (await prompt !== 'y') {
+        return
+      }
+
       await verifyTriviaQuestions({ ids: getSelectedIds() })
 
       reload()
       setSelectedIndexes([])
       dispatchReloadTriviaCounts()
     }
-  }, [getSelectedIds, reload, verifyTriviaQuestions, setSelectedIndexes])
+  }, [getSelectedIds, reload, verifyTriviaQuestions, setSelectedIndexes, showPromptDialog])
 
   const handleDeleteClick = React.useMemo(() => {
     return async () => {
+      const prompt = showPromptDialog({
+        title: 'Delete selected questions?',
+        buttons: [{ key: 'y', label: 'YES' }, { key: 'n', label: 'NO' }],
+      })
+
+      if (await prompt !== 'y') {
+        return
+      }
+
       await removeTriviaQuestions({ ids: getSelectedIds() })
 
       reload()
       setSelectedIndexes([])
       dispatchReloadTriviaCounts()
     }
-  }, [getSelectedIds, reload, removeTriviaQuestions, setSelectedIndexes])
+  }, [getSelectedIds, reload, removeTriviaQuestions, setSelectedIndexes, showPromptDialog])
 
   const [changeCategoryDialogOpen, setChangeCategoryDialogOpen] = React.useState(false)
 
@@ -379,10 +389,16 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
       {isTriviaAdmin && (
         <Dialog open={changeCategoryDialogOpen} onClose={handleChangeCategoryDialogClose} maxWidth="xl">
           <Form initialValues={initialChangeCategoryValues} onSubmit={handleReportSubmit}>
-            <DialogTitle>Change Categories To</DialogTitle>
+            <DialogTitle>Change category of selected questions</DialogTitle>
             <DialogContent>
               <div>
                 <FormAutocomplete name="category" options={triviaCategoriesResult?.triviaCategories ?? []} getOptionLabel={o => typeof o === 'string' ? o : o.name} autoHighlight filterSelectedOptions
+                  renderOption={option => (
+                    <React.Fragment>
+                      <VerifiedUser style={{ marginRight: '8px' }} />
+                      <span>{option.name}</span>
+                    </React.Fragment>
+                  )}
                   renderInput={params => (
                     <TextField {...params} label="Category" style={{ width: '100%' }} required />
                   )} />
