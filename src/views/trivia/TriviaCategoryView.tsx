@@ -160,6 +160,10 @@ const TriviaCategoryView: React.FC<Props> = ({ id }) => {
         <Form.Context.Consumer>
           {({ formState, submit }) => (
             <Toolbar>
+              {data?.triviaCategory?.verified && (
+                <VerifiedUser />
+              )}
+
               <span className={classes.flexGrow1} />
 
               {isTriviaAdmin && (

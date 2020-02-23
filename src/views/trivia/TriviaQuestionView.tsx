@@ -288,6 +288,14 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
 
               <span className={classes.flexGrow1} />
 
+              <IconButton
+                type="button"
+                onClick={handleReportDialogOpen}
+                disabled={isNew}
+              >
+                <ReportProblemIcon />
+              </IconButton>
+
               {isTriviaAdmin && (
                 <IconButton
                   type="button"
@@ -296,14 +304,6 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
                   <Delete />
                 </IconButton>
               )}
-
-              <IconButton
-                type="button"
-                onClick={handleReportDialogOpen}
-                disabled={isNew}
-              >
-                <ReportProblemIcon />
-              </IconButton>
 
               <ProgressIconButton
                 type="button"
