@@ -3,7 +3,7 @@ import { graphql } from '../../lib/graphql/graphql'
 import useDocumentAndDrawerTitle from '../../lib/useDocumentAndDrawerTitle'
 import useDrawerWithoutPadding from '../../lib/useDrawerWithoutPadding'
 import AppTable from '../../app/AppTable'
-import { IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, MenuItem } from '@material-ui/core'
+import { IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@material-ui/core'
 import OpenInBrowser from '@material-ui/icons/OpenInBrowser'
 import { MUIDataTableOptions } from 'mui-datatables'
 import useQuery from '../../lib/graphql/useQuery'
@@ -18,8 +18,8 @@ import CallMerge from '@material-ui/icons/CallMerge'
 import { dispatchReloadTriviaCounts } from '../../app/AppSidebar'
 import VerifiedUser from '@material-ui/icons/VerifiedUserOutlined'
 import Form from '../../lib/Form'
-import FormTextField from '../../lib/mui/FormTextField'
 import ProgressButton from '../../lib/mui/ProgressButton'
+import FormAutocomplete from '../../lib/mui/FormAutocomplete'
 
 const TriviaCategoryListView: React.FC = () => {
   useDocumentAndDrawerTitle('Trivia Categories')
@@ -266,12 +266,10 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedCategor
           <DialogTitle>Merge selected categories into another</DialogTitle>
           <DialogContent>
             <div>
-              <FormTextField select name="target" label="Target Category" options={triviaCategoriesResult?.triviaCategories} optionId={(o: any) => o.id} style={{ width: '100%' }} required>
-                <MenuItem />
-                {triviaCategoriesResult?.triviaCategories?.map((o: any) => (
-                  <MenuItem key={o.id} value={o.id}>{o.name}</MenuItem>
-                ))}
-              </FormTextField>
+              <FormAutocomplete name="target" options={triviaCategoriesResult?.triviaCategories ?? []} getOptionLabel={o => typeof o === 'string' ? o : o.name} autoHighlight filterSelectedOptions
+                renderInput={params => (
+                  <TextField {...params} label="Target Category" style={{ width: '100%' }} required />
+                )} />
             </div>
           </DialogContent>
           <DialogActions>
