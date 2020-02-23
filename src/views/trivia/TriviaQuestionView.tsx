@@ -55,19 +55,6 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
   const isNew = id === 'new'
   const readOnly = !isNew && !isTriviaAdmin
 
-  const categoriesAndLanguagesQueryFragment = graphql`
-    fragment Fragment on Query {
-      triviaCategories(disabled: false) {
-        id
-        name
-      }
-      languages {
-        id
-        name
-      }
-    }
-  `
-
   const query = graphql`
     query Query($id: ID!, $isNew: Boolean!, $isTriviaAdmin: Boolean!) {
       triviaQuestion(id: $id) @skip(if: $isNew) {
@@ -99,7 +86,14 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
           updatedAt
         }
       }
-      ...${categoriesAndLanguagesQueryFragment}
+      triviaCategories(disabled: false) {
+        id
+        name
+      }
+      languages {
+        id
+        name
+      }
     }
   `
 
