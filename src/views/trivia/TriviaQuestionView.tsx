@@ -20,6 +20,7 @@ import Delete from '@material-ui/icons/Delete'
 import FormAutocomplete from '../../lib/mui/FormAutocomplete'
 import VerifiedUser from '@material-ui/icons/VerifiedUserOutlined'
 import { MUIDataTableOptions } from 'mui-datatables'
+import useShowPromptDialog from '../../lib/useShowPromptDialog'
 
 const useStyles =
   makeStyles(theme =>
@@ -402,6 +403,7 @@ export default TriviaQuestionView
 
 const ReportsCustomToolbar: React.FC<{ reload: () => void, reports: TriviaReport[] }> = props => {
   const { reload, reports } = props
+  const showPromptDialog = useShowPromptDialog()
 
   const [removeTriviaReports] = useMutation({
     query: graphql`
@@ -415,6 +417,15 @@ const ReportsCustomToolbar: React.FC<{ reload: () => void, reports: TriviaReport
 
   const handleRemoveTriviaReports = React.useMemo(() => {
     return async () => {
+      const prompt = showPromptDialog({
+        title: 'Delete all reports for this question?',
+        buttons: [{ key: 'y', label: 'YES' }, { key: 'n', label: 'NO' }],
+      })
+
+      if (await prompt !== 'y') {
+        return
+      }
+
       await removeTriviaReports({ ids: reports.map(r => r.id) })
       reload()
     }

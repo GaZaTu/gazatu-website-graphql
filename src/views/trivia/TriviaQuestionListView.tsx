@@ -27,6 +27,7 @@ import ProgressButton from '../../lib/mui/ProgressButton'
 import useQuery from '../../lib/graphql/useQuery'
 import { dispatchReloadTriviaCounts } from '../../app/AppSidebar'
 import FormAutocomplete from '../../lib/mui/FormAutocomplete'
+import useShowPromptDialog from '../../lib/useShowPromptDialog'
 
 const TriviaQuestionListView: React.FC = () => {
   useDocumentAndDrawerTitle('Trivia Questions')
@@ -241,6 +242,7 @@ const CustomToolbar: React.FC<{ reload: () => void }> = props => {
 const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestions: TriviaQuestion[], setSelectedIndexes: React.Dispatch<React.SetStateAction<number[]>> }> = props => {
   const { reload, selectedQuestions, setSelectedIndexes } = props
   const [isTriviaAdmin] = useAuthorization('trivia-admin')
+  const showPromptDialog = useShowPromptDialog()
 
   const verifyTriviaQuestionsMutation = graphql`
     mutation Mutation($ids: [ID!]!) {
@@ -278,23 +280,41 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
 
   const handleVerifyClick = React.useMemo(() => {
     return async () => {
+      const prompt = showPromptDialog({
+        title: 'Verify selected questions?',
+        buttons: [{ key: 'y', label: 'YES' }, { key: 'n', label: 'NO' }],
+      })
+
+      if (await prompt !== 'y') {
+        return
+      }
+
       await verifyTriviaQuestions({ ids: getSelectedIds() })
 
       reload()
       setSelectedIndexes([])
       dispatchReloadTriviaCounts()
     }
-  }, [getSelectedIds, reload, verifyTriviaQuestions, setSelectedIndexes])
+  }, [getSelectedIds, reload, verifyTriviaQuestions, setSelectedIndexes, showPromptDialog])
 
   const handleDeleteClick = React.useMemo(() => {
     return async () => {
+      const prompt = showPromptDialog({
+        title: 'Delete selected questions?',
+        buttons: [{ key: 'y', label: 'YES' }, { key: 'n', label: 'NO' }],
+      })
+
+      if (await prompt !== 'y') {
+        return
+      }
+
       await removeTriviaQuestions({ ids: getSelectedIds() })
 
       reload()
       setSelectedIndexes([])
       dispatchReloadTriviaCounts()
     }
-  }, [getSelectedIds, reload, removeTriviaQuestions, setSelectedIndexes])
+  }, [getSelectedIds, reload, removeTriviaQuestions, setSelectedIndexes, showPromptDialog])
 
   const [changeCategoryDialogOpen, setChangeCategoryDialogOpen] = React.useState(false)
 
