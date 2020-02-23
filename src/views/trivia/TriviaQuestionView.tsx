@@ -21,6 +21,7 @@ import FormAutocomplete from '../../lib/mui/FormAutocomplete'
 import VerifiedUser from '@material-ui/icons/VerifiedUserOutlined'
 import { MUIDataTableOptions } from 'mui-datatables'
 import useShowPromptDialog from '../../lib/useShowPromptDialog'
+import { navigateBack } from '../../lib/hookrouter/router'
 
 const useStyles =
   makeStyles(theme =>
@@ -52,6 +53,7 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
   const [, ] = useAuthorization()
   const [isTriviaAdmin] = useAuthorization('trivia-admin')
   const { enqueueSnackbar } = useSnackbar()
+  const showPromptDialog = useShowPromptDialog()
   const theme = useTheme()
   const classes = useStyles({})
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -244,13 +246,56 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
     }
   }, [enqueueSnackbar, initialReportValues, reportTriviaQuestion, setReportDialogOpen, retry])
 
+  const [removeTriviaQuestion] = useMutation<Mutation>({
+    query: graphql`
+      mutation Mutation($id: ID!) {
+        removeTriviaQuestions(ids: [$id]) {
+          count
+        }
+      }
+    `,
+  })
+
+  const handleRemoveClick = React.useMemo(() => {
+    return async () => {
+      try {
+        const prompt = showPromptDialog({
+          title: 'Delete this question?',
+          buttons: [{ key: 'y', label: 'YES' }, { key: 'n', label: 'NO' }],
+        })
+
+        if (await prompt !== 'y') {
+          return
+        }
+
+        await removeTriviaQuestion({ id })
+        navigateBack(true)
+      } catch (error) {
+        enqueueSnackbar(`${error}`, { variant: 'error' })
+      }
+    }
+  }, [removeTriviaQuestion, enqueueSnackbar, id, showPromptDialog])
+
   return (
     <div>
       <Form initialValues={initialValues} onSubmit={handleSubmit}>
         <Form.Context.Consumer>
           {({ formState, submit }) => (
             <Toolbar>
+              {data?.triviaQuestion?.verified && (
+                <VerifiedUser />
+              )}
+
               <span className={classes.flexGrow1} />
+
+              {isTriviaAdmin && (
+                <IconButton
+                  type="button"
+                  onClick={handleRemoveClick}
+                >
+                  <Delete />
+                </IconButton>
+              )}
 
               <IconButton
                 type="button"
@@ -429,7 +474,7 @@ const ReportsCustomToolbar: React.FC<{ reload: () => void, reports: TriviaReport
       await removeTriviaReports({ ids: reports.map(r => r.id) })
       reload()
     }
-  }, [reload, reports, removeTriviaReports])
+  }, [reload, reports, removeTriviaReports, showPromptDialog])
 
   return (
     <React.Fragment>
