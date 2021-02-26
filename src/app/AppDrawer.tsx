@@ -30,13 +30,13 @@ const useStyles =
       appBar: {
         marginLeft: drawerWidth,
         [theme.breakpoints.up('sm')]: {
-          width: `calc(100% - ${drawerWidth}px)`,
+          width: `calc(100% - ${drawerWidth}px) !important`,
         },
       },
       menuButton: {
         marginRight: theme.spacing(2),
         [theme.breakpoints.up('sm')]: {
-          display: 'none',
+          display: 'none !important',
         },
       },
       toolbar: theme.mixins.toolbar,
@@ -82,7 +82,9 @@ const AppDrawer: React.FC<AppDrawerProps> = props => {
   const drawer = (
     <div>
       <div className={classes.toolbar}>
-        <img src={logo} alt="brand" />
+        <a href={window.location.origin}>
+          <img src={logo} alt="brand" />
+        </a>
       </div>
       <Divider />
       {sidebar}
@@ -93,7 +95,7 @@ const AppDrawer: React.FC<AppDrawerProps> = props => {
     <div className={classes.root}>
       <CssBaseline />
       <AppBar position="fixed" color="inherit" className={classes.appBar}>
-        <Toolbar>
+        <Toolbar >
           <IconButton
             color="inherit"
             edge="start"
@@ -125,7 +127,7 @@ const AppDrawer: React.FC<AppDrawerProps> = props => {
             {drawer}
           </Drawer>
         </Hidden>
-        <Hidden xsDown implementation="css">
+        <Hidden smDown implementation="css">
           <Drawer
             classes={{
               paper: classes.drawerPaper,
@@ -141,7 +143,7 @@ const AppDrawer: React.FC<AppDrawerProps> = props => {
         <div className={classes.toolbar} />
         {content}
       </main>
-      <Dialog open={!!store.drawer.promptDialog} onClose={() => setPromptDialogClickedButton(null)} disableBackdropClick={store.drawer.promptDialog?.disableBackdropClick}>
+      <Dialog open={!!store.drawer.promptDialog} onClose={() => setPromptDialogClickedButton(null)} /** disableBackdropClick={store.drawer.promptDialog?.disableBackdropClick} */ >
         {store.drawer.promptDialog?.title && (
           <DialogTitle>{store.drawer.promptDialog?.title}</DialogTitle>
         )}

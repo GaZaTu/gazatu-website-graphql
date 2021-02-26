@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext, useMemo } from 'react'
 import { Grid, Paper, makeStyles, createStyles } from '@material-ui/core'
 import { useSnackbar } from 'notistack'
 import { Store } from '../store'
@@ -60,7 +60,7 @@ interface LoginFormProps {
 const LoginForm: React.FC<LoginFormProps> = props => {
   const { isRegister } = props
   const classes = useStyles()
-  const [, dispatch] = React.useContext(Store)
+  const [, dispatch] = useContext(Store)
   const { enqueueSnackbar } = useSnackbar()
 
   const [registerUser] = useMutation({
@@ -97,7 +97,7 @@ const LoginForm: React.FC<LoginFormProps> = props => {
     `,
   })
 
-  const initialValues = React.useMemo(() => {
+  const initialValues = useMemo(() => {
     return {
       username: '',
       password: '',
@@ -111,7 +111,7 @@ const LoginForm: React.FC<LoginFormProps> = props => {
     reload: false,
   })
 
-  const isLocked = React.useMemo(() => {
+  const isLocked = useMemo(() => {
     const secs = (secs: number) => secs * 1000
     const mins = (mins: number) => secs(mins * 60)
 
@@ -134,7 +134,7 @@ const LoginForm: React.FC<LoginFormProps> = props => {
     }
   }, [failedLogins, setFailedLogins])
 
-  const handleSubmit = React.useMemo(() => {
+  const handleSubmit = useMemo(() => {
     return async (values: typeof initialValues) => {
       try {
         let authResult: any
@@ -165,29 +165,29 @@ const LoginForm: React.FC<LoginFormProps> = props => {
         enqueueSnackbar(`${error}`, { variant: 'error' })
       }
     }
-  }, [authenticate, dispatch, enqueueSnackbar, initialValues, isRegister, registerUser, setFailedLogins])
+  }, [authenticate, dispatch, enqueueSnackbar, isRegister, registerUser, setFailedLogins])
 
-  const handleValidate = React.useMemo(() => {
+  const handleValidate = useMemo(() => {
     return async (values: typeof initialValues) => {
       return {
         password2: (isRegister && values.password2 !== values.password) ? 'Passwords must be equal' : undefined,
       }
     }
-  }, [initialValues, isRegister])
+  }, [isRegister])
 
   return (
     <Form initialValues={initialValues} onSubmit={handleSubmit} onValidate={handleValidate}>
       <div>
-        <FormTextField type="text" name="username" label="Username" className={classes.field} required />
+        <FormTextField type="text" name="username" label="Username" variant="standard" className={classes.field} required />
       </div>
 
       <div>
-        <FormTextField type="password" name="password" label="Password" className={classes.field} required />
+        <FormTextField type="password" name="password" label="Password" variant="standard" className={classes.field} required />
       </div>
 
       {isRegister && (
         <div>
-          <FormTextField type="password" name="password2" label="Repeat password" className={classes.field} required />
+          <FormTextField type="password" name="password2" label="Repeat password" variant="standard" className={classes.field} required />
         </div>
       )}
 

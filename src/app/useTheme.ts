@@ -1,19 +1,21 @@
 import { useMemo, useContext } from 'react'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
+import darkScrollbar from '@material-ui/core/darkScrollbar'
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme'
 import { Store } from '../store'
 
 const useTheme = () => {
+  const usesDesktopDisplay = useMediaQuery('(min-width: 600px)')
   const prefersDarkColorScheme = useMediaQuery('(prefers-color-scheme: dark)')
   const [{ theme: themeOverrides }] = useContext(Store)
   const colorScheme = prefersDarkColorScheme ? 'dark' : 'light'
-  const paletteType = themeOverrides.palette?.type ?? colorScheme
+  const paletteMode = themeOverrides.palette?.mode ?? colorScheme
 
   const theme = useMemo(() => {
     return createMuiTheme({
-      "palette": {
-        type: paletteType,
-        background: paletteType === 'dark' ? {
+      palette: {
+        mode: paletteMode,
+        background: paletteMode === 'dark' ? {
           default: '#212121',
           paper: '#212121',
         } : {},
@@ -30,29 +32,38 @@ const useTheme = () => {
           contrastText: '#000000',
         },
       },
-      overrides: {
-        MuiTableRow: {
-          root: {
-            '&hover': {
-              backgroundColor: 'rgba(245, 245, 245, 0.1)',
-            },
-            '&selected': {
-              backgroundColor: 'rgba(74, 20, 140, 0.2)',
+      components: {
+        MuiCssBaseline: {
+          styleOverrides: {
+            body: {
+              ...((paletteMode === 'dark' && usesDesktopDisplay) ? darkScrollbar() : {}),
             },
           },
         },
-        MuiLink: {
-          root: {
-            '&.active': {
-              '& > *': {
-                backgroundColor: 'rgba(74, 20, 140, 0.2)',
-              },
-            },
-          },
-        },
-      }
+      },
+      // overrides: {
+      //   MuiTableRow: {
+      //     root: {
+      //       '&hover': {
+      //         backgroundColor: 'rgba(245, 245, 245, 0.1)',
+      //       },
+      //       '&selected': {
+      //         backgroundColor: 'rgba(74, 20, 140, 0.2)',
+      //       },
+      //     },
+      //   },
+      //   MuiLink: {
+      //     root: {
+      //       '&.active': {
+      //         '& > *': {
+      //           backgroundColor: 'rgba(74, 20, 140, 0.2)',
+      //         },
+      //       },
+      //     },
+      //   },
+      // }
     })
-  }, [paletteType])
+  }, [paletteMode, usesDesktopDisplay])
 
   return theme
 }

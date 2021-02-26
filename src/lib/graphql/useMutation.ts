@@ -1,6 +1,6 @@
 import { useState, useMemo, useContext } from 'react'
 import { GraphQLScript } from './graphql'
-import { GraphQLContext } from './context'
+import { GraphQLContext } from './createFetchGraphQL'
 
 type GraphQLResult<T = any> = {
   errors?: any[]

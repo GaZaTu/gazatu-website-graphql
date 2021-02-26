@@ -39,8 +39,8 @@ const UserListView: React.FC = () => {
       count: data?.users?.length,
       filter: false,
       rowsPerPageOptions: [20],
-      rowsPerPage: 20,
-      responsive: 'scrollMaxHeight',
+      rowsPerPage: 25,
+      responsive: 'simple',
       customToolbar: () => <CustomToolbar />,
     }
   }, [data])
@@ -61,7 +61,7 @@ const UserListView: React.FC = () => {
           </AppTable.Column>
           <AppTable.Column name="username" label="Username" />
           <AppTable.Column name="roles" label="Roles">
-            {v => `[${v.map((r: any) => r.name).join(', ')}]`}
+            {(v: any) => `[${v.map((r: any) => r.name).join(', ')}]`}
           </AppTable.Column>
           <AppTable.Column name="updatedAt" label="Updated">
             {v => new Date(v).toLocaleDateString()}

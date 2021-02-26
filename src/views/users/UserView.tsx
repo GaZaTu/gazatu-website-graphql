@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import useDocumentAndDrawerTitle from '../../lib/useDocumentAndDrawerTitle'
 import useAuthorization from '../../lib/useAuthorization'
 import { makeStyles, createStyles } from '@material-ui/core/styles'
@@ -73,7 +73,7 @@ const UserView: React.FC<Props> = props => {
     }
   `
 
-  const variables = React.useMemo(() => {
+  const variables = useMemo(() => {
     return { id }
   }, [id])
 
@@ -86,7 +86,7 @@ const UserView: React.FC<Props> = props => {
     query: mutation,
   })
 
-  const initialValues = React.useMemo(() => {
+  const initialValues = useMemo(() => {
     return {
       username: '',
       roles: [] as any[],
@@ -94,7 +94,7 @@ const UserView: React.FC<Props> = props => {
     }
   }, [data])
 
-  const handleSubmit = React.useMemo(() => {
+  const handleSubmit = useMemo(() => {
     return async (values: typeof initialValues) => {
       try {
         console.log({ id, input: values })
@@ -106,7 +106,7 @@ const UserView: React.FC<Props> = props => {
         enqueueSnackbar(`${error}`, { variant: 'error' })
       }
     }
-  }, [enqueueSnackbar, initialValues, retry, updateUser, id])
+  }, [enqueueSnackbar, retry, updateUser, id])
 
   return (
     <div>
@@ -132,11 +132,12 @@ const UserView: React.FC<Props> = props => {
         </Form.Context.Consumer>
 
         <div>
-          <FormTextField type="text" name="username" label="Username" className={classes.field} inputProps={{ readOnly: true }} required />
+          <FormTextField type="text" name="username" label="Username" variant="standard" className={classes.field} inputProps={{ readOnly: true }} required />
         </div>
 
-        <div>
-          <FormAutocomplete name="roles" options={data?.userRoles ?? []} getOptionLabel={o => typeof o === 'string' ? o : o.name} autoHighlight filterSelectedOptions multiple
+        <div style={{ marginTop: '12px' }}>
+          <FormAutocomplete name="roles" options={data?.userRoles ?? []} autoHighlight filterSelectedOptions multiple
+            getOptionLabel={o => typeof o === 'string' ? o : o.name}
             renderInput={params => (
               <TextField {...params} label="Roles" className={classes.field} inputProps={{ ...params.inputProps, readOnly }} />
             )} />

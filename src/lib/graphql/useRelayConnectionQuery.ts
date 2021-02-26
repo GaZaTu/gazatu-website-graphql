@@ -20,7 +20,7 @@ const useRelayConnectionQuery: UseRelayConnectionQuery = ({ query, variables, pa
   })
 
   useLayoutEffect(() => {
-    setResultSet(data ? Object.values<any>(data)[0] : undefined)
+    setResultSet(data ? Object.values<any>(data as any)[0] : undefined)
   }, [data])
 
   return [[parsedEdges, error, loading, retry], [count, page, paginateForward, paginateBackward]]

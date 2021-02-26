@@ -1,13 +1,12 @@
-import React, { useContext, useMemo, useEffect, useState } from 'react'
-import { List, ListItem, ListItemIcon, ListItemText, Divider, ListSubheader, Badge } from '@material-ui/core'
-import HomeIcon from '@material-ui/icons/Home'
+import { Badge, List, ListItem, ListItemText, ListSubheader } from '@material-ui/core'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
+import { graphql } from '../lib/graphql'
+import { Query, TriviaCounts } from '../lib/graphql/schema.gql'
+import useQuery from '../lib/graphql/useQuery'
+import { getPath, useInterceptor } from '../lib/hookrouter'
 import NavLink from '../lib/mui/NavLink'
 import useAuthorization from '../lib/useAuthorization'
-import { graphql } from '../lib/graphql'
-import useQuery from '../lib/graphql/useQuery'
-import { Query, TriviaCounts } from '../lib/graphql/schema.gql'
 import { Store } from '../store'
-import { useInterceptor } from '../lib/hookrouter'
 
 export let dispatchReloadTriviaCounts: () => void
 
@@ -69,19 +68,6 @@ const AppSidebar: React.FC = () => {
 
   return (
     <React.Fragment>
-      <List dense>
-        <NavLink exact href="/" replaceQueryParams force color="inherit" underline="none">
-          <ListItem button>
-            <ListItemIcon>
-              <HomeIcon />
-            </ListItemIcon>
-            <ListItemText primary="Start" />
-          </ListItem>
-        </NavLink>
-      </List>
-
-      <Divider />
-
       <List dense subheader={(
         <ListSubheader>Trivia</ListSubheader>
       )}>
@@ -147,6 +133,23 @@ const AppSidebar: React.FC = () => {
         )}
       </List>
 
+      {(isAdmin || getPath().startsWith('/blog')) && (
+        <List dense subheader={(
+          <ListSubheader>Blog</ListSubheader>
+        )}>
+          <NavLink exact href="/blog/gallery" replaceQueryParams force color="inherit" underline="none">
+            <ListItem button>
+              <ListItemText primary="Gallery" />
+            </ListItem>
+          </NavLink>
+          <NavLink exact href="/blog/stories/new" replaceQueryParams force color="inherit" underline="none">
+            <ListItem button>
+              <ListItemText primary="New Story" />
+            </ListItem>
+          </NavLink>
+        </List>
+      )}
+
       {isAdmin && (
         <List dense subheader={(
           <ListSubheader>Users</ListSubheader>
@@ -175,6 +178,11 @@ const AppSidebar: React.FC = () => {
           </NavLink>
         )}
       </List>
+
+      {/* <List dense subheader={(
+        <ListSubheader>Misc</ListSubheader>
+      )}>
+      </List> */}
     </React.Fragment>
   )
 }

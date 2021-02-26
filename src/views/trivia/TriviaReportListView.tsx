@@ -40,8 +40,8 @@ const TriviaReportListView: React.FC = () => {
       count: data?.triviaReports?.length,
       filter: false,
       rowsPerPageOptions: [20],
-      rowsPerPage: 20,
-      responsive: 'scrollMaxHeight',
+      rowsPerPage: 25,
+      responsive: 'simple',
       customToolbar: () => <CustomToolbar />,
     }
   }, [data])

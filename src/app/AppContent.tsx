@@ -16,6 +16,8 @@ const TriviaQuestionView = React.lazy(() => import('../views/trivia/TriviaQuesti
 const TriviaCategoryListView = React.lazy(() => import('../views/trivia/TriviaCategoryListView'))
 const TriviaCategoryView = React.lazy(() => import('../views/trivia/TriviaCategoryView'))
 const TriviaReportListView = React.lazy(() => import('../views/trivia/TriviaReportListView'))
+const BlogGalleryView = React.lazy(() => import('../views/blog/BlogGalleryView'))
+const BlogStoryView = React.lazy(() => import('../views/blog/BlogStoryView'))
 
 const useStyles =
   makeStyles(theme =>
@@ -41,6 +43,8 @@ const AppContent: React.FC = () => {
       '/trivia/questions/:id': ({ id }: any) => <TriviaQuestionView id={id} />,
       '/trivia/categories': () => <TriviaCategoryListView />,
       '/trivia/categories/:id': ({ id }: any) => <TriviaCategoryView id={id} />,
+      '/blog/galery': () => <BlogGalleryView />,
+      '/blog/stories/:name': ({ name }: any) => <BlogStoryView name={name} />,
     }
   }, [])
 

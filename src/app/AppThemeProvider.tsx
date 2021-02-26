@@ -1,5 +1,6 @@
 import React from 'react'
-import ThemeProvider from '@material-ui/styles/ThemeProvider'
+import { ThemeProvider as MuiThemeProvider } from '@material-ui/styles'
+import { ThemeProvider as EmotionThemeProvider } from '@emotion/react'
 import useTheme from './useTheme'
 
 interface Props {
@@ -11,9 +12,11 @@ const AppThemeProvider: React.FC<Props> = props => {
   const theme = useTheme()
 
   return (
-    <ThemeProvider theme={theme}>
-      {children}
-    </ThemeProvider>
+    <MuiThemeProvider theme={theme}>
+      <EmotionThemeProvider theme={theme}>
+        {children}
+      </EmotionThemeProvider>
+    </MuiThemeProvider>
   )
 }
 

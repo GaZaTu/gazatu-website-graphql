@@ -16,7 +16,7 @@ const UploadIconButton: React.FC<Props> = props => {
 
   return (
     <span {...rootProps}>
-      <Tooltip title={title}>
+      <Tooltip title={title ?? ''}>
         <IconButton {...nativeProps}>
           <input {...inputProps} />
           {children}

@@ -10,7 +10,7 @@ const useDocumentTitle = (title: string) => {
     return () => {
       documentTitle.innerText = previousTitle
     }
-  }, [title, previousTitle, documentTitle.innerText])
+  }, [title, previousTitle, documentTitle])
 
   return title
 }
