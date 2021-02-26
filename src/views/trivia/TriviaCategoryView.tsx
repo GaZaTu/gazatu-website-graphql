@@ -99,7 +99,7 @@ const TriviaCategoryView: React.FC<Props> = ({ id }) => {
     query: mutation,
   })
 
-  const initialValues = React.useMemo(() => {
+  const initialValues = useMemo(() => {
     return {
       name: '',
       submitter: null as string | null,
@@ -107,7 +107,7 @@ const TriviaCategoryView: React.FC<Props> = ({ id }) => {
     }
   }, [data])
 
-  const handleSubmit = React.useMemo(() => {
+  const handleSubmit = useMemo(() => {
     return async (values: typeof initialValues) => {
       try {
         const id = await saveTriviaCategory({ input: values })
@@ -122,7 +122,7 @@ const TriviaCategoryView: React.FC<Props> = ({ id }) => {
         enqueueSnackbar(`${error}`, { variant: 'error' })
       }
     }
-  }, [enqueueSnackbar, initialValues, isNew, retry, saveTriviaCategory])
+  }, [enqueueSnackbar, isNew, retry, saveTriviaCategory])
 
   const [removeTriviaCategory] = useMutation<Mutation>({
     query: graphql`
@@ -134,7 +134,7 @@ const TriviaCategoryView: React.FC<Props> = ({ id }) => {
     `,
   })
 
-  const handleRemoveClick = React.useMemo(() => {
+  const handleRemoveClick = useMemo(() => {
     return async () => {
       try {
         const prompt = showPromptDialog({
@@ -170,6 +170,7 @@ const TriviaCategoryView: React.FC<Props> = ({ id }) => {
                 <IconButton
                   type="button"
                   onClick={handleRemoveClick}
+                  disabled={isNew}
                 >
                   <Delete />
                 </IconButton>
@@ -189,11 +190,11 @@ const TriviaCategoryView: React.FC<Props> = ({ id }) => {
         </Form.Context.Consumer>
 
         <div>
-          <FormTextField type="text" name="name" label="Name" className={classes.field} inputProps={{ readOnly }} required />
+          <FormTextField type="text" name="name" label="Name" variant="standard" className={classes.field} inputProps={{ readOnly }} required />
         </div>
 
         <div>
-          <FormTextField type="text" name="submitter" label="Submitter" className={classes.field} inputProps={{ readOnly }} />
+          <FormTextField type="text" name="submitter" label="Submitter" variant="standard" className={classes.field} inputProps={{ readOnly }} />
         </div>
       </Form>
 
@@ -201,7 +202,7 @@ const TriviaCategoryView: React.FC<Props> = ({ id }) => {
 
       {data?.triviaCategory?.questions && (
         <div>
-          <AppTable title="Questions" data={data?.triviaCategory?.questions ?? []} options={{ filter: false, viewColumns: false, responsive: 'scrollMaxHeight' }}>
+          <AppTable title="Questions" data={data?.triviaCategory?.questions ?? []} options={{ filter: false, viewColumns: false, responsive: 'simple' }}>
             <AppTable.Column name="id" options={{ display: 'excluded' }} />
             <AppTable.Column name="" options={{ empty: true, filter: false, sort: false }}>
               {(_, meta) => (

@@ -1,9 +1,8 @@
 import React from 'react'
 import Form from '../Form'
-import Autocomplete, { AutocompleteProps } from '@material-ui/lab/Autocomplete'
-import { UseAutocompleteSingleProps, UseAutocompleteMultipleProps } from '@material-ui/lab/useAutocomplete'
+import Autocomplete, { AutocompleteProps } from '@material-ui/core/Autocomplete'
 
-type FormAutocompleteProps<T = any> = ((AutocompleteProps<T> & UseAutocompleteSingleProps<T>) | (AutocompleteProps<T> & UseAutocompleteMultipleProps<T>)) & {
+type FormAutocompleteProps<T = any> = AutocompleteProps<T, boolean, boolean, boolean> & {
   name: string
 }
 

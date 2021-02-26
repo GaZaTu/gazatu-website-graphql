@@ -19,10 +19,10 @@ const AppToolbar: React.FC = () => {
   const logout = () =>
     dispatch({ type: '@@AUTH/LOGOUT' })
 
-  const themeMode = themeOverrides.palette?.type ?? 'system'
+  const themeMode = themeOverrides.palette?.mode ?? 'system'
 
   const changeThemeMode = (ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-    dispatch({ type: '@@THEME/SET_STATE', payload: { palette: { type: ev.target.value === 'system' ? undefined : ev.target.value as any } } })
+    dispatch({ type: '@@THEME/SET_STATE', payload: { palette: { mode: ev.target.value === 'system' ? undefined : ev.target.value as any } } })
 
   return (
     <React.Fragment>
@@ -54,7 +54,7 @@ const AppToolbar: React.FC = () => {
           </NavLink>
         )}
         <MenuItem button={false}>
-          <TextField label="Theme" style={{ minWidth: '10rem' }} value={themeMode} onChange={changeThemeMode} select>
+          <TextField label="Theme" variant="standard" style={{ minWidth: '10rem' }} value={themeMode} onChange={changeThemeMode} select>
             <MenuItem value="system">System Default</MenuItem>
             <MenuItem value="light">Light-Mode</MenuItem>
             <MenuItem value="dark">Dark-Mode</MenuItem>

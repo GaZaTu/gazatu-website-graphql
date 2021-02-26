@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react'
+import React, { useMemo, useEffect, useState } from 'react'
 import useDocumentAndDrawerTitle from '../../lib/useDocumentAndDrawerTitle'
 import { makeStyles, createStyles, Toolbar, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton, useMediaQuery, useTheme, Typography, TextField } from '@material-ui/core'
 import useAuthorization from '../../lib/useAuthorization'
@@ -163,7 +163,7 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
         enqueueSnackbar(`${error}`, { variant: 'error' })
       }
     }
-  }, [enqueueSnackbar, initialValues, isNew, retry, saveTriviaQuestion])
+  }, [enqueueSnackbar, isNew, retry, saveTriviaQuestion])
 
   useEffect(() => {
     if (error) {
@@ -207,7 +207,7 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
   //   }
   // }, [id])
 
-  const [reportDialogOpen, setReportDialogOpen] = React.useState(false)
+  const [reportDialogOpen, setReportDialogOpen] = useState(false)
 
   const handleReportDialogOpen = () =>
     setReportDialogOpen(true)
@@ -244,7 +244,7 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
         enqueueSnackbar(`${error}`, { variant: 'error' })
       }
     }
-  }, [enqueueSnackbar, initialReportValues, reportTriviaQuestion, setReportDialogOpen, retry])
+  }, [enqueueSnackbar, reportTriviaQuestion, setReportDialogOpen, retry])
 
   const [removeTriviaQuestion] = useMutation<Mutation>({
     query: graphql`
@@ -300,6 +300,7 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
                 <IconButton
                   type="button"
                   onClick={handleRemoveClick}
+                  disabled={isNew}
                 >
                   <Delete />
                 </IconButton>
@@ -319,40 +320,42 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
         </Form.Context.Consumer>
 
         <div>
-          <FormAutocomplete name="category" options={data?.triviaCategories ?? []} getOptionLabel={o => typeof o === 'string' ? o : o.name} autoHighlight filterSelectedOptions
-            renderOption={option => (
-              <React.Fragment>
+          <FormAutocomplete name="category" options={data?.triviaCategories ?? []} autoHighlight filterSelectedOptions
+            getOptionLabel={o => typeof o === 'string' ? o : o.name}
+            getOptionSelected={(o, v) => o.name === v}
+            renderOption={(props, option) => (
+              <MenuItem {...props}>
                 <VerifiedUser style={{ color: (option.disabled || !option.verified) ? 'transparent' : undefined, marginRight: '8px' }} />
                 <span>{option.name}</span>
-              </React.Fragment>
+              </MenuItem>
             )}
             renderInput={params => (
-              <TextField {...params} label="Category" className={classes.field} inputProps={{ ...params.inputProps, readOnly }} required />
+              <TextField {...params} label="Category" variant="standard" className={classes.field} inputProps={{ ...params.inputProps, readOnly }} required />
             )} />
         </div>
 
         <div>
-          <FormTextField type="text" name="question" label="Question" className={classes.field} inputProps={{ readOnly }} required />
+          <FormTextField type="text" name="question" label="Question" variant="standard" className={classes.field} inputProps={{ readOnly }} required />
         </div>
 
         <div>
-          <FormTextField type="text" name="answer" label="Answer" className={classes.field} inputProps={{ readOnly }} required />
+          <FormTextField type="text" name="answer" label="Answer" variant="standard" className={classes.field} inputProps={{ readOnly }} required />
         </div>
 
         <div>
-          <FormTextField type="text" name="hint1" label="Hint 1" className={classes.field} inputProps={{ readOnly }} />
+          <FormTextField type="text" name="hint1" label="Hint 1" variant="standard" className={classes.field} inputProps={{ readOnly }} />
         </div>
 
         <div>
-          <FormTextField type="text" name="hint2" label="Hint 2" className={classes.field} inputProps={{ readOnly }} />
+          <FormTextField type="text" name="hint2" label="Hint 2" variant="standard" className={classes.field} inputProps={{ readOnly }} />
         </div>
 
         <div>
-          <FormTextField type="text" name="submitter" label="Submitter" className={classes.field} inputProps={{ readOnly }} />
+          <FormTextField type="text" name="submitter" label="Submitter" variant="standard" className={classes.field} inputProps={{ readOnly }} />
         </div>
 
         <div>
-          <FormTextField select name="language" label="Language" options={data?.languages} optionId={(o: any) => o.id} className={classes.field} required disabled>
+          <FormTextField select name="language" label="Language" variant="standard" options={data?.languages} optionId={(o: any) => o.id} className={classes.field} required disabled>
             <MenuItem />
             {data?.languages?.map((o: any) => (
               <MenuItem key={o.id} value={o.id}>{o.name}</MenuItem>
@@ -383,7 +386,7 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
           search: false,
           filter: false,
           viewColumns: false,
-          responsive: 'scrollMaxHeight',
+          responsive: 'simple',
           customToolbar: () => <ReportsCustomToolbar reports={data?.triviaQuestion?.reports ?? []} reload={retry} />,
         }
 
@@ -407,11 +410,11 @@ const TriviaQuestionView: React.FC<Props> = ({ id }) => {
             <DialogTitle>Submit a report for this question</DialogTitle>
             <DialogContent>
               <div>
-                <FormTextField type="text" name="message" label="Message" className={classes.field} required />
+                <FormTextField type="text" name="message" label="Message" variant="standard" className={classes.field} required />
               </div>
 
               <div>
-                <FormTextField type="text" name="submitter" label="Submitter" className={classes.field} required />
+                <FormTextField type="text" name="submitter" label="Submitter" variant="standard" className={classes.field} required />
               </div>
             </DialogContent>
             <DialogActions>

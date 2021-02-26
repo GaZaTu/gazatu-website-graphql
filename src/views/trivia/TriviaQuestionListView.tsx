@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { graphql } from '../../lib/graphql/graphql'
 import useRelayConnectionQuery from '../../lib/graphql/useRelayConnectionQuery'
 import { relayConnectionFragment } from '../../lib/graphql/useRelayConnection'
@@ -6,7 +6,7 @@ import useDocumentAndDrawerTitle from '../../lib/useDocumentAndDrawerTitle'
 import useDrawerWithoutPadding from '../../lib/useDrawerWithoutPadding'
 import useAuthorization from '../../lib/useAuthorization'
 import AppTable from '../../app/AppTable'
-import { IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@material-ui/core'
+import { IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, MenuItem } from '@material-ui/core'
 import OpenInBrowser from '@material-ui/icons/OpenInBrowser'
 import CloudUpload from '@material-ui/icons/CloudUpload'
 import { MUIDataTableOptions } from 'mui-datatables'
@@ -83,7 +83,7 @@ const TriviaQuestionListView: React.FC = () => {
   const [[data, error, loading, retry], [count, page, paginateForwards, paginateBackwards]] = useRelayConnectionQuery<TriviaQuestion>({
     query,
     variables,
-    pageSize: 20,
+    pageSize: 25,
   })
 
   const changePage = React.useMemo(() => {
@@ -96,7 +96,7 @@ const TriviaQuestionListView: React.FC = () => {
     }
   }, [page, paginateBackwards, paginateForwards])
 
-  const changeSort = React.useMemo(() => {
+  const changeSort = useMemo(() => {
     return (field: string, direction: string) =>
       setVariables(state => ({
         ...state,
@@ -105,7 +105,7 @@ const TriviaQuestionListView: React.FC = () => {
       }))
   }, [])
 
-  const changeSearch = React.useMemo(() => {
+  const changeSearch = useMemo(() => {
     return debounce((search: string) =>
       setVariables(state => ({
         ...state,
@@ -114,16 +114,16 @@ const TriviaQuestionListView: React.FC = () => {
       , 500)
   }, [])
 
-  const [selectedIndexes, setSelectedIndexes] = React.useState<number[]>([])
+  const [selectedIndexes, setSelectedIndexes] = useState([] as number[])
 
-  const tableOptions = React.useMemo<MUIDataTableOptions>(() => {
+  const tableOptions = useMemo<MUIDataTableOptions>(() => {
     return {
       serverSide: true,
       count,
       filter: false,
       rowsPerPageOptions: [20],
-      rowsPerPage: 20,
-      responsive: 'scrollMaxHeight',
+      rowsPerPage: 25,
+      responsive: 'simple',
       onTableChange: (action, tableState) => {
         const activeColumn = (tableState.activeColumn !== null) ? (tableState as any).columns[tableState.activeColumn] : null
 
@@ -133,21 +133,23 @@ const TriviaQuestionListView: React.FC = () => {
             setSelectedIndexes([])
             break
           case 'sort':
-            changeSort(activeColumn!.name, activeColumn!.sortDirection)
+            changeSort(activeColumn!.name, tableState!.sortOrder.direction)
             setSelectedIndexes([])
             break
         }
       },
-      onSearchChange: changeSearch,
+      onSearchChange: text => changeSearch(text ?? ''),
       searchText: variables.search,
+      searchProps: { variant: 'standard' } as any,
       customToolbar: () => <CustomToolbar reload={retry} />,
       selectableRows: isTriviaAdmin ? 'multiple' : 'none',
       isRowSelectable: () => isTriviaAdmin,
-      onRowsSelect: (clickedRows, selectedRows) => {
+      onRowSelectionChange: (clickedRows, selectedRows) => {
         setSelectedIndexes(selectedRows.slice(0, 20).map(r => r.dataIndex))
       },
       rowsSelected: selectedIndexes,
       customToolbarSelect: () => <CustomSelectedItemsToolbar reload={retry} selectedQuestions={selectedIndexes.map(i => data![i])} setSelectedIndexes={setSelectedIndexes} />,
+      enableNestedDataAccess: '.',
     }
   }, [count, variables.search, changePage, changeSearch, changeSort, retry, isTriviaAdmin, data, selectedIndexes, setSelectedIndexes])
 
@@ -211,7 +213,7 @@ const CustomToolbar: React.FC<{ reload: () => void }> = props => {
     `,
   })
 
-  const handleImportLegacyQuestions = React.useMemo(() => {
+  const handleImportLegacyQuestions = useMemo(() => {
     return async ([file]: any[]) => {
       try {
         const json = await readFile(file)
@@ -268,17 +270,17 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
     query: removeTriviaQuestionsMutation,
   })
 
-  const getSelectedIds = React.useMemo(() => {
+  const getSelectedIds = useMemo(() => {
     return () =>
       selectedQuestions.map(q => q.id)
   }, [selectedQuestions])
 
-  const canVerifySelection = React.useMemo(() => {
+  const canVerifySelection = useMemo(() => {
     return !selectedQuestions
       .some(question => !question.category?.verified || question.category?.disabled)
   }, [selectedQuestions])
 
-  const handleVerifyClick = React.useMemo(() => {
+  const handleVerifyClick = useMemo(() => {
     return async () => {
       const prompt = showPromptDialog({
         title: 'Verify selected questions?',
@@ -297,7 +299,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
     }
   }, [getSelectedIds, reload, verifyTriviaQuestions, setSelectedIndexes, showPromptDialog])
 
-  const handleDeleteClick = React.useMemo(() => {
+  const handleDeleteClick = useMemo(() => {
     return async () => {
       const prompt = showPromptDialog({
         title: 'Delete selected questions?',
@@ -316,9 +318,9 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
     }
   }, [getSelectedIds, reload, removeTriviaQuestions, setSelectedIndexes, showPromptDialog])
 
-  const [changeCategoryDialogOpen, setChangeCategoryDialogOpen] = React.useState(false)
+  const [changeCategoryDialogOpen, setChangeCategoryDialogOpen] = useState(false)
 
-  const triviaCategoriesQuery = React.useMemo(() => {
+  const triviaCategoriesQuery = useMemo(() => {
     return changeCategoryDialogOpen ? graphql`
       query Query {
         triviaCategories(verified: true, disabled: false) {
@@ -339,7 +341,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
   const handleChangeCategoryDialogClose = () =>
     setChangeCategoryDialogOpen(false)
 
-  const initialChangeCategoryValues = React.useMemo(() => {
+  const initialChangeCategoryValues = useMemo(() => {
     return {
       category: null as TriviaCategory | null,
     }
@@ -357,7 +359,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
     query: categorizeTriviaQuestionsMutation,
   })
 
-  const handleReportSubmit = React.useMemo(() => {
+  const handleReportSubmit = useMemo(() => {
     return async (values: typeof initialChangeCategoryValues) => {
       await categorizeTriviaQuestions({ ids: getSelectedIds(), categoryId: values.category?.id })
 
@@ -367,7 +369,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
       setSelectedIndexes([])
       dispatchReloadTriviaCounts()
     }
-  }, [initialChangeCategoryValues, categorizeTriviaQuestions, setChangeCategoryDialogOpen, getSelectedIds, reload, setSelectedIndexes])
+  }, [categorizeTriviaQuestions, setChangeCategoryDialogOpen, getSelectedIds, reload, setSelectedIndexes])
 
   return (
     <div className="MuiToolbar-gutters" style={{ flex: '1 1 auto', textAlign: 'right' }}>
@@ -392,12 +394,14 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedQuestio
             <DialogTitle>Change category of selected questions</DialogTitle>
             <DialogContent>
               <div>
-                <FormAutocomplete name="category" options={triviaCategoriesResult?.triviaCategories ?? []} getOptionLabel={o => typeof o === 'string' ? o : o.name} autoHighlight filterSelectedOptions
-                  renderOption={option => (
-                    <React.Fragment>
+                <FormAutocomplete name="category" options={triviaCategoriesResult?.triviaCategories ?? []} autoHighlight filterSelectedOptions
+                  getOptionLabel={o => typeof o === 'string' ? o : o.name}
+                  getOptionSelected={(o, v) => o.name === v}
+                  renderOption={(props, option) => (
+                    <MenuItem {...props}>
                       <VerifiedUser style={{ marginRight: '8px' }} />
                       <span>{option.name}</span>
-                    </React.Fragment>
+                    </MenuItem>
                   )}
                   renderInput={params => (
                     <TextField {...params} label="Category" style={{ width: '100%' }} required />

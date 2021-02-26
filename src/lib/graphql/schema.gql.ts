@@ -3,88 +3,119 @@ export interface AuthResult {
   token?: string;
   user?: User;
 }
+export interface BlogEntry {
+  __typename?: 'BlogEntry';
+  createdAt?: DateTime;
+  id?: string;
+  imageAsBase64?: string | null;
+  imageAsDataURL?: string | null;
+  imageFileExtension?: string | null;
+  imageMimeType?: string | null;
+  message?: string | null;
+  story?: string;
+  title?: string;
+  updatedAt?: DateTime;
+}
+export interface BlogEntryInput {
+  id?: string | null;
+  imageAsBase64?: string | null;
+  imageAsDataURL?: string | null;
+  imageFileExtension?: string | null;
+  imageMimeType?: string | null;
+  message?: string | null;
+  story?: string | null;
+  title?: string | null;
+}
 export interface Change {
   __typename?: 'Change';
+  createdAt?: DateTime;
   id?: string;
   kind?: ChangeKind;
+  newColumnValue?: string | null;
+  targetColumn?: string | null;
   targetEntityName?: string;
   targetId?: string | null;
-  targetColumn?: string | null;
-  newColumnValue?: string | null;
-  createdAt?: DateTime;
 }
 export enum ChangeKind {
   INSERT = "INSERT",
-  UPDATE = "UPDATE",
-  REMOVE = "REMOVE"
+  REMOVE = "REMOVE",
+  UPDATE = "UPDATE"
 }
 export interface CountResult {
   __typename?: 'CountResult';
   count?: number;
 }
 export type DateTime = unknown;
+export interface IDsResult {
+  __typename?: 'IDsResult';
+  ids?: string[];
+}
 export interface Language {
   __typename?: 'Language';
-  id?: string;
-  name?: string;
-  languageCode?: string | null;
   countryCode?: string | null;
   createdAt?: DateTime;
+  id?: string;
+  languageCode?: string | null;
+  name?: string;
   updatedAt?: DateTime;
 }
 export interface LanguageInput {
-  name: string;
-  languageCode: string;
   countryCode: string;
+  languageCode: string;
+  name: string;
 }
 export interface Mutation {
   __typename?: 'Mutation';
   addLanguage?: Language;
-  updateUser?: User | null;
+  categorizeTriviaQuestions?: CountResult;
   deleteUser?: CountResult;
   getOrAddUserRole?: UserRole;
-  registerUser?: AuthResult;
-  saveTriviaQuestion?: TriviaQuestion;
-  verifyTriviaQuestions?: CountResult;
-  removeTriviaQuestions?: CountResult;
-  categorizeTriviaQuestions?: CountResult;
   importLegacyTriviaQuestions?: CountResult;
-  saveTriviaCategory?: TriviaCategory;
-  verifyTriviaCategories?: CountResult;
-  removeTriviaCategories?: CountResult;
   mergeTriviaCategoriesInto?: CountResult;
-  reportTriviaQuestion?: TriviaReport;
+  registerUser?: AuthResult;
+  removeTriviaCategories?: CountResult;
+  removeTriviaQuestions?: CountResult;
   removeTriviaReports?: CountResult;
+  reportTriviaQuestion?: TriviaReport;
+  saveBlogEntries?: IDsResult;
+  saveBlogEntry?: BlogEntry;
+  saveTriviaCategory?: TriviaCategory;
+  saveTriviaQuestion?: TriviaQuestion;
+  updateUser?: User | null;
+  verifyTriviaCategories?: CountResult;
+  verifyTriviaQuestions?: CountResult;
 }
 export interface NodeRef {
   id: string;
 }
 export interface PageInfo {
   __typename?: 'PageInfo';
-  startCursor?: string | null;
-  endCursor?: string | null;
-  hasPreviousPage?: boolean;
-  hasNextPage?: boolean;
   count?: number;
+  endCursor?: string | null;
+  hasNextPage?: boolean;
+  hasPreviousPage?: boolean;
+  startCursor?: string | null;
 }
 export interface Query {
   __typename?: 'Query';
+  authenticate?: AuthResult;
+  blogEntries?: BlogEntry[];
+  blogEntry?: BlogEntry | null;
+  changes?: Change[];
+  currentUser?: User | null;
   language?: Language | null;
   languages?: Language[];
-  changes?: Change[];
-  user?: User | null;
-  users?: User[];
-  currentUser?: User | null;
-  userRole?: UserRole | null;
-  userRoles?: UserRole[];
-  authenticate?: AuthResult;
+  triviaCategories?: TriviaCategory[];
+  triviaCategory?: TriviaCategory | null;
+  triviaCounts?: TriviaCounts;
   triviaQuestion?: TriviaQuestion | null;
   triviaQuestions?: TriviaQuestionConnection;
-  triviaCategory?: TriviaCategory | null;
-  triviaCategories?: TriviaCategory[];
   triviaReport?: TriviaReport | null;
   triviaReports?: TriviaReport[];
-  triviaCounts?: TriviaCounts;
+  user?: User | null;
+  userRole?: UserRole | null;
+  userRoles?: UserRole[];
+  users?: User[];
 }
 export enum SortDirection {
   ASC = "ASC",
@@ -96,51 +127,51 @@ export interface Subscription {
 }
 export interface TriviaCategory {
   __typename?: 'TriviaCategory';
+  createdAt?: DateTime;
+  description?: string | null;
+  disabled?: boolean | null;
   id?: string;
   name?: string;
-  description?: string | null;
-  submitter?: string | null;
-  verified?: boolean | null;
-  disabled?: boolean | null;
-  createdAt?: DateTime;
-  updatedAt?: DateTime;
   questions?: TriviaQuestion[] | null;
   questionsCount?: number;
+  submitter?: string | null;
+  updatedAt?: DateTime;
+  verified?: boolean | null;
 }
 export interface TriviaCategoryInput {
+  description?: string | null;
   id?: string | null;
   name: string;
-  description?: string | null;
   submitter?: string | null;
 }
 export interface TriviaCounts {
   __typename?: 'TriviaCounts';
-  questionsCount?: number;
-  unverifiedQuestionsCount?: number;
   categoriesCount?: number;
-  unverifiedCategoriesCount?: number;
-  reportsCount?: number;
-  reportedQuestionsCount?: number;
   danglingQuestionsCount?: number;
+  questionsCount?: number;
+  reportedQuestionsCount?: number;
+  reportsCount?: number;
+  unverifiedCategoriesCount?: number;
+  unverifiedQuestionsCount?: number;
 }
 export interface TriviaQuestion {
   __typename?: 'TriviaQuestion';
-  id?: string;
-  question?: string;
   answer?: string;
+  category?: TriviaCategory;
+  createdAt?: DateTime;
+  disabled?: boolean | null;
   hint1?: string | null;
   hint2?: string | null;
-  submitter?: string | null;
-  verified?: boolean | null;
-  disabled?: boolean | null;
-  createdAt?: DateTime;
-  updatedAt?: DateTime;
-  version?: number;
-  category?: TriviaCategory;
+  id?: string;
   language?: Language;
-  submitterUser?: User | null;
-  updatedBy?: User | null;
+  question?: string;
   reports?: TriviaReport[] | null;
+  submitter?: string | null;
+  submitterUser?: User | null;
+  updatedAt?: DateTime;
+  updatedBy?: User | null;
+  verified?: boolean | null;
+  version?: number;
 }
 export interface TriviaQuestionConnection {
   __typename?: 'TriviaQuestionConnection';
@@ -149,74 +180,64 @@ export interface TriviaQuestionConnection {
 }
 export interface TriviaQuestionEdge {
   __typename?: 'TriviaQuestionEdge';
-  node?: TriviaQuestion;
   cursor?: string;
+  node?: TriviaQuestion;
 }
 export interface TriviaQuestionInput {
-  id?: string | null;
-  question: string;
   answer: string;
   category: NodeRef;
-  language: NodeRef;
   hint1?: string | null;
   hint2?: string | null;
+  id?: string | null;
+  language: NodeRef;
+  question: string;
   submitter?: string | null;
 }
 export interface TriviaQuestionLegacyInput {
-  question: string;
   answer: string;
   category: string;
-  language: string;
+  createdAt: DateTime;
+  disabled: boolean;
   hint1?: string | null;
   hint2?: string | null;
+  language: string;
+  question: string;
   submitter?: string | null;
-  verified: boolean;
-  disabled: boolean;
-  createdAt: DateTime;
   updatedAt: DateTime;
+  verified: boolean;
 }
 export interface TriviaReport {
   __typename?: 'TriviaReport';
+  createdAt?: DateTime;
   id?: string;
   message?: string;
-  submitter?: string;
-  createdAt?: DateTime;
-  updatedAt?: DateTime;
   question?: TriviaQuestion;
+  submitter?: string;
+  updatedAt?: DateTime;
 }
 export interface TriviaReportInput {
-  questionId: string;
   message: string;
+  questionId: string;
   submitter: string;
-}
-export interface TriviaStatistics {
-  __typename?: 'TriviaStatistics';
-  questionsCount?: number;
-  verifiedQuestionsCount?: number;
-  categoriesCount?: number;
-  verifiedCategoriesCount?: number;
-  topCategories?: TriviaCategory[];
-  topSubmitters?: string[];
-  submissionDates?: DateTime[];
 }
 export interface User {
   __typename?: 'User';
-  id?: string;
-  username?: string;
   createdAt?: DateTime;
-  updatedAt?: DateTime;
+  id?: string;
   roles?: UserRole[];
+  updatedAt?: DateTime;
+  username?: string;
 }
 export interface UserInput {
   roles: NodeRef[];
 }
 export interface UserRole {
   __typename?: 'UserRole';
+  description?: string | null;
   id?: string;
   name?: string;
-  description?: string | null;
 }
 export interface UserRoleInput {
   name: string;
 }
-export type Node = Change | Language | TriviaCategory | TriviaQuestion | TriviaReport | User | UserRole;
+export type Node = BlogEntry | Change | Language | TriviaCategory | TriviaQuestion | TriviaReport | User | UserRole;

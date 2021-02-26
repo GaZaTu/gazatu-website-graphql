@@ -39,19 +39,25 @@ const useForm = <V extends Values>(props: Props<V>) => {
 
   const { values, errors, ...formState } = combinedFormState
 
-  const setValues = (values: V) =>
-    setCombinedFormState(state => ({ ...state, values }))
+  const setValues = useMemo(() => {
+    return (action: (values: V) => V) =>
+      setCombinedFormState(state => ({ ...state, values: action(state.values) }))
+  }, [setCombinedFormState])
 
-  const setErrors = (errors: Errors<V>) =>
-    setCombinedFormState(state => ({ ...state, errors }))
+  const setErrors = useMemo(() => {
+    return (action: (errors: Errors<V>) => Errors<V>) =>
+      setCombinedFormState(state => ({ ...state, errors: action(state.errors) }))
+  }, [setCombinedFormState])
 
-  const setFormStateProp = <K extends keyof FormState<V>>(k: K, v: FormState<V>[K]) =>
-    setCombinedFormState(state => ({ ...state, [k]: v }))
+  const setFormStateProp = useMemo(() => {
+    return <K extends keyof FormState<V>>(k: K, v: FormState<V>[K]) =>
+      setCombinedFormState(state => ({ ...state, [k]: v }))
+  }, [setCombinedFormState])
 
   const reset = useMemo(() => {
     return (values: V = initialValues) =>
-      setValues(values)
-  }, [initialValues])
+      setValues(() => values)
+  }, [setValues, initialValues])
 
   const validate = useMemo(() => {
     return async () => {
@@ -66,14 +72,14 @@ const useForm = <V extends Values>(props: Props<V>) => {
           setFormStateProp('isValidating', false)
         }
 
-        setErrors(errors)
+        setErrors(() => errors as Errors<V>)
 
         isValid = isValid && !Object.values(errors).find(e => !!e)
       }
 
       setFormStateProp('isValid', isValid)
     }
-  }, [onValidate, values])
+  }, [onValidate, setFormStateProp, setErrors, values])
 
   useLayoutEffect(() => {
     validate()
@@ -83,12 +89,23 @@ const useForm = <V extends Values>(props: Props<V>) => {
     reset()
   }, [reset])
 
+  const getValueByPath = (o: any, p: any) =>
+    String(p).split('.').reduce((o, i) => o?.[i], o)
+
+  const getValue = (p: any) =>
+    getValueByPath(values, p)
+
+  const getInitialValue = (p: any) =>
+    getValueByPath(initialValues, p)
+
   const normalizeValueForState = <K extends keyof V>({ name, value }: { name: K, value: V[K] }) => {
+    const initialValue = getInitialValue(name)
+
     if (value) {
       return value
-    } else if (initialValues[name] === null) {
+    } else if (initialValue === null) {
       return null
-    } else if (initialValues[name] === undefined) {
+    } else if (initialValue === undefined) {
       return undefined
     } else {
       return value
@@ -161,7 +178,23 @@ const useForm = <V extends Values>(props: Props<V>) => {
     reset()
 
   const handleChange = <K extends keyof V>({ name, value }: { name: K, value: V[K] }) =>
-    setValues({ ...values, [name]: value })
+    setValues(values => {
+      const nameAsString = String(name)
+      const result = { ...values }
+
+      if (nameAsString.includes('.')) {
+        const pathParts = nameAsString.split('.')
+        const parentObject = getValueByPath(result, pathParts.slice(0, -1).join('.'))
+
+        if (typeof parentObject === 'object') {
+          parentObject[pathParts.slice(-1).join('.')] = value
+        }
+      } else {
+        result[name] = value
+      }
+
+      return result
+    })
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement & HTMLSelectElement>) => {
     const { name, type, valueAsDate, valueAsNumber, value: valueAsString } = event.target
@@ -173,20 +206,20 @@ const useForm = <V extends Values>(props: Props<V>) => {
   const inputProps = <K extends keyof V>(name: K, { type }: { type: string } = { type: 'text' }) => ({
     name,
     type,
-    value: normalizeValueForInput(values[name], type),
+    value: normalizeValueForInput(getValue(name), type),
     onChange: handleInputChange,
   })
 
   const checkboxProps = <K extends keyof V>(name: K) => ({
     name,
     type: 'checkbox' as 'checkbox',
-    checked: !!values[name],
-    onChange: () => handleChange({ name, value: !values[name] as any }),
+    checked: !!getValue(name),
+    onChange: () => handleChange({ name, value: !getValue(name) as any }),
   })
 
   const radioProps = <K extends keyof V>(name: K, value: Exclude<V[K], null>, getId?: (v: Exclude<V[K], null | undefined>) => string) => {
     const newValue = getId && value ? getId(value!) : value
-    const savedValue = getId && values[name] ? getId(values[name]!) : values[name]
+    const savedValue = getId && getValue(name) ? getId(getValue(name)!) : getValue(name)
 
     return {
       name,
@@ -198,7 +231,7 @@ const useForm = <V extends Values>(props: Props<V>) => {
   }
 
   const selectProps = <K extends keyof V>(name: K, data: Exclude<V[K], null>[], getId?: (v: Exclude<V[K], null | undefined>) => string) => {
-    const savedValue = getId && values[name] ? getId(values[name]!) : values[name]
+    const savedValue = getId && getValue(name) ? getId(getValue(name)!) : getValue(name)
 
     return {
       name,
@@ -215,12 +248,12 @@ const useForm = <V extends Values>(props: Props<V>) => {
   }
 
   const controlProps = <K extends keyof V>(name: K) => ({
-    value: values[name],
+    value: getValue(name),
     onChange: (event: React.ChangeEvent<{ value: any }>) => handleChange({ name, value: event.target.value }),
   })
 
   const customControlProps = <K extends keyof V>(name: K) => ({
-    value: values[name],
+    value: getValue(name),
     onChange: (value: V[K]) => handleChange({ name, value }),
   })
 

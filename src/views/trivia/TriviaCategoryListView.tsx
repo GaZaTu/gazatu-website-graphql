@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { graphql } from '../../lib/graphql/graphql'
 import useDocumentAndDrawerTitle from '../../lib/useDocumentAndDrawerTitle'
 import useDrawerWithoutPadding from '../../lib/useDrawerWithoutPadding'
 import AppTable from '../../app/AppTable'
-import { IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@material-ui/core'
+import { IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, MenuItem } from '@material-ui/core'
 import OpenInBrowser from '@material-ui/icons/OpenInBrowser'
 import { MUIDataTableOptions } from 'mui-datatables'
 import useQuery from '../../lib/graphql/useQuery'
@@ -44,12 +44,12 @@ const TriviaCategoryListView: React.FC = () => {
     }
   `
 
-  const [variables, setVariables] = React.useState({
+  const [variables, setVariables] = useState({
     verified: undefined as boolean | undefined,
     disabled: false as boolean | undefined,
   })
 
-  React.useEffect(() => {
+  useEffect(() => {
     setVariables(variables => ({
       ...variables,
       isTriviaAdmin,
@@ -64,7 +64,7 @@ const TriviaCategoryListView: React.FC = () => {
   })
 
   const [search, setSearch] = React.useState('')
-  const [selectedIndexes, setSelectedIndexes] = React.useState<number[]>([])
+  const [selectedIndexes, setSelectedIndexes] = React.useState([] as number[])
 
   const tableOptions = React.useMemo<MUIDataTableOptions>(() => {
     return {
@@ -72,8 +72,8 @@ const TriviaCategoryListView: React.FC = () => {
       count: data?.triviaCategories?.length,
       filter: false,
       rowsPerPageOptions: [20],
-      rowsPerPage: 20,
-      responsive: 'scrollMaxHeight',
+      rowsPerPage: 25,
+      responsive: 'simple',
       onTableChange: (action, tableState) => {
         switch (action) {
           case 'changePage':
@@ -82,15 +82,15 @@ const TriviaCategoryListView: React.FC = () => {
         }
       },
       searchText: search,
-      onSearchChange: setSearch,
+      onSearchChange: text => setSearch(text ?? ''),
       customToolbar: () => <CustomToolbar />,
       selectableRows: isTriviaAdmin ? 'multiple' : 'none',
       isRowSelectable: () => isTriviaAdmin,
-      onRowsSelect: (clickedRows, selectedRows) => {
+      onRowSelectionChange: (clickedRows, selectedRows) => {
         setSelectedIndexes(selectedRows.slice(0, 20).map(r => r.dataIndex))
       },
       rowsSelected: selectedIndexes,
-      customToolbarSelect: () => <CustomSelectedItemsToolbar reload={retry} selectedCategories={selectedIndexes.map(i => data?.triviaCategories![i])} setSelectedIndexes={setSelectedIndexes} />,
+      customToolbarSelect: () => <CustomSelectedItemsToolbar reload={retry} selectedCategories={selectedIndexes.map(i => data?.triviaCategories![i]!)} setSelectedIndexes={setSelectedIndexes} />,
     }
   }, [data, setSelectedIndexes, isTriviaAdmin, retry, selectedIndexes, setSearch, search])
 
@@ -190,7 +190,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedCategor
     query: mergeTriviaCategoriesIntoMutation,
   })
 
-  const handleVerifyClick = React.useMemo(() => {
+  const handleVerifyClick = useMemo(() => {
     return async () => {
       const prompt = showPromptDialog({
         title: 'Verify selected categories?',
@@ -209,7 +209,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedCategor
     }
   }, [getSelectedIds, reload, verifyTriviaCategories, setSelectedIndexes, showPromptDialog])
 
-  const handleDeleteClick = React.useMemo(() => {
+  const handleDeleteClick = useMemo(() => {
     return async () => {
       const prompt = showPromptDialog({
         title: 'Delete selected categories?',
@@ -228,7 +228,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedCategor
     }
   }, [getSelectedIds, reload, removeTriviaCategories, setSelectedIndexes, showPromptDialog])
 
-  const [mergeDialogOpen, setMergeDialogOpen] = React.useState(false)
+  const [mergeDialogOpen, setMergeDialogOpen] = useState(false)
 
   const handleMergeDialogOpen = () =>
     setMergeDialogOpen(true)
@@ -236,7 +236,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedCategor
   const handleMergeDialogClose = () =>
     setMergeDialogOpen(false)
 
-  const triviaCategoriesQuery = React.useMemo(() => {
+  const triviaCategoriesQuery = useMemo(() => {
     return mergeDialogOpen ? graphql`
       query Query {
         triviaCategories(verified: true, disabled: false) {
@@ -251,13 +251,13 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedCategor
     query: triviaCategoriesQuery,
   })
 
-  const initialMergeValues = React.useMemo(() => {
+  const initialMergeValues = useMemo(() => {
     return {
       target: null as { id: string } | null,
     }
   }, [])
 
-  const handleMergeSubmit = React.useMemo(() => {
+  const handleMergeSubmit = useMemo(() => {
     return async (values: typeof initialMergeValues) => {
       await mergeTriviaCategoriesInto({ ids: getSelectedIds(), targetId: values.target?.id })
 
@@ -265,7 +265,7 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedCategor
       setSelectedIndexes([])
       dispatchReloadTriviaCounts()
     }
-  }, [getSelectedIds, reload, mergeTriviaCategoriesInto, setSelectedIndexes, initialMergeValues])
+  }, [getSelectedIds, reload, mergeTriviaCategoriesInto, setSelectedIndexes])
 
   return (
     <div className="MuiToolbar-gutters" style={{ flex: '1 1 auto', textAlign: 'right' }}>
@@ -290,15 +290,17 @@ const CustomSelectedItemsToolbar: React.FC<{ reload: () => void, selectedCategor
           <DialogTitle>Merge selected categories into another</DialogTitle>
           <DialogContent>
             <div>
-              <FormAutocomplete name="target" options={triviaCategoriesResult?.triviaCategories?.filter(c => !getSelectedIds().includes(c.id)) ?? []} getOptionLabel={o => typeof o === 'string' ? o : o.name} autoHighlight filterSelectedOptions
-                renderOption={option => (
-                  <React.Fragment>
+              <FormAutocomplete name="target" options={triviaCategoriesResult?.triviaCategories?.filter(c => !getSelectedIds().includes(c.id)) ?? []} autoHighlight filterSelectedOptions
+                getOptionLabel={o => typeof o === 'string' ? o : o.name}
+                getOptionSelected={(o, v) => o.name === v}
+                renderOption={(props, option) => (
+                  <MenuItem {...props}>
                     <VerifiedUser style={{ marginRight: '8px' }} />
                     <span>{option.name}</span>
-                  </React.Fragment>
+                  </MenuItem>
                 )}
                 renderInput={params => (
-                  <TextField {...params} label="Target Category" style={{ width: '100%' }} required />
+                  <TextField {...params} label="Target Category" variant="standard" style={{ width: '100%' }} required />
                 )} />
             </div>
           </DialogContent>
