@@ -10,7 +10,7 @@ interface ReadFileOpts<How extends keyof ResultMap> {
   encoding?: string
 }
 
-function readFile<How extends keyof ResultMap = 'readAsText'>(file: File, { how, encoding }: ReadFileOpts<How> = { how: 'readAsText' as any }) {
+const readFile = <How extends keyof ResultMap = 'readAsText'>(file: File, { how, encoding }: ReadFileOpts<How> = { how: 'readAsText' as any }) => {
   return new Promise<ResultMap[How]>((resolve, reject) => {
     const fr = new FileReader()
 

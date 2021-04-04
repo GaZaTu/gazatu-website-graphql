@@ -6,7 +6,7 @@ type ConsoleLogEvent = {
   args: any[]
 }
 
-function hookIntoConsole(console: Console, handler: (event: ConsoleLogEvent) => unknown) {
+function hookIntoConsole(handler: (event: ConsoleLogEvent) => unknown, console = window.console) {
   const methodNames: ConsoleLogKind[] = ['log', 'info', 'warn', 'error', 'debug']
 
   for (const methodName of methodNames) {

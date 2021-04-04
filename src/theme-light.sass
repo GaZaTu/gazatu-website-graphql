@@ -1,0 +1,1631 @@
+// ------------------------------------------------ Variables ------------------------------------------------
+$light-black:        hsl(0, 0%, 4%) !default
+$light-black-bis:    hsl(0, 0%, 7%) !default
+$light-black-ter:    hsl(0, 0%, 14%) !default
+// $light-black:        hsl(0, 0%, 96%) !default
+// $light-black-bis:    hsl(0, 0%, 98%) !default
+// $light-black-ter:    hsl(0, 0%, 100%) !default
+
+$light-grey-darkest:  hsl(0, 0%, 14%) !default
+$light-grey-darker:  hsl(0, 0%, 21%) !default
+$light-grey-dark:    hsl(0, 0%, 29%) !default
+$light-grey:         hsl(0, 0%, 48%) !default
+$light-grey-light:   hsl(0, 0%, 71%) !default
+$light-grey-lighter: hsl(0, 0%, 86%) !default
+$light-grey-lightest: hsl(0, 0%, 93%) !default
+// $light-grey-darkest:  hsl(0, 0%, 93%) !default
+// $light-grey-darker:  hsl(0, 0%, 86%) !default
+// $light-grey-dark:    hsl(0, 0%, 71%) !default
+// $light-grey:         hsl(0, 0%, 48%) !default
+// $light-grey-light:   hsl(0, 0%, 29%) !default
+// $light-grey-lighter: hsl(0, 0%, 21%) !default
+// $light-grey-lightest: hsl(0, 0%, 14%) !default
+
+$light-white-ter:    hsl(0, 0%, 96%) !default
+$light-white-bis:    hsl(0, 0%, 98%) !default
+$light-white:        hsl(0, 0%, 100%) !default
+// $light-white-ter:    hsl(0, 0%, 4%) !default
+// $light-white-bis:    hsl(0, 0%, 7%) !default
+// $light-white:        hsl(0, 0%, 14%) !default
+
+$light-orange:       hsl(14,  100%, 53%) !default
+$light-yellow:       hsl(44,  100%, 77%) !default
+$light-green:        hsl(153, 53%,  53%) !default
+$light-turquoise:    hsl(171, 100%, 41%) !default
+$light-cyan:         hsl(207, 61%,  53%) !default
+$light-blue:         hsl(229, 53%,  53%) !default
+$light-purple:       hsl(271, 100%, 71%) !default
+$light-red:          hsl(348, 86%, 61%) !default
+
+// Typography
+// $family-sans-serif: BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif !default
+// $family-monospace: monospace !default
+// $render-mode: optimizeLegibility !default
+
+// $size-1: 3rem !default
+// $size-2: 2.5rem !default
+// $size-3: 2rem !default
+// $size-4: 1.5rem !default
+// $size-5: 1.25rem !default
+// $size-6: 1rem !default
+// $size-7: 0.75rem !default
+
+// $weight-light: 300 !default
+// $weight-normal: 400 !default
+// $weight-medium: 500 !default
+// $weight-semibold: 600 !default
+// $weight-bold: 700 !default
+
+// Spacing
+// $block-spacing: 1.5rem !default
+
+// Responsiveness
+// // The container horizontal gap, which acts as the offset for breakpoints
+// $gap: 32px !default
+// // 960, 1152, and 1344 have been chosen because they are divisible by both 12 and 16
+// $tablet: 769px !default
+// // 960px container + 4rem
+// $desktop: 960px + (2 * $gap) !default
+// // 1152px container + 4rem
+// $widescreen: 1152px + (2 * $gap) !default
+// $widescreen-enabled: true !default
+// // 1344px container + 4rem
+// $fullhd: 1344px + (2 * $gap) !default
+// $fullhd-enabled: true !default
+
+// Miscellaneous
+// $easing: ease-out !default
+// $radius-small: 2px !default
+// $radius: 4px !default
+// $radius-large: 6px !default
+// $radius-rounded: 9999px !default
+// $speed: 86ms !default
+
+// Flags
+// $variable-columns: true !default
+// $rtl: false !default
+
+// ------------------------------------------------ Derived ------------------------------------------------
+$light-primary: #8a2be2
+$light-secondary: #e2b72b
+
+$light-info: $light-cyan !default
+$light-success: $light-green !default
+$light-warning: $light-yellow !default
+$light-danger: $light-red !default
+
+$light-light: $light-white-ter !default
+$light-dark: $light-grey-darker !default
+
+// Invert colors
+$light-orange-invert: findColorInvert($light-orange) !default
+$light-yellow-invert: findColorInvert($light-yellow) !default
+$light-green-invert: findColorInvert($light-green) !default
+$light-turquoise-invert: findColorInvert($light-turquoise) !default
+$light-cyan-invert: findColorInvert($light-cyan) !default
+$light-blue-invert: findColorInvert($light-blue) !default
+$light-purple-invert: findColorInvert($light-purple) !default
+$light-red-invert: findColorInvert($light-red) !default
+
+// General colors
+$light-scheme-main: $light-white !default
+$light-scheme-main-bis: $light-white-bis !default
+$light-scheme-main-ter: $light-white-ter !default
+$light-scheme-invert: $light-black !default
+$light-scheme-invert-bis: $light-black-bis !default
+$light-scheme-invert-ter: $light-black-ter !default
+
+$light-background: $light-white-ter !default
+
+$light-border: $light-grey-lighter !default
+$light-border-hover: $light-grey-light !default
+$light-border-light: $light-grey-lightest !default
+$light-border-light-hover: $light-grey-light !default
+
+// $light-primary-invert: findColorInvert($light-primary) !default
+$light-primary-invert: $light-scheme-main !default
+$light-primary-light: findLightColor($light-primary) !default
+$light-primary-dark: findDarkColor($light-primary) !default
+$light-secondary-invert: findColorInvert($light-secondary) !default
+$light-secondary-light: findLightColor($light-secondary) !default
+$light-secondary-dark: findDarkColor($light-secondary) !default
+$light-info-invert: findColorInvert($light-info) !default
+$light-info-light: findLightColor($light-info) !default
+$light-info-dark: findDarkColor($light-info) !default
+$light-success-invert: findColorInvert($light-success) !default
+$light-success-light: findLightColor($light-success) !default
+$light-success-dark: findDarkColor($light-success) !default
+$light-warning-invert: findColorInvert($light-warning) !default
+$light-warning-light: findLightColor($light-warning) !default
+$light-warning-dark: findDarkColor($light-warning) !default
+$light-danger-invert: findColorInvert($light-danger) !default
+$light-danger-light: findLightColor($light-danger) !default
+$light-danger-dark: findDarkColor($light-danger) !default
+$light-light-invert: findColorInvert($light-light) !default
+$light-dark-invert: findColorInvert($light-dark) !default
+
+// Text colors
+$light-text: $light-grey-dark !default
+$light-text-invert: findColorInvert($light-text) !default
+$light-text-light: $light-grey !default
+$light-text-strong: $light-grey-darkest !default
+
+// Code colors
+$light-code: darken($light-red, 15%) !default
+$light-code-background: $light-background !default
+
+$light-pre: $light-text !default
+$light-pre-background: $light-background !default
+
+// Link colors
+// $light-link: $light-blue !default
+$light-link: $light-secondary !default
+// $light-link-invert: findColorInvert($light-link) !default
+$light-link-invert: $light-scheme-main !default
+$light-link-light: findLightColor($light-link) !default
+$light-link-dark: findDarkColor($light-link) !default
+$light-link-visited: $light-purple !default
+
+$light-link-hover: $light-grey-darker !default
+$light-link-hover-border: $light-grey-light !default
+
+$light-link-focus: $light-grey-darker !default
+$light-link-focus-border: $light-blue !default
+
+$light-link-active: $grey-darker !default
+$light-link-active-border: $light-grey-dark !default
+
+// Typography
+// $family-primary: $family-sans-serif !default
+// $family-secondary: $family-sans-serif !default
+// $family-code: $family-monospace !default
+
+// $size-small: $size-7 !default
+// $size-normal: $size-6 !default
+// $size-medium: $size-5 !default
+// $size-large: $size-4 !default
+
+// Effects
+$light-shadow: 0 0.5em 1em -0.125em rgba($light-scheme-invert, 0.1), 0 0px 0 1px rgba($light-scheme-invert, 0.02) !default
+
+// Lists and maps
+$light-custom-colors: null !default
+$light-custom-shades: null !default
+
+$light-colors: mergeColorMaps(("white": ($light-white, $light-black), "black": ($light-black, $light-white), "light": ($light-light, $light-light-invert), "dark": ($light-dark, $light-dark-invert), "primary": ($light-primary, $light-primary-invert, $light-primary-light, $light-primary-dark), "link": ($light-link, $light-link-invert, $light-link-light, $light-link-dark), "info": ($light-info, $light-info-invert, $light-info-light, $light-info-dark), "success": ($light-success, $light-success-invert, $light-success-light, $light-success-dark), "warning": ($light-warning, $light-warning-invert, $light-warning-light, $light-warning-dark), "danger": ($light-danger, $light-danger-invert, $light-danger-light, $light-danger-dark)), $light-custom-colors) !default
+
+$light-shades: mergeColorMaps(("black-bis": $light-black-bis, "black-ter": $light-black-ter, "grey-darker": $light-grey-darker, "grey-dark": $light-grey-dark, "grey": $light-grey, "grey-light": $light-grey-light, "grey-lighter": $light-grey-lighter, "white-ter": $light-white-ter, "white-bis": $light-white-bis), $light-custom-shades) !default
+
+// $sizes: $size-1 $size-2 $size-3 $size-4 $size-5 $size-6 $size-7 !default
+
+// ------------------------------------------------ Generic ------------------------------------------------
+$light-background-color: $light-scheme-main
+
+$light-body-color: $light-text
+
+$light-hr-background-color: $light-background
+
+// ------------------------------------------------ Box ------------------------------------------------
+$light-box-color: $light-text // color
+
+$light-box-background-color: $light-scheme-main // color
+
+// $light-box-radius: $light-radius-large // size
+
+$light-box-shadow: 0 0.5em 1em -0.125em rgba($light-scheme-invert, 0.1), 0 0px 0 1px rgba($light-scheme-invert, 0.02) //
+// $light-box-padding: 1.25rem //
+$light-box-link-hover-shadow: 0 0.5em 1em -0.125em rgba($light-scheme-invert, 0.1), 0 0 0 1px $light-link //
+$light-box-link-active-shadow: inset 0 1px 2px rgba($light-scheme-invert, 0.2), 0 0 0 1px $light-link //
+
+// ------------------------------------------------ Button ------------------------------------------------
+$light-button-color: $light-text-strong // color
+
+$light-button-background-color: $light-scheme-main // color
+
+// $light-button-family: false //
+$light-button-border-color: $light-border // color
+
+// $light-button-border-width: $light-control-border-width //
+// $light-button-padding-vertical: calc(0.5em - #{$light-button-border-width}) //
+// $light-button-padding-horizontal: 1em //
+$light-button-hover-color: $light-link-hover // color
+
+$light-button-hover-border-color: $light-link-hover-border // color
+
+$light-button-focus-color: $light-link-focus // color
+
+$light-button-focus-border-color: $light-link-focus-border // color
+
+// $light-button-focus-box-shadow-size: 0 0 0 0.125em //
+$light-button-focus-box-shadow-color: bulmaRgba($light-link, 0.25) //
+$light-button-active-color: $light-link-active // color
+
+$light-button-active-border-color: $light-link-active-border // color
+
+$light-button-text-color: $light-text // color
+
+// $light-button-text-decoration: underline //
+$light-button-text-hover-background-color: $light-background // color
+
+$light-button-text-hover-color: $light-text-strong // color
+
+$light-button-ghost-background: none //
+$light-button-ghost-border-color: transparent //
+$light-button-ghost-color: $light-link // color
+
+// $light-button-ghost-decoration: none //
+$light-button-ghost-hover-color: $light-link // color
+
+// $light-button-ghost-hover-decoration: underline //
+$light-button-disabled-background-color: $light-scheme-main // color
+
+$light-button-disabled-border-color: $light-border // color
+
+$light-button-disabled-shadow: none //
+$light-button-disabled-opacity: 0.5 //
+$light-button-static-color: $light-text-light // color
+
+$light-button-static-background-color: $light-scheme-main-ter // color
+
+$light-button-static-border-color: $light-border // color
+$light-button-colors: $light-colors // map
+
+// ------------------------------------------------ Icon ------------------------------------------------
+// $light-icon-dimensions: 1.5rem //
+// $light-icon-dimensions-small: 1rem //
+// $light-icon-dimensions-medium: 2rem //
+// $light-icon-dimensions-large: 3rem //
+// $light-icon-text-spacing: 0.25em //
+
+// ------------------------------------------------ Dimensions ------------------------------------------------
+// $light-dimensions: 16 24 32 48 64 96 128 //
+
+// ------------------------------------------------ Notification ------------------------------------------------
+$light-notification-background-color: $light-background // color
+
+$light-notification-code-background-color: $light-scheme-main // color
+
+// $light-notification-radius: $light-radius // size
+
+// $light-notification-padding: 1.25rem 2.5rem 1.25rem 1.5rem //
+// $light-notification-padding-ltr: 1.25rem 2.5rem 1.25rem 1.5rem //
+// $light-notification-padding-rtl: 1.25rem 1.5rem 1.25rem 2.5rem //
+$light-notification-colors: $light-colors // map
+
+// ------------------------------------------------ Table ------------------------------------------------
+$light-table-color: $light-text-strong // color
+
+$light-table-background-color: $light-scheme-main // color
+
+$light-table-cell-border: 1px solid $light-border //
+// $light-table-cell-border-width: 0 0 1px //
+// $light-table-cell-padding: 0.5em 0.75em //
+$light-table-cell-heading-color: $light-text-strong // color
+
+$light-table-head-cell-border-width: 0 0 2px //
+$light-table-head-cell-color: $light-text-strong // color
+
+$light-table-foot-cell-border-width: 2px 0 0 //
+$light-table-foot-cell-color: $light-text-strong // color
+
+$light-table-head-background-color: transparent //
+$light-table-body-background-color: transparent //
+$light-table-foot-background-color: transparent //
+$light-table-row-hover-background-color: $light-scheme-main-bis // color
+
+$light-table-row-active-background-color: $light-primary // color
+
+$light-table-row-active-color: $light-primary-invert // color
+
+$light-table-striped-row-even-background-color: $light-scheme-main-bis // color
+
+$light-table-striped-row-even-hover-background-color: $light-scheme-main-ter // color
+
+$light-table-colors: $light-colors // map
+
+// ------------------------------------------------ Tag ------------------------------------------------
+$light-tag-background-color: $light-background // color
+
+$light-tag-color: $light-text-strong // color
+
+// $light-tag-radius: $light-radius // size
+
+// $light-tag-delete-margin: 1px //
+$light-tag-colors: $light-colors // map
+
+// ------------------------------------------------ Title ------------------------------------------------
+$light-title-color: $light-text-strong // color
+
+// $light-title-family: false //
+// $light-title-size: $light-size-3 // size
+
+// $light-title-weight: $light-weight-semibold // font-weight
+// $light-title-line-height: 1.125 //
+$light-title-strong-color: inherit //
+// $light-title-strong-weight: inherit //
+// $light-title-sub-size: 0.75em //
+// $light-title-sup-size: 0.75em //
+$light-subtitle-color: $light-text // color
+
+// $light-subtitle-family: false //
+// $light-subtitle-size: $light-size-5 // size
+
+// $light-subtitle-weight: $light-weight-normal // font-weight
+// $light-subtitle-line-height: 1.25 //
+$light-subtitle-strong-color: $light-text-strong // color
+
+// $light-subtitle-strong-weight: $light-weight-semibold // font-weight
+// $light-subtitle-negative-margin: -1.25rem //
+
+// ------------------------------------------------ Card ------------------------------------------------
+$light-card-color: $light-text // color
+
+$light-card-background-color: $light-scheme-main // color
+
+$light-card-shadow: 0 0.5em 1em -0.125em rgba($light-scheme-invert, 0.1), 0 0px 0 1px rgba($light-scheme-invert, 0.02) //
+// $light-card-radius: 0.25rem //
+$light-card-header-background-color: transparent //
+$light-card-header-color: $light-text-strong // color
+
+// $light-card-header-padding: 0.75rem 1rem //
+$light-card-header-shadow: 0 0.125em 0.25em rgba($light-scheme-invert, 0.1) //
+// $light-card-header-weight: $light-weight-bold // font-weight
+$light-card-content-background-color: transparent //
+// $light-card-content-padding: 1.5rem //
+$light-card-footer-background-color: transparent //
+$light-card-footer-border-top: 1px solid $light-border-light //
+// $light-card-footer-padding: 0.75rem //
+// $light-card-media-margin: $light-block-spacing // size
+
+// ------------------------------------------------ Dropdown ------------------------------------------------
+// $light-dropdown-menu-min-width: 12rem //
+$light-dropdown-content-background-color: $light-scheme-main // color
+
+$light-dropdown-content-arrow: $light-link // color
+
+// $light-dropdown-content-offset: 4px //
+// $light-dropdown-content-padding-bottom: 0.5rem //
+// $light-dropdown-content-padding-top: 0.5rem //
+// $light-dropdown-content-radius: $light-radius // size
+
+$light-dropdown-content-shadow: 0 0.5em 1em -0.125em rgba($light-scheme-invert, 0.1), 0 0px 0 1px rgba($light-scheme-invert, 0.02) //
+// $light-dropdown-content-z: 20 //
+$light-dropdown-item-color: $light-text // color
+
+$light-dropdown-item-hover-color: $light-scheme-invert // color
+
+$light-dropdown-item-hover-background-color: $light-background // color
+
+$light-dropdown-item-active-color: $light-link-invert // color
+
+$light-dropdown-item-active-background-color: $light-link // color
+
+$light-dropdown-divider-background-color: $light-border-light // color
+
+// ------------------------------------------------ Menu ------------------------------------------------
+$light-menu-item-color: $light-text // color
+
+// $light-menu-item-radius: $light-radius-small // size
+
+$light-menu-item-hover-color: $light-text-strong // color
+
+$light-menu-item-hover-background-color: $light-background // color
+
+$light-menu-item-active-color: $light-link-invert // color
+
+$light-menu-item-active-background-color: $light-link // color
+
+$light-menu-list-border-left: 1px solid $light-border //
+// $light-menu-list-line-height: 1.25 //
+// $light-menu-list-link-padding: 0.5em 0.75em //
+// $light-menu-nested-list-margin: 0.75em //
+// $light-menu-nested-list-padding-left: 0.75em //
+$light-menu-label-color: $light-text-light // color
+
+// $light-menu-label-font-size: 0.75em //
+// $light-menu-label-letter-spacing: 0.1em //
+// $light-menu-label-spacing: 1em //
+
+// ------------------------------------------------ Message ------------------------------------------------
+$light-message-background-color: $light-background // color
+
+// $light-message-radius: $light-radius // size
+
+$light-message-header-background-color: $light-text // color
+
+$light-message-header-color: $light-text-invert // color
+
+// $light-message-header-weight: $light-weight-bold // font-weight
+// $light-message-header-padding: 0.75em 1em //
+// $light-message-header-radius: $light-radius // size
+
+$light-message-body-border-color: $light-border // color
+
+// $light-message-body-border-width: 0 0 0 4px //
+$light-message-body-color: $light-text // color
+
+// $light-message-body-padding: 1.25em 1.5em //
+// $light-message-body-radius: $light-radius // size
+
+$light-message-body-pre-background-color: $light-scheme-main // color
+
+$light-message-body-pre-code-background-color: transparent //
+// $light-message-header-body-border-width: 0 //
+$light-message-colors: $light-colors // map
+
+// ------------------------------------------------ Modal ------------------------------------------------
+// $light-modal-z: 40 //
+$light-modal-background-background-color: bulmaRgba($light-scheme-invert, 0.86) //
+// $light-modal-content-width: 640px //
+// $light-modal-content-margin-mobile: 20px //
+// $light-modal-content-spacing-mobile: 160px //
+// $light-modal-content-spacing-tablet: 40px //
+// $light-modal-close-dimensions: 40px //
+// $light-modal-close-right: 20px //
+// $light-modal-close-top: 20px //
+// $light-modal-card-spacing: 40px //
+$light-modal-card-head-background-color: $light-background // color
+
+$light-modal-card-head-border-bottom: 1px solid $light-border //
+// $light-modal-card-head-padding: 20px //
+// $light-modal-card-head-radius: $light-radius-large // size
+
+$light-modal-card-title-color: $light-text-strong // color
+
+// $light-modal-card-title-line-height: 1 //
+// $light-modal-card-title-size: $light-size-4 // size
+
+// $light-modal-card-foot-radius: $light-radius-large // size
+
+$light-modal-card-foot-border-top: 1px solid $light-border //
+$light-modal-card-body-background-color: $light-scheme-main // color
+
+// $light-modal-card-body-padding: 20px //
+// $light-modal-breakpoint: $light-tablet // size
+
+// ------------------------------------------------ Navbar ------------------------------------------------
+$light-navbar-background-color: $light-scheme-main // color
+
+// $light-navbar-box-shadow-size: 0 2px 0 0 //
+$light-navbar-box-shadow-color: $light-background // color
+
+// $light-navbar-height: 3.25rem //
+// $light-navbar-padding-vertical: 1rem //
+// $light-navbar-padding-horizontal: 2rem //
+// $light-navbar-z: 30 //
+// $light-navbar-fixed-z: 30 //
+$light-navbar-item-color: $light-text-strong // color
+
+$light-navbar-item-hover-color: $light-link // color
+
+$light-navbar-item-hover-background-color: $light-scheme-main-bis // color
+
+$light-navbar-item-active-color: $light-scheme-invert // color
+
+$light-navbar-item-active-background-color: transparent //
+// $light-navbar-item-img-max-height: 1.75rem //
+$light-navbar-burger-color: $light-navbar-item-color //
+$light-navbar-tab-hover-background-color: transparent //
+$light-navbar-tab-hover-border-bottom-color: $light-link // color
+
+$light-navbar-tab-active-color: $light-link // color
+
+$light-navbar-tab-active-background-color: transparent //
+$light-navbar-tab-active-border-bottom-color: $light-link // color
+
+// $light-navbar-tab-active-border-bottom-style: solid //
+// $light-navbar-tab-active-border-bottom-width: 3px //
+$light-navbar-dropdown-background-color: $light-scheme-main // color
+
+$light-navbar-dropdown-border-top: 2px solid $light-border //
+// $light-navbar-dropdown-offset: -4px //
+$light-navbar-dropdown-arrow: $light-link // color
+
+// $light-navbar-dropdown-radius: $light-radius-large // size
+
+// $light-navbar-dropdown-z: 20 //
+// $light-navbar-dropdown-boxed-radius: $light-radius-large // size
+
+$light-navbar-dropdown-boxed-shadow: 0 8px 8px bulmaRgba($light-scheme-invert, 0.1), 0 0 0 1px bulmaRgba($light-scheme-invert, 0.1) //
+$light-navbar-dropdown-item-hover-color: $light-scheme-invert // color
+
+$light-navbar-dropdown-item-hover-background-color: $light-background // color
+
+$light-navbar-dropdown-item-active-color: $light-link // color
+
+$light-navbar-dropdown-item-active-background-color: $light-background // color
+
+$light-navbar-divider-background-color: $light-background // color
+
+// $light-navbar-divider-height: 2px //
+// $light-navbar-bottom-box-shadow-size: 0 -2px 0 0 //
+// $light-navbar-breakpoint: $light-desktop // computed
+
+$light-navbar-colors: $light-colors // map
+
+// ------------------------------------------------ Pagination ------------------------------------------------
+$light-pagination-color: $light-text-strong // color
+
+$light-pagination-border-color: $light-border // color
+
+// $light-pagination-margin: -0.25rem //
+// $light-pagination-min-width: $light-control-height //
+// $light-pagination-item-font-size: 1em //
+// $light-pagination-item-margin: 0.25rem //
+// $light-pagination-item-padding-left: 0.5em //
+// $light-pagination-item-padding-right: 0.5em //
+// $light-pagination-nav-padding-left: 0.75em //
+// $light-pagination-nav-padding-right: 0.75em //
+$light-pagination-hover-color: $light-link-hover // color
+
+$light-pagination-hover-border-color: $light-link-hover-border // color
+
+$light-pagination-focus-color: $light-link-focus // color
+
+$light-pagination-focus-border-color: $light-link-focus-border // color
+
+$light-pagination-active-color: $light-link-active // color
+
+$light-pagination-active-border-color: $light-link-active-border // color
+
+$light-pagination-disabled-color: $light-text-light // color
+
+$light-pagination-disabled-background-color: $light-border // color
+
+$light-pagination-disabled-border-color: $light-border // color
+
+$light-pagination-current-color: $light-link-invert // color
+
+$light-pagination-current-background-color: $light-link // color
+
+$light-pagination-current-border-color: $light-link // color
+
+$light-pagination-ellipsis-color: $light-grey-light // color
+
+$light-pagination-shadow-inset: dark-inset 0 1px 2px rgba($light-scheme-invert, 0.2) //
+
+// ------------------------------------------------ Panel ------------------------------------------------
+// $light-panel-margin: $light-block-spacing // size
+
+$light-panel-item-border: 1px solid $light-border-light //
+// $light-panel-radius: $light-radius-large // size
+
+$light-panel-shadow: 0 0.5em 1em -0.125em rgba($light-scheme-invert, 0.1), 0 0px 0 1px rgba($light-scheme-invert, 0.02) //
+$light-panel-heading-background-color: $light-border-light // color
+
+$light-panel-heading-color: $light-text-strong // color
+
+// $light-panel-heading-line-height: 1.25 //
+// $light-panel-heading-padding: 0.75em 1em //
+// $light-panel-heading-radius: $light-radius // size
+
+// $light-panel-heading-size: 1.25em //
+// $light-panel-heading-weight: $light-weight-bold // font-weight
+// $light-panel-tabs-font-size: 0.875em //
+$light-panel-tab-border-bottom: 1px solid $light-border //
+$light-panel-tab-active-border-bottom-color: $light-link-active-border // color
+
+$light-panel-tab-active-color: $light-link-active // color
+
+$light-panel-list-item-color: $light-text // color
+
+$light-panel-list-item-hover-color: $light-link // color
+
+$light-panel-block-color: $light-text-strong // color
+
+$light-panel-block-hover-background-color: $light-background // color
+
+$light-panel-block-active-border-left-color: $light-link // color
+
+$light-panel-block-active-color: $light-link-active // color
+
+$light-panel-block-active-icon-color: $light-link // color
+
+$light-panel-icon-color: $light-text-light // color
+
+$light-panel-colors: $light-colors // map
+
+// ------------------------------------------------ Label ------------------------------------------------
+$light-label-color: $light-grey-darker // color
+
+// $light-label-weight: $light-weight-bold // font-weight
+// $light-help-size: $light-size-small // size
+
+$light-label-colors: $light-colors
+
+// ------------------------------------------------ Input ------------------------------------------------
+$light-input-color: $light-grey-darker // color
+
+$light-input-background-color: $light-white // color
+
+$light-input-border-color: $light-grey-light // color
+
+$light-input-shadow: inset 0 1px 2px rgba($light-black, 0.1) //
+$light-input-hover-color: $light-grey-darker // color
+
+$light-input-hover-border-color: $light-grey-light // color
+
+$light-input-focus-color: $light-grey-darker // color
+
+$light-input-focus-border-color: $light-link // color
+
+// $light-input-focus-box-shadow-size: 0 0 0 0.125em //
+$light-input-focus-box-shadow-color: rgba($light-link, 0.25) //
+$light-input-disabled-color: $light-text-light // color
+
+$light-input-disabled-background-color: $light-background // color
+
+$light-input-disabled-border-color: $light-background // color
+
+$light-input-arrow: $light-link // color
+
+$light-input-icon-color: $light-grey-lighter // color
+
+$light-input-icon-active-color: $light-grey // color
+
+// $light-input-radius: $light-radius // size
+
+$light-input-placeholder-color: bulmaRgba($light-input-color, 0.3) !default
+$light-input-disabled-placeholder-color: bulmaRgba($light-input-disabled-color, 0.3) !default
+
+$light-textarea-colors: $light-colors
+
+// ------------------------------------------------ Select ------------------------------------------------
+$light-select-colors: $light-colors
+
+html.light-theme
+  // ------------------------------------------------ Generic ------------------------------------------------
+  background-color: $light-background-color
+
+  body
+    color: $light-body-color
+
+  a
+    color: $light-link
+    strong
+      color: currentColor
+    &:hover
+      color: $light-link-hover
+
+  // code
+  //   background-color: $light-code-background
+  //   color: $light-code
+
+  hr
+    background-color: $light-hr-background-color
+  // strong
+  //   color: $light-strong-color
+
+  // pre
+  //   background-color: $light-pre-background
+  //   color: $light-pre
+  //   code
+  //     background-color: transparent
+  //     color: currentColor
+  //
+  table
+    th
+      color: $light-text-strong
+
+  // ------------------------------------------------ Box ------------------------------------------------
+  .box
+    background-color: $light-box-background-color
+    color: $light-box-color
+  a.box
+    &:hover,
+    &:focus
+      box-shadow: $light-box-link-hover-shadow
+    &:active
+      box-shadow: $light-box-link-active-shadow
+
+  // ------------------------------------------------ Button ------------------------------------------------
+  .button
+    background-color: $light-button-background-color
+    border-color: $light-button-border-color
+    color: $light-button-color
+    strong
+      color: inherit
+    &:hover,
+    &.is-hovered
+      border-color: $light-button-hover-border-color
+      color: $light-button-hover-color
+    &:focus,
+    &.is-focused
+      border-color: $light-button-focus-border-color
+      color: $light-button-focus-color
+      &:not(:active)
+        box-shadow: $button-focus-box-shadow-size $light-button-focus-box-shadow-color
+    &:active,
+    &.is-active
+      border-color: $light-button-active-border-color
+      color: $light-button-active-color
+    &.is-text
+      background-color: transparent
+      border-color: transparent
+      color: $light-button-text-color
+      &:hover,
+      &.is-hovered,
+      &:focus,
+      &.is-focused
+        border-color: $button-text-hover-background-color
+        color: $light-button-text-hover-color
+      &:active,
+      &.is-active
+        border-color: bulmaDarken($light-button-text-hover-background-color, 5%)
+        color: $light-button-text-hover-color
+      &[disabled],
+      fieldset[disabled] &
+        background-color: transparent
+        border-color: transparent
+        box-shadow: none
+    &.is-ghost
+      background: $light-button-ghost-background
+      border-color: $light-button-ghost-border-color
+      color: $light-button-ghost-color
+      &:hover,
+      &.is-hovered
+        color: $light-button-ghost-hover-color
+    @each $name, $pair in $light-button-colors
+      $color: nth($pair, 1)
+      $color-invert: nth($pair, 2)
+      &.is-#{$name}
+        background-color: $color
+        border-color: transparent
+        color: $color-invert
+        &:hover,
+        &.is-hovered
+          background-color: bulmaDarken($color, 2.5%)
+          border-color: transparent
+          color: $color-invert
+        &:focus,
+        &.is-focused
+          border-color: transparent
+          color: $color-invert
+          &:not(:active)
+            box-shadow: $button-focus-box-shadow-size bulmaRgba($color, 0.25)
+        &:active,
+        &.is-active
+          background-color: bulmaDarken($color, 5%)
+          border-color: transparent
+          color: $color-invert
+        &[disabled],
+        fieldset[disabled] &
+          background-color: $color
+          border-color: transparent
+          box-shadow: none
+        &.is-inverted
+          background-color: $color-invert
+          color: $color
+          &:hover,
+          &.is-hovered
+            background-color: bulmaDarken($color-invert, 5%)
+          &[disabled],
+          fieldset[disabled] &
+            background-color: $color-invert
+            border-color: transparent
+            box-shadow: none
+            color: $color
+        &.is-loading
+          &::after
+            border-color: transparent transparent $color-invert $color-invert !important
+        &.is-outlined
+          background-color: transparent
+          border-color: $color
+          color: $color
+          &:hover,
+          &.is-hovered,
+          &:focus,
+          &.is-focused
+            background-color: $color
+            border-color: $color
+            color: $color-invert
+          &.is-loading
+            &::after
+              border-color: transparent transparent $color $color !important
+            &:hover,
+            &.is-hovered,
+            &:focus,
+            &.is-focused
+              &::after
+                border-color: transparent transparent $color-invert $color-invert !important
+          &[disabled],
+          fieldset[disabled] &
+            background-color: transparent
+            border-color: $color
+            box-shadow: none
+            color: $color
+        &.is-inverted.is-outlined
+          background-color: transparent
+          border-color: $color-invert
+          color: $color-invert
+          &:hover,
+          &.is-hovered,
+          &:focus,
+          &.is-focused
+            background-color: $color-invert
+            color: $color
+          &.is-loading
+            &:hover,
+            &.is-hovered,
+            &:focus,
+            &.is-focused
+              &::after
+                border-color: transparent transparent $color $color !important
+          &[disabled],
+          fieldset[disabled] &
+            background-color: transparent
+            border-color: $color-invert
+            box-shadow: none
+            color: $color-invert
+        // If light and dark colors are provided
+        @if length($pair) >= 4
+          $color-light: nth($pair, 3)
+          $color-dark: nth($pair, 4)
+          &.is-light
+            background-color: $color-light
+            color: $color-dark
+            &:hover,
+            &.is-hovered
+              background-color: bulmaDarken($color-light, 2.5%)
+              border-color: transparent
+              color: $color-dark
+            &:active,
+            &.is-active
+              background-color: bulmaDarken($color-light, 5%)
+              border-color: transparent
+              color: $color-dark
+    // Modifiers
+    &[disabled],
+    fieldset[disabled] &
+      background-color: $light-button-disabled-background-color
+      border-color: $light-button-disabled-border-color
+      box-shadow: $light-button-disabled-shadow
+      opacity: $light-button-disabled-opacity
+    &.is-loading
+      color: transparent !important
+    &.is-static
+      background-color: $light-button-static-background-color
+      border-color: $light-button-static-border-color
+      color: $light-button-static-color
+      box-shadow: none
+      pointer-events: none
+
+  // ------------------------------------------------ Notification ------------------------------------------------
+  .notification
+    background-color: $light-notification-background-color
+    a:not(.button):not(.dropdown-item)
+      color: currentColor
+    strong
+      color: currentColor
+    code,
+    pre
+      background: $light-notification-code-background-color
+    pre code
+      background: transparent
+    .title,
+    .subtitle,
+    .content
+      color: currentColor
+    // Colors
+    @each $name, $pair in $light-notification-colors
+      $color: nth($pair, 1)
+      $color-invert: nth($pair, 2)
+      &.is-#{$name}
+        background-color: $color
+        color: $color-invert
+        // If light and dark colors are provided
+        @if length($pair) >= 4
+          $color-light: nth($pair, 3)
+          $color-dark: nth($pair, 4)
+          &.is-light
+            background-color: $color-light
+            color: $color-dark
+
+  // ------------------------------------------------ Table ------------------------------------------------
+  .table
+    background-color: $light-table-background-color
+    color: $light-table-color
+    td,
+    th
+      // Colors
+      @each $name, $pair in $light-table-colors
+        $color: nth($pair, 1)
+        $color-invert: nth($pair, 2)
+        &.is-#{$name}
+          background-color: $color
+          border-color: $color
+          color: $color-invert
+      // Modifiers
+      &.is-selected
+        background-color: $light-table-row-active-background-color
+        color: $light-table-row-active-color
+        a,
+        strong
+          color: currentColor
+    th
+      color: $light-table-cell-heading-color
+    tr
+      &.is-selected
+        background-color: $light-table-row-active-background-color
+        color: $light-table-row-active-color
+        a,
+        strong
+          color: currentColor
+        td,
+        th
+          border-color: $light-table-row-active-color
+          color: currentColor
+    thead
+      background-color: $light-table-head-background-color
+      td,
+      th
+        color: $light-table-head-cell-color
+    tfoot
+      background-color: $light-table-foot-background-color
+      td,
+      th
+        color: $light-table-foot-cell-color
+    tbody
+      background-color: $light-table-body-background-color
+    // Modifiers
+    &.is-hoverable
+      tbody
+        tr:not(.is-selected)
+          &:hover
+            background-color: $light-table-row-hover-background-color
+      &.is-striped
+        tbody
+          tr:not(.is-selected)
+            &:hover
+              background-color: $light-table-row-hover-background-color
+              &:nth-child(even)
+                background-color: $light-table-striped-row-even-hover-background-color
+    &.is-striped
+      tbody
+        tr:not(.is-selected)
+          &:nth-child(even)
+            background-color: $light-table-striped-row-even-background-color
+
+  // ------------------------------------------------ Tag ------------------------------------------------
+  .tag:not(body)
+    background-color: $light-tag-background-color
+    color: $light-tag-color
+    // Colors
+    @each $name, $pair in $light-tag-colors
+      $color: nth($pair, 1)
+      $color-invert: nth($pair, 2)
+      &.is-#{$name}
+        background-color: $color
+        // color: $color-invert
+        // If a light and dark colors are provided
+        @if length($pair) > 3
+          $color-light: nth($pair, 3)
+          $color-dark: nth($pair, 4)
+          &.is-light
+            background-color: $color-light
+            color: $color-dark
+    // Modifiers
+    &.is-delete
+      &::before,
+      &::after
+        background-color: currentColor
+      &:hover,
+      &:focus
+        background-color: darken($light-tag-background-color, 5%)
+      &:active
+        background-color: darken($light-tag-background-color, 10%)
+
+  // ------------------------------------------------ Title ------------------------------------------------
+  .title
+    color: $light-title-color
+    strong
+      color: $light-title-strong-color
+
+  .subtitle
+    color: $light-subtitle-color
+    strong
+      color: $light-subtitle-strong-color
+
+  // ------------------------------------------------ Card ------------------------------------------------
+  .card
+    background-color: $light-card-background-color
+    box-shadow: $light-card-shadow
+    color: $light-card-color
+
+  .card-header
+    background-color: $light-card-header-background-color
+    box-shadow: $light-card-header-shadow
+
+  .card-header-title
+    color: $light-card-header-color
+
+  .card-content
+    background-color: $light-card-content-background-color
+
+  .card-footer
+    background-color: $light-card-footer-background-color
+
+  // ------------------------------------------------ Dropdown ------------------------------------------------
+  .dropdown-content
+    background-color: $light-dropdown-content-background-color
+    box-shadow: $light-dropdown-content-shadow
+
+  .dropdown-item
+    color: $light-dropdown-item-color
+
+  a.dropdown-item,
+  button.dropdown-item
+    &:hover
+      background-color: $light-dropdown-item-hover-background-color
+      color: $light-dropdown-item-hover-color
+    &.is-active
+      background-color: $light-dropdown-item-active-background-color
+      color: $light-dropdown-item-active-color
+
+  .dropdown-divider
+    background-color: $light-dropdown-divider-background-color
+
+  // ------------------------------------------------ Menu ------------------------------------------------
+  .menu-list
+    a
+      color: $light-menu-item-color
+      &:hover
+        background-color: $light-menu-item-hover-background-color
+        color: $light-menu-item-hover-color
+      // Modifiers
+      &.is-active
+        background-color: $light-menu-item-active-background-color
+        color: $light-menu-item-active-color
+
+  .menu-label
+    color: $light-menu-label-color
+
+  // ------------------------------------------------ Message ------------------------------------------------
+  .message
+    background-color: $light-message-background-color
+    strong
+      color: currentColor
+    a:not(.button):not(.tag):not(.dropdown-item)
+      color: currentColor
+    // Colors
+    @each $name, $components in $light-message-colors
+      $color: nth($components, 1)
+      $color-invert: nth($components, 2)
+      $color-light: null
+      $color-dark: null
+
+      @if length($components) >= 3
+        $color-light: nth($components, 3)
+        @if length($components) >= 4
+          $color-dark: nth($components, 4)
+        @else
+          $color-luminance: colorLuminance($color)
+          $darken-percentage: $color-luminance * 70%
+          $desaturate-percentage: $color-luminance * 30%
+          $color-dark: desaturate(darken($color, $darken-percentage), $desaturate-percentage)
+      @else
+        $color-lightning: max((100% - lightness($color)) - 2%, 0%)
+        $color-light: lighten($color, $color-lightning)
+
+      &.is-#{$name}
+        background-color: $color-light
+        .message-header
+          background-color: $color
+          color: $color-invert
+        .message-body
+          border-color: $color
+          color: $color-dark
+
+  .message-header
+    background-color: $light-message-header-background-color
+    color: $light-message-header-color
+
+  .message-body
+    border-color: $light-message-body-border-color
+    color: $light-message-body-color
+    code,
+    pre
+      background-color: $light-message-body-pre-background-color
+    pre code
+      background-color: $light-message-body-pre-code-background-color
+
+  // ------------------------------------------------ Modal ------------------------------------------------
+  .modal-background
+    background-color: $light-modal-background-background-color
+
+  .modal-close
+    background: none
+
+  .modal-card-head,
+  .modal-card-foot
+    background-color: $light-modal-card-head-background-color
+
+  .modal-card-title
+    color: $light-modal-card-title-color
+
+  .modal-card-body
+    background-color: $light-modal-card-body-background-color
+
+  // ------------------------------------------------ Navbar ------------------------------------------------
+  .navbar
+    background-color: $light-navbar-background-color
+    @each $name, $pair in $light-navbar-colors
+      $color: nth($pair, 1)
+      $color-invert: nth($pair, 2)
+      &.is-#{$name}
+        background-color: $color
+        color: $color-invert
+        .navbar-brand
+          & > .navbar-item,
+          .navbar-link
+            color: $color-invert
+          & > a.navbar-item,
+          .navbar-link
+            &:focus,
+            &:hover,
+            &.is-active
+              background-color: bulmaDarken($color, 5%)
+              color: $color-invert
+          .navbar-link
+            &::after
+              border-color: $color-invert
+        .navbar-burger
+          color: $color-invert
+        +from($navbar-breakpoint)
+          .navbar-start,
+          .navbar-end
+            & > .navbar-item,
+            .navbar-link
+              color: $color-invert
+            & > a.navbar-item,
+            .navbar-link
+              &:focus,
+              &:hover,
+              &.is-active
+                background-color: bulmaDarken($color, 5%)
+                color: $color-invert
+            .navbar-link
+              &::after
+                border-color: $color-invert
+          .navbar-item.has-dropdown:focus .navbar-link,
+          .navbar-item.has-dropdown:hover .navbar-link,
+          .navbar-item.has-dropdown.is-active .navbar-link
+            background-color: bulmaDarken($color, 5%)
+            color: $color-invert
+          .navbar-dropdown
+            a.navbar-item
+              &.is-active
+                background-color: $color
+                color: $color-invert
+    &.has-shadow
+      box-shadow: $navbar-box-shadow-size $light-navbar-box-shadow-color
+    &.is-fixed-bottom
+      &.has-shadow
+        box-shadow: $navbar-bottom-box-shadow-size $light-navbar-box-shadow-color
+
+  .navbar-brand
+    a.navbar-item
+      &:focus,
+      &:hover
+        background-color: transparent
+
+  .navbar-burger
+    color: $light-navbar-burger-color
+
+  .navbar-item,
+  .navbar-link
+    color: $light-navbar-item-color
+
+  a.navbar-item,
+  .navbar-link
+    &:focus,
+    &:focus-within,
+    &:hover,
+    &.is-active
+      background-color: $light-navbar-item-hover-background-color
+      color: $light-navbar-item-hover-color
+
+  .navbar-item
+    &.is-tab
+      &:focus,
+      &:hover
+        background-color: $light-navbar-tab-hover-background-color
+        border-bottom-color: $light-navbar-tab-hover-border-bottom-color
+      &.is-active
+        background-color: $light-navbar-tab-active-background-color
+        border-bottom-color: $light-navbar-tab-active-border-bottom-color
+        color: $light-navbar-tab-active-color
+
+  .navbar-link:not(.is-arrowless)
+    &::after
+      border-color: $light-navbar-dropdown-arrow
+
+  .navbar-divider
+    background-color: $light-navbar-divider-background-color
+
+  +until($navbar-breakpoint)
+    .navbar-menu
+      background-color: $light-navbar-background-color
+      box-shadow: 0 8px 16px bulmaRgba($scheme-invert, 0.1)
+    // Fixed navbar
+    .navbar
+      &.is-fixed-bottom-touch
+        &.has-shadow
+          box-shadow: 0 -2px 3px bulmaRgba($scheme-invert, 0.1)
+
+  +from($navbar-breakpoint)
+    .navbar
+      &.is-transparent
+        a.navbar-item,
+        .navbar-link
+          &:focus,
+          &:hover,
+          &.is-active
+            background-color: transparent !important
+        .navbar-item.has-dropdown
+          &.is-active,
+          &.is-hoverable:focus,
+          &.is-hoverable:focus-within,
+          &.is-hoverable:hover
+            .navbar-link
+              background-color: transparent !important
+        .navbar-dropdown
+          a.navbar-item
+            &:focus,
+            &:hover
+              background-color: $light-navbar-dropdown-item-hover-background-color
+              color: $light-navbar-dropdown-item-hover-color
+            &.is-active
+              background-color: $light-navbar-dropdown-item-active-background-color
+              color: $light-navbar-dropdown-item-active-color
+    .navbar-item
+      &.has-dropdown-up
+        .navbar-dropdown
+          border-bottom: $light-navbar-dropdown-border-top
+          box-shadow: 0 -8px 8px bulmaRgba($scheme-invert, 0.5)
+    .navbar-dropdown
+      background-color: $light-navbar-dropdown-background-color
+      border-top: $light-navbar-dropdown-border-top
+      box-shadow: 0 8px 8px bulmaRgba($scheme-invert, 0.5)
+      a.navbar-item
+        &:focus,
+        &:hover
+          background-color: $light-navbar-dropdown-item-hover-background-color
+          color: $light-navbar-dropdown-item-hover-color
+        &.is-active
+          background-color: $light-navbar-dropdown-item-active-background-color
+          color: $light-navbar-dropdown-item-active-color
+      .navbar.is-spaced &,
+      &.is-boxed
+        box-shadow: $light-navbar-dropdown-boxed-shadow
+    // Fixed navbar
+    .navbar
+      &.is-fixed-bottom-desktop
+        &.has-shadow
+          box-shadow: 0 -2px 3px bulmaRgba($scheme-invert, 0.5)
+    // Hover/Active states
+    a.navbar-item,
+    .navbar-link
+      &.is-active
+        color: $light-navbar-item-active-color
+      &.is-active:not(:focus):not(:hover)
+        background-color: $light-navbar-item-active-background-color
+    .navbar-item.has-dropdown
+      &:focus,
+      &:hover,
+      &.is-active
+        .navbar-link
+          background-color: $light-navbar-item-hover-background-color
+
+  // ------------------------------------------------ Pagination ------------------------------------------------
+  .pagination-previous,
+  .pagination-next,
+  .pagination-link
+    border-color: $light-pagination-border-color
+    color: $light-pagination-color
+    &:hover
+      border-color: $light-pagination-hover-border-color
+      color: $light-pagination-hover-color
+    &:focus
+      border-color: $light-pagination-focus-border-color
+    &:active
+      box-shadow: $light-pagination-shadow-inset
+    &[disabled]
+      background-color: $light-pagination-disabled-background-color
+      border-color: $light-pagination-disabled-border-color
+      box-shadow: none
+      color: $light-pagination-disabled-color
+      opacity: 0.5
+
+  .pagination-link
+    &.is-current
+      background-color: $light-pagination-current-background-color
+      border-color: $light-pagination-current-border-color
+      color: $light-pagination-current-color
+
+  .pagination-ellipsis
+    color: $light-pagination-ellipsis-color
+
+  // ------------------------------------------------ Panel ------------------------------------------------
+  .panel
+    box-shadow: $light-panel-shadow
+    // Colors
+    @each $name, $components in $light-panel-colors
+      $color: nth($components, 1)
+      $color-invert: nth($components, 2)
+      &.is-#{$name}
+        .panel-heading
+          background-color: $color
+          color: $color-invert
+        .panel-tabs a.is-active
+          border-bottom-color: $color
+        .panel-block.is-active .panel-icon
+          color: $color
+
+  .panel-heading
+    background-color: $light-panel-heading-background-color
+    color: $light-panel-heading-color
+
+  .panel-tabs
+    a
+      // Modifiers
+      &.is-active
+        border-bottom-color: $light-panel-tab-active-border-bottom-color
+        color: $light-panel-tab-active-color
+
+  .panel-list
+    a
+      color: $light-panel-list-item-color
+      &:hover
+        color: $light-panel-list-item-hover-color
+
+  .panel-block
+    color: $light-panel-block-color
+    &.is-active
+      border-left-color: $light-panel-block-active-border-left-color
+      color: $light-panel-block-active-color
+      .panel-icon
+        color: $light-panel-block-active-icon-color
+
+  a.panel-block,
+  label.panel-block
+    &:hover
+      background-color: $light-panel-block-hover-background-color
+
+  .panel-icon
+    color: $light-panel-icon-color
+
+  // ------------------------------------------------ Label ------------------------------------------------
+  .label
+    color: $light-label-color
+
+  .help
+    @each $name, $pair in $light-label-colors
+      $color: nth($pair, 1)
+      &.is-#{$name}
+        color: $color
+
+  .control
+    // Modifiers
+    &.has-icons-left,
+    &.has-icons-right
+      .input,
+      .select
+        &:focus
+          & ~ .icon
+            color: $light-input-icon-active-color
+      .icon
+        color: $light-input-icon-color
+
+  // ------------------------------------------------ Input ------------------------------------------------
+  .input
+    background-color: $light-input-background-color
+    border-color: $light-input-border-color
+    color: $light-input-color
+    +placeholder
+      color: $light-input-placeholder-color
+    &:hover,
+    &.is-hovered
+      border-color: $light-input-hover-border-color
+    &:focus,
+    &.is-focused,
+    &:active,
+    &.is-active
+      border-color: $light-input-focus-border-color
+      box-shadow: $input-focus-box-shadow-size $input-focus-box-shadow-color
+    &[disabled],
+    fieldset[disabled] &
+      background-color: $light-input-disabled-background-color
+      border-color: $light-input-disabled-border-color
+      box-shadow: none
+      color: $light-input-disabled-color
+      +placeholder
+        color: $light-input-disabled-placeholder-color
+    box-shadow: $light-input-shadow
+    &[readonly]
+      box-shadow: none
+    // Colors
+    @each $name, $pair in $light-textarea-colors
+      $color: nth($pair, 1)
+      &.is-#{$name}
+        border-color: $color
+        &:focus,
+        &.is-focused,
+        &:active,
+        &.is-active
+          box-shadow: $input-focus-box-shadow-size bulmaRgba($color, 0.25)
+
+  // ------------------------------------------------ Select ------------------------------------------------
+  .select
+    &:not(.is-multiple):not(.is-loading)
+      &::after
+        border-color: $light-input-arrow
+    // States
+    &:not(.is-multiple):not(.is-loading):hover
+      &::after
+        border-color: $light-input-hover-color
+    // Colors
+    @each $name, $pair in $light-select-colors
+      $color: nth($pair, 1)
+      &.is-#{$name}
+        &:not(:hover)::after
+          border-color: $color
+        select
+          border-color: $color
+          &:hover,
+          &.is-hovered
+            border-color: bulmaDarken($color, 5%)
+          &:focus,
+          &.is-focused,
+          &:active,
+          &.is-active
+            box-shadow: $input-focus-box-shadow-size bulmaRgba($color, 0.25)
+    // Modifiers
+    &.is-disabled
+      &::after
+        border-color: $light-input-disabled-color
+
+  // ------------------------------------------------ bulma-ext ------------------------------------------------
+  @media (min-width: $desktop)
+    *::-webkit-scrollbar-track
+      background: $light-grey-lighter
+    *::-webkit-scrollbar-thumb
+      background: $light-grey-light
+    *::-webkit-scrollbar-thumb:hover
+      background: $light-grey
+
+  .button.is-inverted.is-static
+    border-color: transparent
+
+  .button > .tag,
+  .navbar-item > .tag,
+  .navbar-link > .tag
+    border: solid 2px $light-scheme-main
+
+  .checkbox.has-svg
+    > .input
+      + span::after
+        border: 2px solid $light-grey
+      &:checked
+        + span::after
+          background-color: $light-grey
+      // Colors
+      @each $name, $pair in $light-colors
+        $color: nth($pair, 1)
+        &.is-#{$name}
+          + span::after
+            border-color: $color
+        &.is-#{$name}:checked
+          + span::after
+            background-color: $color
+
+  .table-panel.has-sticky-toolbars
+    > .table-panel-toolbar
+      background-color: $light-scheme-main
+    > .table-panel-pagination
+      background-color: $light-scheme-main
+
+  .pagination-link.is-loading,
+  .pagination.is-loading .pagination-link:not(.is-current),
+  .pagination.is-loading .pagination-previous,
+  .pagination.is-loading .pagination-next
+    color: transparent !important
+
+  .pagination-link.is-loading::after,
+  .pagination.is-loading .pagination-link:not(.is-current)::after,
+  .pagination.is-loading .pagination-previous::after,
+  .pagination.is-loading .pagination-next::after
+    border: 2px solid #dbdbdb
+    border-right-color: transparent
+    border-top-color: transparent
+
+  // ------------------------------------------------ Pageloader ------------------------------------------------
+  .pageloader
+    background: $light-scheme-main
+    background: rgba( $light-scheme-main, $pageloader-opacity )
+    @each $name, $pair in $light-colors
+      $color: nth($pair, 1)
+      $color-invert: nth($pair, 2)
+      &.is-#{$name}
+        background-color: $color
+        background: rgba( $color, $pageloader-opacity )
+        &::after
+          border-color: $color-invert
+        .title
+          color: $color-invert
+    &::after
+      border: 0 solid $white
+    .title
+      color: $white
+    +keyframes(loader-figure)
+      0%
+        background-color: $white
+      29%
+        background-color: $white
+      30%
+        background-color: transparent
+      100%
+        background-color: transparent
+
+  @each $name, $pair in $light-colors
+    $color: nth($pair, 1)
+    $color-invert: nth($pair, 2)
+    +keyframes(loader-figure-#{$name})
+      0%
+        background-color: $color-invert
+      29%
+        background-color: $color-invert
+      30%
+        background-color: transparent
+        opacity: 1
+      100%
+        opacity: 0
+        background-color: transparent
+
+  // ------------------------------------------------ Divider ------------------------------------------------
+  $light-divider-background-color: $grey-lighter !default
+  // $light-divider-thickness: .1rem !default
+  // $light-divider-font-size: $size-7 !default
+  $light-divider-color: $grey-light !default
+  $light-divider-content-background-color : $light-scheme-main !default
+
+  .is-divider, .is-divider-vertical
+    border-top: $divider-thickness solid $light-divider-background-color
+
+  .is-divider[data-content]::after, .is-divider-vertical[data-content]::after
+    background: $light-divider-content-background-color
+    color: $light-divider-color
+
+  .is-divider-vertical
+    +tablet
+      &::before
+        border-left: $divider-thickness solid $light-divider-background-color
+
+  .is-divider,
+  .is-divider-vertical
+    @each $name, $pair in mergeColorMaps($light-colors, $light-shades)
+      $color: nth($pair, 1)
+      $color-invert: nth($pair, 2)
+      &.is-#{$name}
+        border-top-color: $color
+
+        &[data-content]::after, &[data-content]::after
+          background: $color-invert
+          color: $color
+
+        &::before
+          border-left-color: $color
+
+  // ------------------------------------------------ TagsField ------------------------------------------------
+  .tagsfield
+    // Only child
+    > div:first-child:nth-last-child(1) span[contenteditable]
+      &:empty:after
+        content: attr(placeholder)
+        color: $light-input-placeholder-color
+
+    &.show-placeholder
+      > div:last-child
+        span[contenteditable]:after
+          content: attr(placeholder)
+          color: $light-input-placeholder-color

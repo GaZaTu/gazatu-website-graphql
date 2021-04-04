@@ -1,22 +1,31 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import * as serviceWorker from './serviceWorkerRegistration'
+import './index.scss'
 import App from './App'
-import { StoreProvider } from './store'
-import './index.css'
+import * as serviceWorkerRegistration from './serviceWorkerRegistration'
+// import reportWebVitals from './reportWebVitals'
+import { Store } from './store'
 
-ReactDOM.render((
-  <StoreProvider>
-    <App />
-  </StoreProvider>
-), document.getElementById('root'))
+ReactDOM.render(
+  <React.StrictMode>
+    <Store.Provider>
+      <App />
+    </Store.Provider>
+  </React.StrictMode>,
+  document.getElementById('root'),
+)
 
-serviceWorker.register({
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://cra.link/PWA
+serviceWorkerRegistration.register({
   onUpdate: registration => {
-    if (registration?.waiting) {
-      registration.waiting.postMessage({ type: 'SKIP_WAITING' })
-    }
-
-    window.location.reload()
+    registration?.waiting?.postMessage?.({ type: 'SKIP_WAITING' })
+    setTimeout(() => window.location.reload(), 100)
   },
 })
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+// reportWebVitals()

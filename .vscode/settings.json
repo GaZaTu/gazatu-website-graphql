@@ -3,6 +3,5 @@
     "node_modules": true,
     "build": true,
     "package-lock.json": true
-  },
-  "typescript.tsdk": "node_modules\\typescript\\lib"
+  }
 }

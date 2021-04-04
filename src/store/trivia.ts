@@ -1,4 +1,4 @@
-import { TriviaCounts } from '../lib/graphql/schema.gql'
+import { TriviaCounts } from '../graphql/schema.gql'
 
 export type State = {
   counts?: TriviaCounts

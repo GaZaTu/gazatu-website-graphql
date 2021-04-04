@@ -1,0 +1,412 @@
+@media (min-width: $desktop) {
+  *::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: #888;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+}
+
+@keyframes tag-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(204, 169, 44, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(204, 169, 44, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(204, 169, 44, 0);
+  }
+}
+
+.tag.has-pulse {
+  animation: shadow-pulse 2s infinite;
+}
+
+.tag.is-tight {
+  width: 0px;
+  height: 0px;
+  padding: 5px;
+  border-radius: 50%;
+}
+
+.button.is-inverted.is-static {
+  border-color: transparent;
+}
+
+.button.is-circular {
+  border-radius: 50%;
+}
+
+.button > .tag {
+  z-index: 1;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  transform: translateY(-50%) translateX(+50%);
+  pointer-events: none;
+  border: solid 2px $scheme-main;
+}
+
+.dropdown.is-active .dropdown-menu,
+.dropdown.is-hoverable:hover .dropdown-menu {
+  display: none;
+}
+
+.dropdown.is-active > .dropdown-menu[role="menu"],
+.dropdown.is-hoverable:hover > .dropdown-menu[role="menu"] {
+  display: block;
+}
+
+.dropdown.is-narrow > .dropdown-menu > .dropdown-content {
+  margin-top: -1.5rem;
+}
+
+.dropdown.is-scrollable > .dropdown-menu > .dropdown-content {
+  overflow-y: auto;
+  max-height: 25rem;
+}
+
+.menu-list > * .tag {
+  z-index: 1;
+  position: absolute;
+  // top: 0px;
+  // right: 0px;
+  transform: translateY(-50%) translateX(+50%);
+  pointer-events: none;
+}
+
+.menu-list > * .tag.is-right {
+  right: 0px;
+}
+
+.navbar-item > .tag {
+  z-index: 1;
+  position: absolute;
+  transform: translateY(-50%) translateX(-50%);
+  pointer-events: none;
+  right: 0px;
+  border: solid 2px $scheme-main;
+}
+
+.navbar-link > .tag {
+  z-index: 1;
+  position: absolute;
+  transform: translateY(-75%) translateX(-75%);
+  pointer-events: none;
+  right: 0px;
+  border: solid 2px $scheme-main;
+}
+
+.notifications {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  max-width: 100%;
+  width: 25rem;
+  padding: 1rem;
+}
+
+.pagination-link.is-current {
+  pointer-events: none;
+}
+
+.pagination-link.is-loading,
+.pagination.is-loading .pagination-link:not(.is-current),
+.pagination.is-loading .pagination-previous,
+.pagination.is-loading .pagination-next {
+  color: transparent !important;
+  pointer-events: none;
+}
+
+.pagination-link.is-loading::after,
+.pagination.is-loading .pagination-link:not(.is-current)::after,
+.pagination.is-loading .pagination-previous::after,
+.pagination.is-loading .pagination-next::after {
+  animation: spinAround .5s infinite linear;
+  border: 2px solid #dbdbdb;
+  border-radius: 9999px;
+  border-right-color: transparent;
+  border-top-color: transparent;
+  content: "";
+  display: block;
+  height: 1em;
+  position: relative;
+  width: 1em;
+
+  position: absolute;
+  left: calc(50% - (1em / 2));
+  top: calc(50% - (1em / 2));
+  position: absolute !important;
+}
+
+@media (min-width: $tablet) {
+  .navbar.is-padded {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@media (min-width: $desktop) {
+  .navbar.is-padded {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+}
+
+.section .is-unpadded {
+  margin-left: calc(-1 * 1.2rem);
+  margin-right: calc(-1 * 1.2rem);
+}
+
+@media (min-width: $desktop) {
+  .section .is-unpadded {
+    margin-left: calc(-1 * 2.7rem);
+    margin-right: calc(-1 * 2.7rem);
+  }
+}
+
+@media (min-width: $widescreen) {
+  .section .is-unpadded {
+    margin-left: calc(-1 * 4.2rem);
+    margin-right: calc(-1 * 4.2rem);
+  }
+}
+
+@media (min-width: $fullhd) {
+  .section .is-unpadded {
+    margin-left: calc(-1 * 5.7rem);
+    margin-right: calc(-1 * 5.7rem);
+  }
+}
+
+@keyframes checkbox-draw {
+  0% {
+    stroke-dashoffset: 33;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.checkbox.has-svg > .input + span::after {
+  content: "";
+  height: 20px;
+  width: 20px;
+  margin-right: 0.75rem;
+  float: left;
+  border: 2px solid #000000;
+  border-radius: 3px;
+  transition: 0.15s all ease-out;
+}
+
+.checkbox.has-svg > .input.is-primary + span::after {
+  border-color: $primary;
+}
+
+.checkbox.has-svg > .input.is-link + span::after {
+  border-color: $link;
+}
+
+.checkbox.has-svg > .input.is-info + span::after {
+  border-color: $info;
+}
+
+.checkbox.has-svg > .input.is-success + span::after {
+  border-color: $success;
+}
+
+.checkbox.has-svg > .input.is-warning + span::after {
+  border-color: $warning;
+}
+
+.checkbox.has-svg > .input.is-danger + span::after {
+  border-color: $danger;
+}
+
+.checkbox.has-svg:active > span::after {
+  // filter: grayscale(50%);
+  opacity: 0.6;
+}
+
+.checkbox.has-svg > .input + span > svg {
+  stroke: #ffffff;
+  stroke-width: 5px;
+  height: 0; // Firefox fix
+  width: 12px;
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  stroke-dasharray: 33; // Firefox fix
+}
+
+.checkbox.has-svg > .input.is-primary + span > svg,
+.checkbox.has-svg > .input.is-link + span > svg,
+.checkbox.has-svg > .input.is-info + span > svg,
+.checkbox.has-svg > .input.is-success + span > svg,
+.checkbox.has-svg > .input.is-warning + span > svg,
+.checkbox.has-svg > .input.is-danger + span > svg {
+  stroke: $scheme-main;
+}
+
+.checkbox.has-svg > .input {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.checkbox.has-svg > .input:checked + span::after {
+  background-color: #000000;
+}
+
+.checkbox.has-svg > .input.is-primary:checked + span::after {
+  background-color: $primary;
+}
+
+.checkbox.has-svg > .input.is-link:checked + span::after {
+  background-color: $link;
+}
+
+.checkbox.has-svg > .input.is-info:checked + span::after {
+  background-color: $info;
+}
+
+.checkbox.has-svg > .input.is-success:checked + span::after {
+  background-color: $success;
+}
+
+.checkbox.has-svg > .input.is-warning:checked + span::after {
+  background-color: $warning;
+}
+
+.checkbox.has-svg > .input.is-danger:checked + span::after {
+  background-color: $danger;
+}
+
+.checkbox.has-svg > .input:disabled + span::after {
+  // filter: grayscale(50%);
+  opacity: 0.6;
+}
+
+.checkbox.has-svg > .input:checked + span > svg {
+  // Firefox doesn't render svg's that is loading with the use tag if its been set to display: none and then toggled to display: block, so you have to use tricks like this to get it to render again:
+  height: 12px;
+  animation: checkbox-draw ease-in-out 0.2s forwards;
+}
+
+.table-panel.has-sticky-toolbars > .table-panel-toolbar {
+  position: sticky;
+  z-index: 5;
+  background-color: $scheme-main;
+  top: 0;
+}
+
+.table-panel.has-sticky-toolbars > .table-panel-pagination {
+  position: sticky;
+  z-index: 5;
+  background-color: $scheme-main;
+  bottom: 0;
+}
+
+.table-select-column {
+  width: 50px;
+}
+
+*[data-tooltip] {
+  position: relative;
+}
+
+*[data-tooltip]::before {
+  display: none; /* hide by default */
+
+  content: attr(data-tooltip); /* here's the magic */
+  position: absolute;
+
+  /* basic styles */
+  width: 200px;
+  padding: 6px;
+  border-radius: 6px;
+  background: #000;
+  color: #fff;
+  text-align: center;
+
+  /* animation */
+  opacity: 0;
+  transition: .3s opacity;
+}
+
+*[data-tooltip]::after {
+  display: none; /* hide by default */
+
+  content: "";
+  position: absolute;
+
+  /* the arrow */
+  border: 10px solid #000;
+
+  /* animation */
+  opacity: 0;
+  transition: .3s opacity;
+}
+
+*[data-tooltip]:hover::before,
+*[data-tooltip]:hover::after {
+  display: block;
+  opacity: 1;
+}
+
+// *[data-tooltip][data-tooltip-position="top"]::before {}
+
+*[data-tooltip]::before,
+*[data-tooltip][data-tooltip-position="bottom"]::before {
+  top: 50%;
+  left: 60%;
+  transform: translateX(-50%) translateY(50%);
+  margin-left: 0px;
+}
+
+// *[data-tooltip][data-tooltip-position="left"]::before {}
+
+*[data-tooltip][data-tooltip-position="right"]::before {
+  top: 50%;
+  left: 100%;
+  transform: translateX(0%) translateY(-50%);
+  margin-left: 15px;
+}
+
+// *[data-tooltip][data-tooltip-position="top"]::after {}
+
+*[data-tooltip]::after,
+*[data-tooltip][data-tooltip-position="bottom"]::after {
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(0%);
+  margin-left: 0px;
+
+  border-color: transparent transparent black transparent;
+}
+
+// *[data-tooltip][data-tooltip-position="left"]::after {}
+
+*[data-tooltip][data-tooltip-position="right"]::after {
+  top: 50%;
+  left: 100%;
+  transform: translateX(0%) translateY(-50%);
+  margin-left: -5px;
+
+  border-color: transparent black transparent transparent;
+}
