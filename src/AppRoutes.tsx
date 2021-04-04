@@ -5,8 +5,7 @@ import { Span } from './bulma/Text'
 import useAuthorization from './store/useAuthorization'
 
 const HomeView = React.lazy(() => import('./views/HomeView'))
-const FormTestView = React.lazy(() => import('./views/test/FormTestView'))
-const TableTestView = React.lazy(() => import('./views/test/TableTestView'))
+const LoginView = React.lazy(() => import('./views/LoginView'))
 
 const AppRoutes: React.FC = props => {
   const [isAuthenticated] = useAuthorization()
@@ -20,12 +19,11 @@ const AppRoutes: React.FC = props => {
           <HomeView />
         </Route>
 
-        <Route path="/trivia/questions/:id" exact>
-          <FormTestView />
-        </Route>
-        <Route path="/trivia/questions" exact>
-          <TableTestView />
-        </Route>
+        {!isAuthenticated && (
+          <Route path="/login" exact>
+            <LoginView />
+          </Route>
+        )}
 
         <Route>
           <Pageloader active>

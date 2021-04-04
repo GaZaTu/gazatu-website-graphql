@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useLayoutEffect } from 'react'
 import Control from './Control'
 import Field from './Field'
 import Form, { RegisterOptions } from './Form'
@@ -35,14 +35,15 @@ const Input: React.FC<Props> = props => {
   let innerRef = _innerRef
 
   const { setSize } = useContext(Control.Context)
-  useEffect(() => setSize(size), [size, setSize])
+  useLayoutEffect(() => setSize(size), [size, setSize])
 
-  const { setName, label, setLabelHidden } = useContext(Field.Context)
-  useEffect(() => setName(nativeProps.name), [setName, nativeProps.name])
-  useEffect(() => setLabelHidden(nativeProps.type === 'checkbox'), [setLabelHidden, nativeProps.type])
+  const { setName, label, labelAsString, setLabelHidden, setRequired } = useContext(Field.Context)
+  useLayoutEffect(() => setName(nativeProps.name), [setName, nativeProps.name])
+  useLayoutEffect(() => setLabelHidden(nativeProps.type === 'checkbox'), [setLabelHidden, nativeProps.type])
+  useLayoutEffect(() => setRequired(!!nativeProps.required), [setRequired, nativeProps.required])
 
-  if (!nativeProps.placeholder && typeof label === 'string') {
-    nativeProps.placeholder = `${label}...`
+  if (!nativeProps.placeholder && labelAsString) {
+    nativeProps.placeholder = `${labelAsString}...`
   }
 
   const form = useContext(Form.Context)

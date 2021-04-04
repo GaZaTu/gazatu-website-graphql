@@ -45,8 +45,9 @@ const TagsInput: React.FC<Props> = props => {
   let onChange = _onChange
   let placeholder = _placeholder
 
-  const { setName, label } = useContext(Field.Context)
-  useEffect(() => setName(name), [setName, name])
+  const { setName, label, setRequired } = useContext(Field.Context)
+  useLayoutEffect(() => setName(name), [setName, name])
+  useLayoutEffect(() => setRequired(!!required), [setRequired, required])
 
   if (!placeholder && typeof label === 'string') {
     placeholder = `${label}...`

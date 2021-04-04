@@ -85,8 +85,9 @@ const Select: React.FC<Props> = props => {
     }
   }, [_getLabelElement, getLabelString])
 
-  const { setName } = useContext(Field.Context)
-  useEffect(() => setName(name), [setName, name])
+  const { setName, setRequired } = useContext(Field.Context)
+  useLayoutEffect(() => setName(name), [setName, name])
+  useLayoutEffect(() => setRequired(!!required), [setRequired, required])
 
   const form = useContext(Form.Context)
   if (name && !onChange && (form.getValue && form.setValue)) {

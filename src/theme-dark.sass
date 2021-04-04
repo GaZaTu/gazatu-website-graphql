@@ -1506,21 +1506,24 @@ html.dark-theme
   .navbar-link > .tag
     border: solid 2px $dark-scheme-main
 
+  .checkbox:hover
+    color: $dark-grey-dark
+
   .checkbox.has-svg
     > .input
-      + span::after
+      + span::before
         border: 2px solid $dark-grey
       &:checked
-        + span::after
+        + span::before
           background-color: $dark-grey
       // Colors
       @each $name, $pair in $dark-colors
         $color: nth($pair, 1)
         &.is-#{$name}
-          + span::after
+          + span::before
             border-color: $color
         &.is-#{$name}:checked
-          + span::after
+          + span::before
             background-color: $color
 
   .table-panel.has-sticky-toolbars
@@ -1593,7 +1596,7 @@ html.dark-theme
   $dark-divider-color: $grey-light !default
   $dark-divider-content-background-color : $dark-scheme-main !default
 
-  .is-divider, .is-divider-vertical
+  .is-divider
     border-top: $divider-thickness solid $dark-divider-background-color
 
   .is-divider[data-content]::after, .is-divider-vertical[data-content]::after

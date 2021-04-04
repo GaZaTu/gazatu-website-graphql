@@ -5,8 +5,17 @@ import { Color } from './utils/classes'
 import getChildrenByTypeAndProps from './utils/getChildrenByTypeAndProps'
 import { HTMLProps } from './utils/HTMLProps'
 
+function objectUnassign(object: any, keys: any) {
+  for (const key of keys) {
+    delete object[key]
+  }
+
+  return object as any
+}
+
 const Context = React.createContext({
   label: undefined as React.ReactNode | undefined,
+  labelAsString: undefined as string | undefined,
   helpColor: undefined as Color | undefined,
 
   id: undefined as string | undefined,
@@ -16,11 +25,15 @@ const Context = React.createContext({
   setName: (name: string | undefined) => {},
 
   labelHidden: false as boolean,
-  setLabelHidden: (hidden: boolean) => {},
+  setLabelHidden: (labelHidden: boolean) => { },
+
+  required: false as boolean,
+  setRequired: (required: boolean) => { },
 })
 
 type LabelProps = HTMLProps<'label'> & {
   size?: 'small' | 'normal' | 'medium' | 'large'
+  asString?: string
 }
 
 const Label: React.FC<LabelProps> = () => null
@@ -67,17 +80,18 @@ const Field: React.FC<Props> = props => {
 
   const labelChild = (getChildrenByTypeAndProps(children, [Label], {})[0] as any)?.props as LabelProps | undefined
   const label = labelChild?.children ?? _label
-  const labelProps = Object.assign({ ...(labelChild ?? _labelProps) }, { children: undefined, size: undefined })
+  const labelProps = objectUnassign({ ...(labelChild ?? _labelProps) }, ['children', 'size', 'asString'])
   const labelSize = labelChild?.size ?? _labelSize
 
   const helpChild = (getChildrenByTypeAndProps(children, [Help], {})[0] as any)?.props as HelpProps | undefined
   const help = helpChild?.children ?? _help
-  const helpProps = Object.assign({ ...(helpChild ?? _helpProps) }, { children: undefined, color: undefined })
+  const helpProps = objectUnassign({ ...(helpChild ?? _helpProps) }, ['children', 'color'])
   const helpColor = helpChild?.color ?? _helpColor
 
   const [id, setId] = useState<string>()
   const [name, setName] = useState<string>()
   const [labelHidden, setLabelHidden] = useState(false)
+  const [required, setRequired] = useState(false)
 
   const form = useContext(Form.Context)
   const error = (() => {
@@ -107,9 +121,11 @@ const Field: React.FC<Props> = props => {
     'is-grouped-multiline': !!groupedMultiline,
     'has-addons': !!hasAddons,
     [`has-addons-${align}`]: !hasAddons && !!align,
+    'is-required': !!required,
   })
 
-  const context = { label, helpColor, id, setId, name, setName, labelHidden, setLabelHidden }
+  const labelAsString = typeof label === 'string' ? label : labelChild?.asString
+  const context = { label, labelAsString, helpColor, id, setId, name, setName, labelHidden, setLabelHidden, required, setRequired }
 
   const labelNode = label && !labelHidden && (
     <label {...labelProps} className="label">{label}</label>

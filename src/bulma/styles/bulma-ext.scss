@@ -189,6 +189,12 @@
   }
 }
 
+.field.is-required > .label::after {
+  content: '*';
+  margin-left: 0.1rem;
+  font-weight: 100;
+}
+
 @keyframes checkbox-draw {
   0% {
     stroke-dashoffset: 33;
@@ -198,7 +204,7 @@
   }
 }
 
-.checkbox.has-svg > .input + span::after {
+.checkbox.has-svg > .input + span::before {
   content: "";
   height: 20px;
   width: 20px;
@@ -209,31 +215,31 @@
   transition: 0.15s all ease-out;
 }
 
-.checkbox.has-svg > .input.is-primary + span::after {
+.checkbox.has-svg > .input.is-primary + span::before {
   border-color: $primary;
 }
 
-.checkbox.has-svg > .input.is-link + span::after {
+.checkbox.has-svg > .input.is-link + span::before {
   border-color: $link;
 }
 
-.checkbox.has-svg > .input.is-info + span::after {
+.checkbox.has-svg > .input.is-info + span::before {
   border-color: $info;
 }
 
-.checkbox.has-svg > .input.is-success + span::after {
+.checkbox.has-svg > .input.is-success + span::before {
   border-color: $success;
 }
 
-.checkbox.has-svg > .input.is-warning + span::after {
+.checkbox.has-svg > .input.is-warning + span::before {
   border-color: $warning;
 }
 
-.checkbox.has-svg > .input.is-danger + span::after {
+.checkbox.has-svg > .input.is-danger + span::before {
   border-color: $danger;
 }
 
-.checkbox.has-svg:active > span::after {
+.checkbox.has-svg:active > span::before {
   // filter: grayscale(50%);
   opacity: 0.6;
 }
@@ -269,35 +275,35 @@
   width: 1px;
 }
 
-.checkbox.has-svg > .input:checked + span::after {
+.checkbox.has-svg > .input:checked + span::before {
   background-color: #000000;
 }
 
-.checkbox.has-svg > .input.is-primary:checked + span::after {
+.checkbox.has-svg > .input.is-primary:checked + span::before {
   background-color: $primary;
 }
 
-.checkbox.has-svg > .input.is-link:checked + span::after {
+.checkbox.has-svg > .input.is-link:checked + span::before {
   background-color: $link;
 }
 
-.checkbox.has-svg > .input.is-info:checked + span::after {
+.checkbox.has-svg > .input.is-info:checked + span::before {
   background-color: $info;
 }
 
-.checkbox.has-svg > .input.is-success:checked + span::after {
+.checkbox.has-svg > .input.is-success:checked + span::before {
   background-color: $success;
 }
 
-.checkbox.has-svg > .input.is-warning:checked + span::after {
+.checkbox.has-svg > .input.is-warning:checked + span::before {
   background-color: $warning;
 }
 
-.checkbox.has-svg > .input.is-danger:checked + span::after {
+.checkbox.has-svg > .input.is-danger:checked + span::before {
   background-color: $danger;
 }
 
-.checkbox.has-svg > .input:disabled + span::after {
+.checkbox.has-svg > .input:disabled + span::before {
   // filter: grayscale(50%);
   opacity: 0.6;
 }

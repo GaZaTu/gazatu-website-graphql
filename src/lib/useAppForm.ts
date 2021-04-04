@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useForm, UseFormOptions } from 'react-hook-form'
 
 const useAppForm = <T extends Record<string, any>>(options: UseFormOptions<T>) => {
@@ -23,22 +24,30 @@ const useAppForm = <T extends Record<string, any>>(options: UseFormOptions<T>) =
     isSubmitting,
   } = form.formState
 
-  const getValue = (name: any) =>
-    _getValues(name)
+  const getValue = useMemo(() => {
+    return (name: any) =>
+      _getValues(name)
+  }, [])
 
-  const setValue = (name: any, value: any) =>
-    _setValue(name, value, { shouldDirty: true, shouldValidate: true })
+  const setValue = useMemo(() => {
+    return (name: any, value: any) =>
+      _setValue(name, value, { shouldDirty: true, shouldValidate: true })
+  }, [])
 
-  const getError = (name: any) =>
-    errors[name]
+  const getError = useMemo(() => {
+    return (name: any) =>
+      errors[name]
+  }, [])
 
-  const setError = (name: any, value: any) => {
-    if (value) {
-      _setError(name, value)
-    } else {
-      _clearErrors(name)
+  const setError = useMemo(() => {
+    return (name: any, value: any) => {
+      if (value) {
+        _setError(name, value)
+      } else {
+        _clearErrors(name)
+      }
     }
-  }
+  }, [])
 
   return {
     ...form,
