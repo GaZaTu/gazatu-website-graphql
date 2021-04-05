@@ -6,6 +6,12 @@ import getChildrenByTypeAndProps from './utils/getChildrenByTypeAndProps'
 import { HTMLProps } from './utils/HTMLProps'
 import useDocumentTitle from './utils/useDocumentTitle'
 
+const defaultDateFormat = new Intl.DateTimeFormat(undefined, {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+})
+
 const _P: React.FC<Omit<ParagraphProps, 'as'>> = props => (
   <Text as="p" {...props} />
 )
@@ -58,6 +64,8 @@ type SharedProps = {
   color?: Color
   spaced?: boolean
   documentTitle?: boolean | string
+  date?: number | string | Date
+  dateFormat?: Intl.DateTimeFormat
 }
 
 type ParagraphProps = SharedProps & HTMLProps<'p', false> & {}
@@ -88,6 +96,8 @@ const Text: React.FC<Props> = props => {
     color,
     spaced,
     documentTitle,
+    date,
+    dateFormat = defaultDateFormat,
     innerRef,
     ...nativeProps
   } = props
@@ -103,7 +113,6 @@ const Text: React.FC<Props> = props => {
   })
 
   let childString = ''
-
   const children = React.Children.map(nativeProps.children, child => {
     if (typeof child === 'string') {
       childString = child
@@ -116,7 +125,21 @@ const Text: React.FC<Props> = props => {
 
   useDocumentTitle(typeof documentTitle === 'string' ? documentTitle : childString, !documentTitle || !childString)
 
-  return React.createElement(as, { ...nativeProps, ref: innerRef, className }, children)
+  let parsedDate = undefined
+  if (date) {
+    if (typeof date === 'number' || typeof date === 'string') {
+      parsedDate = new Date(date)
+    } else {
+      parsedDate = date
+    }
+  }
+
+  let dateAsString = undefined
+  if (parsedDate) {
+    parsedDate = dateFormat.format(parsedDate)
+  }
+
+  return React.createElement(as, { ...nativeProps, ref: innerRef, className }, dateAsString ?? children)
 }
 
 export default React.memo(Text)

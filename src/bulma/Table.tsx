@@ -57,6 +57,9 @@ type Props = HTMLProps<'div'> & {
   fullwidth?: boolean
 }
 
+const defaultColumns = [] as any[]
+const defaultData = [] as any[]
+
 const Table: React.FC<Props> = props => {
   const {
     children,
@@ -122,8 +125,8 @@ const Table: React.FC<Props> = props => {
       ...options?.initialState,
       ...initialState,
     },
-    columns: columns ?? [],
-    data: data ?? [],
+    columns: columns ?? defaultColumns,
+    data: data ?? defaultData,
   })
 
   const handleGlobalFilterChange = useMemo(() => {
@@ -140,7 +143,7 @@ const Table: React.FC<Props> = props => {
             {filter && (
               <Level.Left className={`${classes.spacing.mb2}`}>
                 <Level.Item>
-                  <Control>
+                  <Control loading={loading}>
                     <Icon i="fas fa-search" />
                     <Input type="text" onChange={handleGlobalFilterChange} style={{ width: '22rem' }} placeholder="Search..." rounded />
                   </Control>

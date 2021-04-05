@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { GraphQLScript } from './graphql'
 import { GraphQLContext } from './useFetchGraphQL'
 
@@ -23,9 +23,9 @@ const useQuery: UseQuery = ({ query, variables }) => {
   const [loading, setLoading] = useState(true)
   const [trueOrFalse, setTrueOrFalse] = useState(false)
   const [graphQLResult, setGraphQLResult] = useState<GraphQLResult>()
+  const [error, setError] = useState<Error>()
 
   const runningRequests = useRef([] as Promise<any>[])
-
   useEffect(() => {
     if (queryScript) {
       runningRequests.current = [] // cancel previous requests
@@ -35,7 +35,14 @@ const useQuery: UseQuery = ({ query, variables }) => {
           if (runningRequests.current.includes(thisRequest)) {
             setLoading(false)
             setGraphQLResult(graphQLResult)
+
+            const graphqlErrorMessage = graphQLResult?.errors?.[0]?.message
+            const graphqlError = graphqlErrorMessage ? new Error(graphqlErrorMessage) : undefined
+            setError(graphqlError)
           }
+        }, error => {
+          setLoading(false)
+          setError(error)
         })
 
       runningRequests.current.push(thisRequest)
@@ -44,16 +51,18 @@ const useQuery: UseQuery = ({ query, variables }) => {
     return () => {
       setLoading(true)
     }
-  }, [fetchGraphQL, queryScript, variables, trueOrFalse])
+  }, [fetchGraphQL, queryScript, variables, trueOrFalse, setError])
 
-  const forceUpdate = () => setTrueOrFalse(s => !s)
-
-  if (graphQLResult) {
-    if ((graphQLResult.errors?.length ?? 0) > 0) {
-      return [undefined, new Error(graphQLResult.errors?.[0].message), loading, forceUpdate]
-    } else {
-      return [graphQLResult.data, undefined, loading, forceUpdate]
+  const forceUpdate = useMemo(() => {
+    return () => {
+      setTrueOrFalse(s => !s)
     }
+  }, [setTrueOrFalse])
+
+  if (error) {
+    return [undefined, error, loading, forceUpdate]
+  } else if (graphQLResult) {
+    return [graphQLResult.data, undefined, loading, forceUpdate]
   } else {
     return [undefined, undefined, loading, forceUpdate]
   }

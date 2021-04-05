@@ -43,7 +43,11 @@
   border-color: transparent;
 }
 
-.button.is-circular {
+.button.is-circular,
+.button.is-circular.is-small,
+.button.is-circular.is-normal,
+.button.is-circular.is-medium,
+.button.is-circular.is-large {
   border-radius: 50%;
 }
 
@@ -195,6 +199,11 @@
   font-weight: 100;
 }
 
+.control.is-loading::after {
+  right: 0.75em;
+  top: 0.75em;
+}
+
 @keyframes checkbox-draw {
   0% {
     stroke-dashoffset: 33;
@@ -316,7 +325,7 @@
 
 .table-panel.has-sticky-toolbars > .table-panel-toolbar {
   position: sticky;
-  z-index: 5;
+  z-index: 6;
   background-color: $scheme-main;
   top: 0;
 }

@@ -152,10 +152,11 @@ const LoginForm: React.FC<LoginFormProps> = props => {
   }
 
   const { getValue, setError } = context
-  const passwordsAreEqual = getValue('password') === getValue('password2')
+  const password = getValue('password')
+  const password2 = getValue('password2')
   useEffect(() => {
-    setError('password2', passwordsAreEqual ? undefined : { type: 'required', message: 'Passwords must be equal' })
-  }, [setError, passwordsAreEqual])
+    setError('password2', (password === password2) ? undefined : { type: 'required', message: 'Passwords must be equal' })
+  }, [setError, password, password2])
 
   return (
     <Form context={context} onSubmit={handleSubmit(onSubmit)} >
@@ -194,7 +195,7 @@ const LoginForm: React.FC<LoginFormProps> = props => {
 
       <Field>
         <Control>
-          <Button type="submit" color="primary" disabled={!canSubmit} loading={isLoading}>{isRegisterForm ? 'Register' : 'Login'}</Button>
+          <Button type="submit" color="primary" disabled={!canSubmit} loading={isLoading || isLocked}>{isRegisterForm ? 'Register' : 'Login'}</Button>
         </Control>
       </Field>
     </Form>

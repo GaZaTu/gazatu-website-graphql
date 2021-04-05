@@ -27,16 +27,19 @@ const useAppForm = <T extends Record<string, any>>(options: UseFormOptions<T>) =
   const getValue = useMemo(() => {
     return (name: any) =>
       _getValues(name)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const setValue = useMemo(() => {
     return (name: any, value: any) =>
       _setValue(name, value, { shouldDirty: true, shouldValidate: true })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const getError = useMemo(() => {
     return (name: any) =>
       errors[name]
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const setError = useMemo(() => {
@@ -47,6 +50,7 @@ const useAppForm = <T extends Record<string, any>>(options: UseFormOptions<T>) =
         _clearErrors(name)
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return {

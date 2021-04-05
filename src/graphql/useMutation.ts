@@ -22,6 +22,7 @@ const useMutation: UseMutation = ({ query }) => {
 
   const [loading, setLoading] = useState(true)
   const [graphQLResult, setGraphQLResult] = useState<GraphQLResult>()
+  const [error, setError] = useState<Error>()
 
   const execute = useMemo(() => {
     return (variables: { [key: string]: any }) =>
@@ -30,20 +31,25 @@ const useMutation: UseMutation = ({ query }) => {
           setLoading(false)
           setGraphQLResult(graphQLResult)
 
-          if (graphQLResult.errors?.length > 0) {
-            throw new Error(graphQLResult.errors[0].message)
-          } else {
-            return graphQLResult.data
-          }
-        })
-  }, [fetchGraphQL, queryScript])
+          const graphqlErrorMessage = graphQLResult?.errors?.[0]?.message
+          const graphqlError = graphqlErrorMessage ? new Error(graphqlErrorMessage) : undefined
+          setError(graphqlError)
 
-  if (graphQLResult) {
-    if ((graphQLResult.errors?.length ?? 0) > 0) {
-      return [execute, [undefined, new Error(graphQLResult.errors?.[0].message), loading]]
-    } else {
-      return [execute, [graphQLResult.data, undefined, loading]]
-    }
+          if (graphqlError) {
+            throw graphqlError
+          }
+
+          return graphQLResult.data
+        }, error => {
+          setLoading(false)
+          setError(error)
+        })
+  }, [fetchGraphQL, queryScript, setError])
+
+  if (error) {
+    return [execute, [undefined, error, loading]]
+  } else if (graphQLResult) {
+    return [execute, [graphQLResult.data, undefined, loading]]
   } else {
     return [execute, [undefined, undefined, loading]]
   }

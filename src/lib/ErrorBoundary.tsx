@@ -5,8 +5,12 @@ type Props = {
 }
 
 class ErrorBoundary extends React.Component<Props> {
-  constructor(props: Props) {
-    super(props)
+  // constructor(props: Props) {
+  //   super(props)
+  // }
+
+  static getDerivedStateFromError(error: Error) {
+    return {}
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {

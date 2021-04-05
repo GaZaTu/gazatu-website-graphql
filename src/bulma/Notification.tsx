@@ -1,6 +1,8 @@
 import classNames from 'classnames'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Button from './Button'
+import Icon from './Icon'
+import { Span } from './Text'
 import { Color } from './utils/classes'
 import { HTMLProps } from './utils/HTMLProps'
 
@@ -23,6 +25,7 @@ const Context = React.createContext({
   pushWarning: ((c, o) => { }) as PushFunction,
   pushDanger: ((c, o) => { }) as PushFunction,
   pushError: ((c, o) => { }) as PushFunction,
+  useErrorNotificationEffect: (error: Error | undefined, retry?: () => void) => { },
 })
 const ContextProvider = Context.Provider
 
@@ -98,6 +101,28 @@ const Provider: React.FC<{}> = props => {
       pushDanger(String(content), options)
   }, [pushDanger])
 
+  const useErrorNotificationEffect = (error: Error | undefined, retry?: () => void) => {
+    useEffect(() => {
+      if (!error) {
+        return
+      }
+
+      pushDanger((
+        <Span>
+          {retry && (
+            <Button size="small" onClick={retry} style={{ marginRight: '1rem' }}>
+              <Icon i="fas fa-lg fa-redo" />
+            </Button>
+          )}
+          <Span>{String(error)}</Span>
+        </Span>
+      ), {
+        closeable: true,
+        timeout: 0,
+      })
+    }, [error, retry])
+  }
+
   const context = {
     push,
     pushPrimary,
@@ -106,6 +131,7 @@ const Provider: React.FC<{}> = props => {
     pushWarning,
     pushDanger,
     pushError,
+    useErrorNotificationEffect,
   }
 
   return (
