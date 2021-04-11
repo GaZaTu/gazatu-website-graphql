@@ -4,7 +4,7 @@ import Icon from './Icon'
 import { Color } from './utils/classes'
 import getChildrenByTypeAndProps from './utils/getChildrenByTypeAndProps'
 import { HTMLProps } from './utils/HTMLProps'
-import useDocumentTitle from './utils/useDocumentTitle'
+import useDocumentTitleEffect from './utils/useDocumentTitleEffect'
 
 const defaultDateFormat = new Intl.DateTimeFormat(undefined, {
   year: 'numeric',
@@ -128,7 +128,7 @@ const Text: React.FC<Props> = props => {
 
   const documentTitle = typeof _documentTitle === 'string' ? _documentTitle : childString
   const setDocumentTitle = typeof _documentTitle === 'string' ? !!_documentTitle : (!!_documentTitle && !!childString)
-  useDocumentTitle(documentTitle, !setDocumentTitle)
+  useDocumentTitleEffect(documentTitle, !setDocumentTitle)
 
   let parsedDate = undefined
   if (date) {
