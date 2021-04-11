@@ -10,7 +10,7 @@ import Notification from '../../bulma/Notification'
 import Section from '../../bulma/Section'
 import Select from '../../bulma/Select'
 import Table, { TableInstance, useTableSearchParams } from '../../bulma/Table'
-import { Div, H1, H2, Span } from '../../bulma/Text'
+import { Div, H1, Span } from '../../bulma/Text'
 import { graphql } from '../../graphql'
 import { Mutation, Query, TriviaQuestion } from '../../graphql/schema.gql'
 import useMutation from '../../graphql/useMutation'
@@ -18,6 +18,7 @@ import useQuery from '../../graphql/useQuery'
 import { relayConnectionFragment } from '../../graphql/useRelayConnection'
 import useRelayConnectionQuery from '../../graphql/useRelayConnectionQuery'
 import parseURLSearchParams from '../../lib/parseURLSearchParam'
+import QueryStringSubtitle from '../../lib/QueryStringSubtitle'
 import useAuthorization from '../../store/useAuthorization'
 import { TriviaCategoryNameDiv } from './TriviaCategoryListView'
 
@@ -91,7 +92,7 @@ const triviaQuestionsQuery = graphql`
 `
 
 const TriviaQuestionListView: React.FC = props => {
-  const [isTriviaAdmin] = useAuthorization('trivia-admin')
+  const isTriviaAdmin = useAuthorization('trivia-admin')
 
   const {
     unusedQueryString,
@@ -251,12 +252,8 @@ const TriviaQuestionListView: React.FC = props => {
   return (
     <Section>
       <Container>
-        {true && (
-          <H1 kind="title" documentTitle caps>Trivia Questions</H1>
-        )}
-        {unusedQueryString && (
-          <H2 kind="subtitle">?{unusedQueryString}</H2>
-        )}
+        <H1 kind="title" documentTitle caps>Trivia Questions</H1>
+        <QueryStringSubtitle query={unusedQueryString} />
 
         <Table className="is-unpadded" data={data} bordered fullwidth loading={loading} canSelectRows={isTriviaAdmin} options={{ pageCount }} initialState={{ pageSize, sortBy: [{ id: 'updatedAt', desc: true }] }} manual onSelectedRowsChange={setSelectedRows} storeStateInQuery>
           {isTriviaAdmin && (

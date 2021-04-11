@@ -36,10 +36,7 @@ const App: React.FC = props => {
   const fetchGraphQL = useFetchGraphQL(fetchInit)
 
   return (
-    <div className="App">
-      <div className="App-Name">{process.env.REACT_APP_NAME}</div>
-      <div className="App-Version">{process.env.REACT_APP_VERSION}</div>
-
+    <div className="App" data-name={process.env.REACT_APP_NAME} data-version={process.env.REACT_APP_VERSION}>
       <FetchContext.Provider value={{ fetch }}>
         <GraphQLContext.Provider value={{ fetchGraphQL }}>
           <BrowserRouter>

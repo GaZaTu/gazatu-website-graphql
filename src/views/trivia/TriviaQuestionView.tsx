@@ -184,7 +184,7 @@ const TriviaQuestionReportForm: React.FC<TriviaQuestionReportFormProps> = props 
 
 const TriviaQuestionView: React.FC = props => {
   const id = useIdParam(props)
-  const [isTriviaAdmin] = useAuthorization('trivia-admin')
+  const isTriviaAdmin = useAuthorization('trivia-admin')
   const readOnly = !!id && !isTriviaAdmin
 
   const variables = useMemo(() => {

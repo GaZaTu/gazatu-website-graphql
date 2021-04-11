@@ -72,7 +72,7 @@ const removeTriviaCategoryMutation = graphql`
 
 const TriviaCategoryView: React.FC = props => {
   const id = useIdParam(props)
-  const [isTriviaAdmin] = useAuthorization('trivia-admin')
+  const isTriviaAdmin = useAuthorization('trivia-admin')
   const readOnly = !!id && !isTriviaAdmin
 
   const variables = useMemo(() => {

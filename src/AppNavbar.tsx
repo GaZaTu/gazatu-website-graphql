@@ -23,9 +23,7 @@ import useAuthorization from './store/useAuthorization'
 const triviaCountsQuery = graphql`
   query Query {
     triviaCounts {
-      questionsCount
       unverifiedQuestionsCount
-      categoriesCount
       unverifiedCategoriesCount
       reportsCount
       reportedQuestionsCount
@@ -36,9 +34,9 @@ const triviaCountsQuery = graphql`
 
 const AppNavbar: React.FC<{}> = props => {
   const [store, dispatch] = useContext(Store)
-  const [isAuthenticated] = useAuthorization()
-  const [isAdmin] = useAuthorization('admin')
-  const [isTriviaAdmin] = useAuthorization('trivia-admin')
+  const isAuthenticated = useAuthorization()
+  const isAdmin = useAuthorization('admin')
+  const isTriviaAdmin = useAuthorization('trivia-admin')
 
   const [theme, setTheme] = useStoredState('@@COLOR_SCHEME', 'Dark-Mode')
   const prefersDark = useMediaQuery({ query: '(prefers-color-scheme: dark)' })

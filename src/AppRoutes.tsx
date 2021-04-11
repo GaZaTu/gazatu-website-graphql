@@ -16,9 +16,9 @@ const TriviaCategoryListView = React.lazy(() => import('./views/trivia/TriviaCat
 const TriviaCategoryView = React.lazy(() => import('./views/trivia/TriviaCategoryView'))
 
 const AppRoutes: React.FC = props => {
-  const [isAuthenticated] = useAuthorization()
-  const [isAdmin] = useAuthorization('admin')
-  const [isTriviaAdmin] = useAuthorization('trivia-admin')
+  const isAuthenticated = useAuthorization()
+  const isAdmin = useAuthorization('admin')
+  const isTriviaAdmin = useAuthorization('trivia-admin')
   const { pushError } = useContext(Notification.Portal)
 
   return (
