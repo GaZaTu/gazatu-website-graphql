@@ -1,5 +1,6 @@
 import classNames from 'classnames'
 import React, { useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import Control from './Control'
 import Dropdown from './Dropdown'
 import Field from './Field'
 import Form, { RegisterOptions } from './Form'
@@ -14,7 +15,7 @@ type OptionProps = {
 
 const Option: React.FC<OptionProps> = props => null
 
-type Props = Omit<HTMLProps<'div'>, 'onChange'> & {
+type Props = Omit<HTMLProps<'div'>, 'onChange' | 'defaultValue'> & {
   name?: string
   options?: any[]
   getKey?: (option: any) => string
@@ -23,18 +24,20 @@ type Props = Omit<HTMLProps<'div'>, 'onChange'> & {
   getLabelElement?: (label: string, option: any) => React.ReactNode
   value?: any
   onChange?: (value: any) => void
+  defaultValue?: any
   color?: Color
   size?: 'small' | 'normal' | 'medium' | 'large'
   hovered?: boolean
   focused?: boolean
   labelized?: boolean
   filterable?: boolean
-  editable?: boolean
+  // editable?: boolean
   // multiple?: boolean
   readOnly?: boolean
   disabled?: boolean
   required?: boolean
   validate?: RegisterOptions['validate']
+  usePortal?: boolean
 }
 
 const Select: React.FC<Props> = props => {
@@ -47,23 +50,30 @@ const Select: React.FC<Props> = props => {
     getLabelElement: _getLabelElement,
     value: _value,
     onChange: _onChange,
-    color,
+    defaultValue,
+    color: _color,
     size,
     hovered,
     focused,
     labelized,
     filterable,
-    editable,
+    // editable,
     readOnly,
     disabled,
     required,
+    validate,
+    usePortal,
     children,
-    innerRef,
+    innerRef: _innerRef,
     ...nativeProps
   } = props
 
+  let color = _color
+
   let value = _value
   let onChange = _onChange
+
+  let innerRef = _innerRef
 
   const getLabelString = useMemo(() => {
     return (option: any) => {
@@ -85,37 +95,92 @@ const Select: React.FC<Props> = props => {
     }
   }, [_getLabelElement, getLabelString])
 
-  const { setName, setRequired } = useContext(Field.Context)
-  useLayoutEffect(() => setName(name), [setName, name])
+  const { setIsValidating } = useContext(Control.Context)
+
+  const { setRequired, setError } = useContext(Field.Context)
   useLayoutEffect(() => setRequired(!!required), [setRequired, required])
 
-  const form = useContext(Form.Context)
-  if (name && !onChange && (form.getValue && form.setValue)) {
-    value = form.getValue!(name)
-    onChange = value => {
-      form.setValue!(name, value)
+  const { useController } = useContext(Form.Context)
+  const controller = useController({
+    name,
+    defaultValue,
+    rules: {
+      required,
+      validate,
+    },
+  })
 
-      if (form.setError) {
-        if (required) {
-          if (value) {
-            form.setError(name, undefined)
-          } else {
-            form.setError(name, 'required')
-          }
-        }
-      }
+  if (controller) {
+    const {
+      field,
+      fieldState: {
+        isDirty,
+        isTouched,
+        invalid,
+      },
+    } = controller
+
+    onChange = field.onChange
+    nativeProps.onBlur = field.onBlur
+
+    value = field.value
+
+    innerRef = field.ref
+
+    if ((isDirty || isTouched) && invalid) {
+      color = 'danger'
     }
   }
 
   useLayoutEffect(() => {
-    if (name && form.register) {
-      form.register({ name, type: 'custom' }, { required })
+    if (!controller?.fieldState) {
+      return
     }
+
+    const {
+      error,
+      isDirty,
+      isTouched,
+      isValidating,
+    } = controller.fieldState
+
+    setError((isDirty || isTouched) ? error : undefined)
+    setIsValidating(isValidating)
+  }, [controller?.fieldState, setError, setIsValidating])
+
+  const [valueState, setValueState] = useState(value ?? defaultValue)
+  const [inputValue, setInputValue] = useState('')
+  const [isTyping, setIsTyping] = useState(false)
+
+  useEffect(() => {
+    if (valueState === value) {
+      return
+    }
+
+    setIsTyping(false)
+    onChange?.(valueState)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [valueState])
+  useEffect(() => {
+    if (value === valueState) {
+      return
+    }
+
+    setValueState?.(value)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
+
+  useEffect(() => {
+    if (isTyping) {
+      return
+    }
+
+    setInputValue(valueState ? getLabelString(valueState) : '')
+  }, [valueState, getLabelString, isTyping])
 
   const className = classNames(nativeProps.className, {
     'select': true,
+    'has-max-width-100percent': true,
     [`is-${color}`]: !!color,
     [`is-${size}`]: !!size,
     'is-hovered': !!hovered,
@@ -123,17 +188,19 @@ const Select: React.FC<Props> = props => {
     'is-static': !!labelized,
   })
 
-  const [inputValue, setInputValue] = useState('')
-  useEffect(() => {
-    setInputValue(value ? getLabelString(value) : '')
-  }, [value, getLabelString])
-
+  const [highlightedOptionIndex, setHighlightedOptionIndex] = useState(filterable ? 0 : -1)
   const filteredOptions = useMemo(() => {
+    setHighlightedOptionIndex(filterable ? 0 : -1)
+
     if (!options) {
       return undefined
     }
 
     if (filterable) {
+      if (valueState && (inputValue === getLabelString(valueState))) {
+        return options
+      }
+
       return options
         ?.filter(option => getLabelString(option).toLowerCase().startsWith(inputValue.toLowerCase()))
     }
@@ -143,15 +210,36 @@ const Select: React.FC<Props> = props => {
     }
 
     return [undefined, ...options]
-  }, [options, filterable, inputValue, getLabelString, required])
+  }, [options, filterable, inputValue, valueState, getLabelString, required, setHighlightedOptionIndex])
 
   const optionChildren = getChildrenByTypeAndProps(children, [Option], {})
 
   const handleInputChange = useMemo(() => {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
+      setIsTyping(true)
       setInputValue(event.currentTarget.value)
     }
-  }, [setInputValue])
+  }, [])
+
+  const handleInputKeydown = useMemo(() => {
+    return (event: React.KeyboardEvent<HTMLInputElement>) => {
+      switch (event.key) {
+        case 'ArrowUp':
+          setHighlightedOptionIndex(i => Math.max(i - 1, 0))
+          break
+        case 'ArrowDown':
+          setHighlightedOptionIndex(i => Math.min(i + 1, (filteredOptions?.length ?? 0) - 1))
+          break
+        case 'Enter':
+          setValueState(filteredOptions?.[highlightedOptionIndex])
+          break
+        default:
+          return
+      }
+
+      event.preventDefault()
+    }
+  }, [filteredOptions, highlightedOptionIndex])
 
   const handleItemClick = useMemo(() => {
     return (event: React.MouseEvent<HTMLElement>) => {
@@ -160,32 +248,27 @@ const Select: React.FC<Props> = props => {
       }
 
       const key = event.currentTarget.dataset.option
-      let value = undefined
+      const value = key && (options ?? [])
+        .filter(o => getKey(o) === key)
+        .map(o => getValue(o))
+        .find(() => true)
 
-      if (key) {
-        for (const option of options ?? []) {
-          if (getKey(option) === key) {
-            value = getValue(option)
-          }
-        }
-      }
-
-      onChange?.(value)
+      setValueState(value)
     }
-  }, [options, getKey, onChange, getValue])
+  }, [options, getKey, setValueState, getValue])
 
   return (
     <div {...nativeProps} ref={innerRef} className={className}>
-      <Dropdown narrow={!editable && !filterable}>
+      <Dropdown disabled={readOnly} narrow={!filterable} usePortal={usePortal} hasMaxWidth100Percent hasMaxHeight300px>
         <Dropdown.Trigger>
-          <Input type="text" value={inputValue} onChange={handleInputChange} color={color} size={size} hovered={hovered} focused={focused} labelized={labelized} readOnly={(!filterable && !editable) || readOnly} disabled={disabled} />
+          <Input type="text" value={inputValue} onChange={handleInputChange} onKeyDown={handleInputKeydown} color={color} size={size} hovered={hovered} focused={focused} labelized={labelized} readOnly={!filterable || readOnly} disabled={disabled} />
         </Dropdown.Trigger>
-        <Dropdown.Menu>
+        <Dropdown.Menu style={{ marginTop: usePortal ? (filterable ? '2.2rem' : '1.1rem') : undefined }}>
           <Dropdown.Context.Consumer>
-            {dropdown => {
+            {({ setActiveState }) => {
               const onClick = (event: React.MouseEvent<HTMLElement>) => {
                 handleItemClick(event)
-                dropdown.setActiveState(false)
+                setActiveState(false)
               }
 
               if (optionChildren.length) {
@@ -201,10 +284,10 @@ const Select: React.FC<Props> = props => {
               }
 
               return filteredOptions
-                ?.map(option => {
+                ?.map((option, i) => {
                   if (!option) {
                     return (
-                      <Dropdown.Item key="__empty" as={readOnly ? 'div' : 'a'} onClick={onClick}>&nbsp;</Dropdown.Item>
+                      <Dropdown.Item key="__empty" as={readOnly ? 'div' : 'a'} onClick={onClick} active={i === highlightedOptionIndex}>&nbsp;</Dropdown.Item>
                     )
                   }
 
@@ -212,7 +295,7 @@ const Select: React.FC<Props> = props => {
                   const label = getLabelElement(option)
 
                   return (
-                    <Dropdown.Item key={key} data-option={key} as={readOnly ? 'div' : 'a'} onClick={onClick}>{label}</Dropdown.Item>
+                    <Dropdown.Item key={key} data-option={key} as={readOnly ? 'div' : 'a'} onClick={onClick} active={i === highlightedOptionIndex}>{label}</Dropdown.Item>
                   )
                 })
             }}

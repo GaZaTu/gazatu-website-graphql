@@ -1539,6 +1539,18 @@ html.light-theme
     border-right-color: transparent
     border-top-color: transparent
 
+  .control
+    // Modifiers
+    &.has-direct-icons-left,
+    &.has-direct-icons-right
+      .input,
+      .select
+        &:focus
+          & ~ .icon
+            color: $input-icon-active-color
+      > .icon
+        color: $input-icon-color
+
   // ------------------------------------------------ Pageloader ------------------------------------------------
   .pageloader
     background: $light-scheme-main

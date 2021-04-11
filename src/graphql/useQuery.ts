@@ -1,5 +1,6 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { GraphQLScript } from './graphql'
+import useDeepCompare from './useDeepCompare'
 import { GraphQLContext } from './useFetchGraphQL'
 
 type GraphQLResult<T = any> = {
@@ -7,15 +8,12 @@ type GraphQLResult<T = any> = {
   data?: T
 }
 
-type UseQueryResult<T> = [T | undefined, Error | undefined, boolean, () => void]
+type UseQueryResult<T> = [T | undefined, Error | undefined, boolean, () => void, () => void]
 
-type UseQuery = <T>(args: { query?: GraphQLScript, variables?: { [key: string]: any } }) => UseQueryResult<T>
+type UseQuery = <T>(args: { query?: GraphQLScript, variables?: { [key: string]: any }, disabled?: boolean }) => UseQueryResult<T>
 
-const useQuery: UseQuery = ({ query, variables }) => {
-  const context = useContext(GraphQLContext)
-  const { fetchGraphQL } = context
-  const queryScript = query?.script
-
+const useQuery: UseQuery = ({ query, variables, disabled }) => {
+  const { fetchGraphQL } = useContext(GraphQLContext)
   if (!fetchGraphQL) {
     throw new Error('Invalid `GraphQLContext`')
   }
@@ -25,12 +23,14 @@ const useQuery: UseQuery = ({ query, variables }) => {
   const [graphQLResult, setGraphQLResult] = useState<GraphQLResult>()
   const [error, setError] = useState<Error>()
 
+  const cachedVariables = useDeepCompare(variables)
   const runningRequests = useRef([] as Promise<any>[])
   useEffect(() => {
-    if (queryScript) {
+    if (query?.script && !disabled) {
+      setLoading(true)
       runningRequests.current = [] // cancel previous requests
 
-      const thisRequest = fetchGraphQL(queryScript, variables)
+      const thisRequest = fetchGraphQL(query?.script, cachedVariables)
         .then(graphQLResult => {
           if (runningRequests.current.includes(thisRequest)) {
             setLoading(false)
@@ -42,16 +42,17 @@ const useQuery: UseQuery = ({ query, variables }) => {
           }
         }, error => {
           setLoading(false)
+          setGraphQLResult(undefined)
           setError(error)
         })
 
       runningRequests.current.push(thisRequest)
+    } else {
+      setLoading(false)
+      setGraphQLResult(undefined)
+      setError(undefined)
     }
-
-    return () => {
-      setLoading(true)
-    }
-  }, [fetchGraphQL, queryScript, variables, trueOrFalse, setError])
+  }, [fetchGraphQL, query?.script, disabled, cachedVariables, trueOrFalse, setError])
 
   const forceUpdate = useMemo(() => {
     return () => {
@@ -59,12 +60,20 @@ const useQuery: UseQuery = ({ query, variables }) => {
     }
   }, [setTrueOrFalse])
 
+  const clearResult = useMemo(() => {
+    return () => {
+      setLoading(false)
+      setGraphQLResult(undefined)
+      setError(undefined)
+    }
+  }, [])
+
   if (error) {
-    return [undefined, error, loading, forceUpdate]
+    return [undefined, error, loading, forceUpdate, clearResult]
   } else if (graphQLResult) {
-    return [graphQLResult.data, undefined, loading, forceUpdate]
+    return [graphQLResult.data, undefined, loading, forceUpdate, clearResult]
   } else {
-    return [undefined, undefined, loading, forceUpdate]
+    return [undefined, undefined, loading, forceUpdate, clearResult]
   }
 }
 

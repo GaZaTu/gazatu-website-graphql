@@ -112,12 +112,40 @@
 }
 
 .notifications {
+  display: none;
   position: fixed;
   bottom: 0;
   right: 0;
   max-width: 100%;
   width: 25rem;
   padding: 1rem;
+  z-index: 100;
+}
+
+.notifications.has-children {
+  display: block;
+}
+
+.dropdown.has-max-width-100percent,
+.dropdown.has-max-width-100percent > .dropdown-trigger,
+.dropdown.has-max-width-100percent > .dropdown-menu {
+  max-width: 100%;
+  width: 100%;
+}
+
+.dropdown.has-max-height-300px > .dropdown-menu > .dropdown-content {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.select.has-max-width-100percent {
+  max-width: 100%;
+  width: 100%;
+}
+
+.dropdowns > .dropdown {
+  position: fixed;
+  z-index: 75;
 }
 
 .pagination-link.is-current {
@@ -202,6 +230,34 @@
 .control.is-loading::after {
   right: 0.75em;
   top: 0.75em;
+}
+
+.control.is-loading > .icon.is-right {
+  display: none;
+}
+
+.control.has-direct-icons-left > .icon,
+.control.has-direct-icons-right > .icon {
+  color: #dbdbdb;
+  height: 2.5em;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 2.5em;
+  z-index: 4;
+}
+
+.control.has-direct-icons-left > .icon.is-left {
+  left: 0;
+}
+
+.control.has-direct-icons-right > .icon.is-right {
+  right: 0;
+}
+
+.control.has-direct-icons-left .input,
+.control.has-direct-icons-left .select select {
+  padding-left: 2.5em;
 }
 
 @keyframes checkbox-draw {
@@ -339,6 +395,14 @@
 
 .table-select-column {
   width: 50px;
+}
+
+.table-select-column > * {
+  vertical-align: middle;
+}
+
+.has-font-variant-caps {
+  font-variant: small-caps;
 }
 
 *[data-tooltip] {

@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, { useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import React, { useContext, useLayoutEffect, useMemo, useState } from 'react'
 import Control from './Control'
 import Field from './Field'
 import Form from './Form'
@@ -33,50 +33,76 @@ const TagsInput: React.FC<Props> = props => {
     // minTags,
     readOnly,
     // disabled,
-    color,
+    color: _color,
     onTagClick,
     getTagHref,
     children,
-    innerRef,
+    innerRef: _innerRef,
     ...nativeProps
   } = props
+
+  let color = _color
 
   let value = _value
   let onChange = _onChange
   let placeholder = _placeholder
 
-  const { setName, label, setRequired } = useContext(Field.Context)
-  useLayoutEffect(() => setName(name), [setName, name])
+  let innerRef = _innerRef
+
+  const { setIsValidating } = useContext(Control.Context)
+
+  const { label, setRequired, setError } = useContext(Field.Context)
   useLayoutEffect(() => setRequired(!!required), [setRequired, required])
 
   if (!placeholder && typeof label === 'string') {
     placeholder = `${label}...`
   }
 
-  const form = useContext(Form.Context)
-  if (name && !onChange && (form.getValue && form.setValue)) {
-    value = form.getValue!(name)
-    onChange = value => {
-      form.setValue!(name, value)
+  const { useController } = useContext(Form.Context)
+  const controller = useController({
+    name,
+    rules: {
+      required,
+    },
+  })
 
-      if (form.setError) {
-        if (required) {
-          if (value.length) {
-            form.setError(name, undefined)
-          } else {
-            form.setError(name, 'required')
-          }
-        }
-      }
+  if (controller) {
+    const {
+      field,
+      fieldState: {
+        isDirty,
+        isTouched,
+        invalid,
+      },
+    } = controller
+
+    onChange = field.onChange
+    nativeProps.onBlur = field.onBlur
+
+    value = field.value
+
+    innerRef = field.ref
+
+    if ((isDirty || isTouched) && invalid) {
+      color = 'danger'
     }
   }
 
   useLayoutEffect(() => {
-    if (name && form.register) {
-      form.register({ name, type: 'custom' }, { required })
+    if (!controller?.fieldState) {
+      return
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+
+    const {
+      error,
+      isDirty,
+      isTouched,
+      isValidating,
+    } = controller.fieldState
+
+    setError((isDirty || isTouched) ? error : undefined)
+    setIsValidating(isValidating)
+  }, [controller?.fieldState, setError, setIsValidating])
 
   const [inputValue, setInputValue] = useState('')
   const [focused, setFocused] = useState(false)

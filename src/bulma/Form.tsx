@@ -11,29 +11,43 @@ export type ValidationValueMessage<TValidationValue extends ValidationValue = Va
 export type ValidateResult = string | string[] | boolean | undefined
 export type Validate = (data: any) => ValidateResult | Promise<ValidateResult>
 export type RegisterOptions = {
-    required?: string | ValidationRule<boolean>
-    min?: ValidationRule<number | string>
-    max?: ValidationRule<number | string>
-    maxLength?: ValidationRule<number | string>
-    minLength?: ValidationRule<number | string>
-    pattern?: ValidationRule<RegExp>
-    validate?: Validate | Record<string, Validate>
-    valueAsNumber?: boolean
-    valueAsDate?: boolean
-    setValueAs?: (value: any) => any
+    required?: boolean
+    min?: string | number
+    max?: string | number
+    maxLength?: number
+    minLength?: number
+    pattern?: RegExp
+    validate?: Validate
 }
 
-export type RegisterFunction = {
-  (opts: RegisterOptions): React.RefCallback<HTMLElement>
-  (name: { name: string, type: 'custom' }, opts?: RegisterOptions): void
+export type Control = unknown
+export type UseControllerOptions = {
+  name?: string
+  rules?: Omit<RegisterOptions, 'valueAsNumber' | 'valueAsDate' | 'setValueAs'>
+  defaultValue?: unknown
+  control?: Control
 }
+export type UseControllerInstance = {
+  field: {
+    onChange: (...event: any[]) => void
+    onBlur: () => void
+    value: any
+    name: string
+    ref: React.Ref<any>
+  }
+  fieldState: {
+    invalid: boolean
+    isTouched: boolean
+    isDirty: boolean
+    isValidating: boolean
+    error?: any
+  }
+}
+
+export type UseController = (opts: UseControllerOptions) => UseControllerInstance | undefined
 
 const Context = React.createContext({
-  register: undefined as undefined | RegisterFunction,
-  getValue: undefined as undefined | ((name: string) => any),
-  setValue: undefined as undefined | ((name: string, value: any) => void),
-  getError: undefined as undefined | ((name: string) => any),
-  setError: undefined as undefined | ((name: string, value: any) => void),
+  useController: (() => undefined) as UseController,
 })
 
 type Props = HTMLProps<'form'> & {

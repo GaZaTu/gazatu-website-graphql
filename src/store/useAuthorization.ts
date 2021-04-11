@@ -7,6 +7,7 @@ const useAuthorization: UseAuthorization = (...needed) => {
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [store] = useContext(Store)
 
+  const neededAsString = JSON.stringify(needed)
   useEffect(() => {
     if (!store.auth) {
       return setIsAuthorized(false)
@@ -21,7 +22,8 @@ const useAuthorization: UseAuthorization = (...needed) => {
     }
 
     return setIsAuthorized(true)
-  }, [needed, store.auth])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [store.auth, neededAsString])
 
   return [isAuthorized, store.auth]
 }

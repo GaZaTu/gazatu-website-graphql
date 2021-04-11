@@ -1,4 +1,5 @@
-import React, { useContext, useLayoutEffect } from 'react'
+import { faDesktop, faMoon, faSun, faUserCircle } from '@fortawesome/free-solid-svg-icons'
+import React, { useContext, useEffect, useLayoutEffect } from 'react'
 import { useMediaQuery } from 'react-responsive'
 import logoPng from './assets/img/gazatu-xyz.png'
 import Button from './bulma/Button'
@@ -7,16 +8,34 @@ import Dropdown from './bulma/Dropdown'
 import Field from './bulma/Field'
 import Icon from './bulma/Icon'
 import Navbar from './bulma/Navbar'
+import Notification from './bulma/Notification'
 import Select from './bulma/Select'
 import Tag from './bulma/Tag'
 import { Span } from './bulma/Text'
+import { graphql } from './graphql'
+import { Query } from './graphql/schema.gql'
+import useQuery from './graphql/useQuery'
 import useAction from './lib/store/useAction'
 import useStoredState from './lib/useStoredState'
 import { Store } from './store'
 import useAuthorization from './store/useAuthorization'
 
+const triviaCountsQuery = graphql`
+  query Query {
+    triviaCounts {
+      questionsCount
+      unverifiedQuestionsCount
+      categoriesCount
+      unverifiedCategoriesCount
+      reportsCount
+      reportedQuestionsCount
+      danglingQuestionsCount
+    }
+  }
+`
+
 const AppNavbar: React.FC<{}> = props => {
-  const [, dispatch] = useContext(Store)
+  const [store, dispatch] = useContext(Store)
   const [isAuthenticated] = useAuthorization()
   const [isAdmin] = useAuthorization('admin')
   const [isTriviaAdmin] = useAuthorization('trivia-admin')
@@ -34,6 +53,26 @@ const AppNavbar: React.FC<{}> = props => {
   }, [theme, prefersDark])
 
   const logout = useAction(dispatch, '@@AUTH/LOGOUT')
+
+  const [triviaCountsResult, triviaCountsError, loadingTriviaCounts, reloadTriviaCounts] = useQuery<Query>({
+    query: triviaCountsQuery,
+    disabled: !isTriviaAdmin,
+  })
+  const triviaCounts = triviaCountsResult?.triviaCounts
+
+  const { useErrorNotificationEffect } = useContext(Notification.Portal)
+  useErrorNotificationEffect(triviaCountsError, reloadTriviaCounts)
+
+  const triviaSetState = useAction(dispatch, '@@TRIVIA/SET_STATE')
+  useEffect(() => {
+    triviaSetState({ counts: triviaCounts })
+  }, [triviaSetState, triviaCounts])
+
+  useEffect(() => {
+    if (!store.trivia.counts && !triviaCountsError && !loadingTriviaCounts) {
+      reloadTriviaCounts()
+    }
+  }, [store.trivia.counts, triviaCountsError, loadingTriviaCounts, reloadTriviaCounts])
 
   return (
     <Navbar fixed="top" shadow padded>
@@ -56,14 +95,14 @@ const AppNavbar: React.FC<{}> = props => {
             <>
               <span>Trivia</span>
               {isTriviaAdmin && (
-                <Tag color="primary" round>2</Tag>
+                <Tag color="primary" round tight={false}>{Object.values(triviaCounts ?? {}).reduce((s, v) => s + v, 0) - (triviaCounts?.questionsCount ?? 0) - (triviaCounts?.categoriesCount ?? 0)}</Tag>
               )}
             </>
           )} href="/trivia" as="div" hoverable>
             <Navbar.Item label="Submit Question" href="/trivia/questions/new" exact />
             <Navbar.Item label="Submit Category" href="/trivia/categories/new" exact />
             <Navbar.Divider />
-            <Navbar.Item label="Questions" href="/trivia/questions" exact exactParams />
+            <Navbar.Item label="Questions" href="/trivia/questions" exact />
             <Navbar.Item label="Categories" href="/trivia/categories" exact />
             <Navbar.Divider />
             <Navbar.Item label="Report a Question" href="/trivia/reports/new" exact />
@@ -71,20 +110,20 @@ const AppNavbar: React.FC<{}> = props => {
               <>
                 <Navbar.Divider />
                 <Navbar.Item label="Categories (Unverified)" href="/trivia/categories?verified=false" exact>
-                  <Tag color="primary" round>2</Tag>
+                  <Tag color="primary" round>{triviaCounts?.unverifiedCategoriesCount}</Tag>
                 </Navbar.Item>
                 <Navbar.Item label="Questions (Unverified)" href="/trivia/questions" params={{ verified: false, dangling: false }} exact exactParams>
-                  <Tag color="primary" round>0</Tag>
+                  <Tag color="primary" round>{triviaCounts?.unverifiedQuestionsCount}</Tag>
                 </Navbar.Item>
                 <Navbar.Item label="Questions (Unverified Categories)" href="/trivia/questions?dangling=true" exact>
-                  <Tag color="primary" round>0</Tag>
+                  <Tag color="primary" round>{triviaCounts?.danglingQuestionsCount}</Tag>
                 </Navbar.Item>
                 <Navbar.Divider />
                 <Navbar.Item label="Reports" href="/trivia/reports" exact>
-                  <Tag color="primary" round>0</Tag>
+                  <Tag color="primary" round>{triviaCounts?.reportsCount}</Tag>
                 </Navbar.Item>
                 <Navbar.Item label="Questions (Reported)" href="/trivia/questions?reported=true" exact>
-                  <Tag color="primary" round>0</Tag>
+                  <Tag color="primary" round>{triviaCounts?.reportedQuestionsCount}</Tag>
                 </Navbar.Item>
               </>
             )}
@@ -121,8 +160,8 @@ const AppNavbar: React.FC<{}> = props => {
               </Button>
               <Dropdown hoverable right narrow>
                 <Dropdown.Trigger>
-                  <Button as="a" href="/profile" kind="inverted" color={isAuthenticated ? 'primary' : undefined}>
-                    <Icon i="fas fa-user-circle fa-lg" />
+                  <Button kind="inverted" color={isAuthenticated ? 'primary' : undefined}>
+                    <Icon icon={faUserCircle} />
                   </Button>
                 </Dropdown.Trigger>
                 <Dropdown.Menu>
@@ -147,7 +186,7 @@ const AppNavbar: React.FC<{}> = props => {
                           options={['System Default', 'Light-Mode', 'Dark-Mode']}
                           getLabelElement={l => (
                             <Span>
-                              <Icon i={`fas fa-${l.startsWith('Light') ? 'sun' : (l.startsWith('Dark') ? 'moon' : 'desktop')}`} />
+                              <Icon icon={l.startsWith('Light') ? faSun : (l.startsWith('Dark') ? faMoon : faDesktop)} />
                               {l}
                             </Span>
                           )}

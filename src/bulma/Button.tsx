@@ -3,6 +3,7 @@ import React from 'react'
 import A from './A'
 import Icon from './Icon'
 import childMatches from './utils/childMatches'
+import { Color } from './utils/classes'
 import { HTMLProps } from './utils/HTMLProps'
 
 type GroupProps = HTMLProps<'div'> & {
@@ -33,7 +34,7 @@ const Group: React.FC<GroupProps> = props => {
 }
 
 type SharedProps = {
-  color?: string
+  color?: Color
   light?: boolean
   size?: 'small' | 'normal' | 'medium' | 'large'
   display?: 'fullwidth'

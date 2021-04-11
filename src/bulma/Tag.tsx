@@ -40,7 +40,7 @@ export const useTag = (props: Props) => {
     [`is-${size}`]: !!size,
     'is-rounded': !!round,
     'is-delete': !!cross,
-    'is-tight': !cross && (tight ?? !children),
+    'is-tight': !cross && (tight ?? (children === undefined)),
   })
 
   return { ...nativeProps, children, className }

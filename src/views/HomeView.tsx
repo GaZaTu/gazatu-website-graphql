@@ -2,6 +2,7 @@ import React from 'react'
 import bbFly2x from '../assets/img/bbFly2x.gif'
 import FeelsDankMan from '../assets/img/FeelsDankMan.png'
 import A from '../bulma/A'
+import Button from '../bulma/Button'
 import Container from '../bulma/Container'
 import Content from '../bulma/Content'
 import Section from '../bulma/Section'
@@ -12,9 +13,14 @@ const HomeView: React.FC = props => {
   return (
     <Section>
       <Container>
-        <H1 kind="title">FDM</H1>
+        <H1 kind="title">@DANKERS FDM</H1>
 
         <Content>
+          <Button.Group>
+            <Button as="a" href="/trivia/questions/new" color="link">Submit Trivia Question</Button>
+            <Button as="a" href="/trivia/categories/new" color="link">Submit Trivia Category</Button>
+          </Button.Group>
+
           <P>API-URL for a random set of Trivia Questions: <A href={`${process.env.REACT_APP_API_URL}/trivia/questions`} external /></P>
           <P>Query-Parameters:</P>
           <ul>
@@ -22,7 +28,7 @@ const HomeView: React.FC = props => {
             <li><b>count</b> (<i>number</i>): amount of questions to return (does not affect shuffling)</li>
             <li><b>exclude</b> (<i>[categoryName,...]</i>): list of categories to exclude</li>
             <li><b>include</b> (<i>[categoryName,...]</i>): list of categories to include</li>
-            <li><b>submitters</b> (<i>[submitterNames,...]</i>): list of submitters to include</li>
+            <li><b>submitters</b> (<i>[submitterName,...]</i>): list of submitters to include</li>
           </ul>
           <P>Example: <A href={`${process.env.REACT_APP_API_URL}/trivia/questions?count=10&exclude=[Anime,Hentai]`} external /></P>
         </Content>

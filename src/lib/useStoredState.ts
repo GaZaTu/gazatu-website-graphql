@@ -3,10 +3,25 @@ import { Dispatch, SetStateAction, useMemo, useState } from 'react'
 function useStoredState<S = undefined>(key: string): [S | undefined, Dispatch<SetStateAction<S | undefined>>]
 function useStoredState<S>(key: string, initialState: S | (() => S)): [S, Dispatch<SetStateAction<S>>]
 function useStoredState<S>(key: string, initialState?: S | (() => S)): [S, Dispatch<SetStateAction<S>>] {
-  const storedStateJson = localStorage.getItem(key)
-  const storedState = storedStateJson && JSON.parse(storedStateJson)
+  const [state, setState] = useState<S>(() => {
+    const storedStateJson = localStorage.getItem(key)
+    const storedState = storedStateJson && JSON.parse(storedStateJson)
 
-  const [state, setState] = useState<S>(storedState || initialState)
+    if (storedState) {
+      return storedState
+    }
+
+    if (initialState === undefined) {
+      return undefined
+    }
+
+    if (typeof initialState === 'function') {
+      return (initialState as (() => S))()
+    } else {
+      return initialState
+    }
+  })
+
   const setStateAndStore = useMemo<Dispatch<SetStateAction<S>>>(() => {
     return (setStateAction: any) => {
       if (typeof setStateAction === 'function') {

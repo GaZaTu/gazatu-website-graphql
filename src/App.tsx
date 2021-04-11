@@ -1,14 +1,25 @@
+import { faCaretDown, faCaretUp, faColumns, faRedo, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useContext, useMemo } from 'react'
-import { BrowserRouter, useHistory, useRouteMatch } from 'react-router-dom'
+import { BrowserRouter, useHistory, useLocation, useRouteMatch } from 'react-router-dom'
 import './App.scss'
 import AppNavbar from './AppNavbar'
 import AppRoutes from './AppRoutes'
 import A from './bulma/A'
+import Dropdown from './bulma/Dropdown'
+import Icon from './bulma/Icon'
 import Modal from './bulma/Modal'
-import Notification from './bulma/Notification'
+import Notification, { notificationIcons } from './bulma/Notification'
+import { tableIcons } from './bulma/Table'
 import useFetchGraphQL, { GraphQLContext } from './graphql/useFetchGraphQL'
 import useFetch, { FetchContext } from './lib/useFetch'
 import { Store } from './store'
+
+notificationIcons.faRedo = faRedo
+tableIcons.faSearch = faSearch
+tableIcons.faColumns = faColumns
+tableIcons.faCaretDown = faCaretDown
+tableIcons.faCaretUp = faCaretUp
 
 const App: React.FC = props => {
   const [store] = useContext(Store)
@@ -32,14 +43,18 @@ const App: React.FC = props => {
       <FetchContext.Provider value={{ fetch }}>
         <GraphQLContext.Provider value={{ fetchGraphQL }}>
           <BrowserRouter>
-            <A.Context.Provider value={{ useHistory, useRouteMatch }}>
-              <Modal.Context.Provider>
-                <Notification.Context.Provider>
-                  <AppNavbar />
-                  <AppRoutes />
-                </Notification.Context.Provider>
-              </Modal.Context.Provider>
-            </A.Context.Provider>
+            <Icon.Context.Provider value={{ Icon: FontAwesomeIcon }}>
+              <A.Context.Provider value={{ useLocation, useHistory, useRouteMatch }}>
+                <Dropdown.Portal.Provider>
+                  <Modal.Portal.Provider>
+                    <Notification.Portal.Provider>
+                      <AppNavbar />
+                      <AppRoutes />
+                    </Notification.Portal.Provider>
+                  </Modal.Portal.Provider>
+                </Dropdown.Portal.Provider>
+              </A.Context.Provider>
+            </Icon.Context.Provider>
           </BrowserRouter>
         </GraphQLContext.Provider>
       </FetchContext.Provider>

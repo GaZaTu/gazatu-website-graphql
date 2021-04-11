@@ -4,7 +4,7 @@ import Button from './Button'
 import getChildrenByTypeAndProps from './utils/getChildrenByTypeAndProps'
 import { HTMLProps } from './utils/HTMLProps'
 
-const Context = React.createContext({
+const Portal = React.createContext({
   showModal: function <R>(content: React.ReactNode) {
     return [Promise.resolve(undefined as any as R), (r: R) => {}, () => {}] as const
   },
@@ -14,17 +14,17 @@ const Context = React.createContext({
     return [Promise.resolve('' as any as K[number]), (r: K[number]) => {}, () => {}] as const
   },
 })
-const ContextProvider = Context.Provider
+const PortalProvider = Portal.Provider
 
 const Provider: React.FC<{}> = props => {
   const { children } = props
 
-  type ContextData = React.ContextType<typeof Context>
+  type PortalData = React.ContextType<typeof Portal>
   type ModalData = { content: React.ReactNode, reject: () => void }
 
   const [modals, setModals] = useState([] as ModalData[])
 
-  const showModal = useMemo<ContextData['showModal']>(() => {
+  const showModal = useMemo<PortalData['showModal']>(() => {
     return content => {
       let resolve = (r: any) => {}
       let reject = () => { }
@@ -47,7 +47,7 @@ const Provider: React.FC<{}> = props => {
     }
   }, [])
 
-  const confirm = useMemo<ContextData['confirm']>(() => {
+  const confirm = useMemo<PortalData['confirm']>(() => {
     return (content, buttons = ['OK', 'Cancel'] as any) => {
       const [promise, resolve, reject] = showModal<(typeof buttons)[number]>(
         <>
@@ -64,7 +64,7 @@ const Provider: React.FC<{}> = props => {
     }
   }, [showModal])
 
-  const alert = useMemo<ContextData['alert']>(() => {
+  const alert = useMemo<PortalData['alert']>(() => {
     return content => {
       const [promise, resolve, reject] = confirm(content, ['OK'] as const)
 
@@ -73,7 +73,7 @@ const Provider: React.FC<{}> = props => {
   }, [confirm])
 
   return (
-    <ContextProvider value={{ showModal, alert, confirm }}>
+    <PortalProvider value={{ showModal, alert, confirm }}>
       {children}
       <div className="modals">
         {modals.map(({ content, reject }, i) => (
@@ -82,7 +82,7 @@ const Provider: React.FC<{}> = props => {
           </Modal>
         ))}
       </div>
-    </ContextProvider>
+    </PortalProvider>
   )
 }
 
@@ -207,7 +207,7 @@ const Modal: React.FC<Props> = props => {
 }
 
 export default Object.assign(React.memo(Modal), {
-  Context: Object.assign(Context, {
+  Portal: Object.assign(Portal, {
     Provider,
   }),
   Head,

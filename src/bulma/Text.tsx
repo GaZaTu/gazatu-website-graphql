@@ -66,6 +66,7 @@ type SharedProps = {
   documentTitle?: boolean | string
   date?: number | string | Date
   dateFormat?: Intl.DateTimeFormat
+  caps?: boolean
 }
 
 type ParagraphProps = SharedProps & HTMLProps<'p', false> & {}
@@ -95,9 +96,10 @@ const Text: React.FC<Props> = props => {
     size,
     color,
     spaced,
-    documentTitle,
+    documentTitle: _documentTitle,
     date,
     dateFormat = defaultDateFormat,
+    caps,
     innerRef,
     ...nativeProps
   } = props
@@ -106,10 +108,11 @@ const Text: React.FC<Props> = props => {
 
   const className = classNames(nativeProps.className, {
     [`${kind}`]: !!kind,
-    [`is-${size}`]: !!size,
+    [`is-size-${size}`]: !!size,
     [`has-text-${color}`]: !!color,
     'is-spaced': !!spaced,
     'icon-text': !!hasIcons,
+    'has-font-variant-caps': !!caps,
   })
 
   let childString = ''
@@ -123,7 +126,9 @@ const Text: React.FC<Props> = props => {
     return child
   })
 
-  useDocumentTitle(typeof documentTitle === 'string' ? documentTitle : childString, !documentTitle || !childString)
+  const documentTitle = typeof _documentTitle === 'string' ? _documentTitle : childString
+  const setDocumentTitle = typeof _documentTitle === 'string' ? !!_documentTitle : (!!_documentTitle && !!childString)
+  useDocumentTitle(documentTitle, !setDocumentTitle)
 
   let parsedDate = undefined
   if (date) {
@@ -136,7 +141,7 @@ const Text: React.FC<Props> = props => {
 
   let dateAsString = undefined
   if (parsedDate) {
-    parsedDate = dateFormat.format(parsedDate)
+    dateAsString = dateFormat.format(parsedDate)
   }
 
   return React.createElement(as, { ...nativeProps, ref: innerRef, className }, dateAsString ?? children)

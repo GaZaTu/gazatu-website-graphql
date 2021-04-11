@@ -14,7 +14,8 @@ type Props = Omit<HTMLProps<'input'>, 'size'> & {
   labelized?: boolean
   rounded?: boolean
   validate?: RegisterOptions['validate']
-  setValueAs?: RegisterOptions['setValueAs']
+  emptyValue?: '' | 'null' | 'undefined'
+  onValueChange?: (value: any) => void
 }
 
 const Input: React.FC<Props> = props => {
@@ -26,19 +27,20 @@ const Input: React.FC<Props> = props => {
     labelized,
     rounded,
     validate,
-    setValueAs,
+    emptyValue = 'undefined',
+    onValueChange,
     children,
     innerRef: _innerRef,
     ...nativeProps
   } = props
 
+  let color = _color
   let innerRef = _innerRef
 
-  const { setSize } = useContext(Control.Context)
+  const { setSize, setIsValidating } = useContext(Control.Context)
   useLayoutEffect(() => setSize(size), [size, setSize])
 
-  const { setName, label, labelAsString, setLabelHidden, setRequired } = useContext(Field.Context)
-  useLayoutEffect(() => setName(nativeProps.name), [setName, nativeProps.name])
+  const { label, labelAsString, setLabelHidden, setRequired, setError } = useContext(Field.Context)
   useLayoutEffect(() => setLabelHidden(nativeProps.type === 'checkbox'), [setLabelHidden, nativeProps.type])
   useLayoutEffect(() => setRequired(!!nativeProps.required), [setRequired, nativeProps.required])
 
@@ -46,70 +48,85 @@ const Input: React.FC<Props> = props => {
     nativeProps.placeholder = `${labelAsString}...`
   }
 
-  const form = useContext(Form.Context)
-  if (nativeProps.name && !nativeProps.onChange && (form.register || (form.getValue && form.setValue))) {
-    if (form.register) {
-      const {
-        required,
-        min,
-        max,
-        maxLength,
-        minLength,
-        pattern,
-        type,
-      } = nativeProps
-
-      innerRef = form.register({
-        required,
-        min,
-        max,
-        maxLength,
-        minLength,
-        pattern: pattern ? new RegExp(pattern) : undefined,
-        validate,
-        valueAsNumber: type === 'number',
-        valueAsDate: type === 'date',
-        setValueAs,
-      })
-    } else {
-      if (nativeProps.type === 'checkbox') {
-        nativeProps.checked = !!form.getValue!(nativeProps.name)
-        nativeProps.onChange = e => {
-          const { name, checked } = e.currentTarget
-
-          form.setValue!(name, checked)
-
-          if (validate && form.setError) {
-            // TODO
-          }
-        }
+  if (onValueChange) {
+    nativeProps.onChange = event => {
+      if (event.target.type === 'checkbox') {
+        onValueChange(event.target.checked)
       } else {
-        const formValue = form.getValue!(nativeProps.name)
-
-        nativeProps.value = setValueAs ? setValueAs(formValue) : formValue
-        nativeProps.onChange = e => {
-          const { name, value: valueAsString, valueAsNumber, valueAsDate } = e.currentTarget
-          const value = valueAsDate ?? valueAsNumber ?? valueAsString
-
-          form.setValue!(name, value)
-
-          if (validate && form.setError) {
-            // TODO
-          }
-        }
+        onValueChange(event.target.value)
       }
     }
   }
 
-  const color = (() => {
-    if (nativeProps.name && form.getError) {
-      if (form.getError(nativeProps.name)) {
-        return 'danger'
+  const { useController } = useContext(Form.Context)
+  const controller = useController({
+    name: nativeProps.name,
+    defaultValue: nativeProps.defaultValue,
+    rules: {
+      required: nativeProps.required,
+      min: nativeProps.min,
+      max: nativeProps.max,
+      maxLength: nativeProps.maxLength,
+      minLength: nativeProps.minLength,
+      pattern: nativeProps.pattern ? new RegExp(nativeProps.pattern) : undefined,
+      validate,
+    },
+  })
+
+  if (controller) {
+    const {
+      field,
+      fieldState: {
+        isDirty,
+        isTouched,
+        invalid,
+      },
+    } = controller
+
+    nativeProps.onChange = event => {
+      if (event.target.type === 'text' && event.target.value === '') {
+        switch (emptyValue) {
+          case '':
+            return field.onChange('')
+          case 'null':
+            return field.onChange(null)
+          case 'undefined':
+            return field.onChange(undefined)
+        }
       }
+
+      field.onChange(event)
+    }
+    nativeProps.onBlur = field.onBlur
+
+    if (nativeProps.type === 'checkbox') {
+      nativeProps.checked = field.value ?? false
+    } else {
+      nativeProps.value = field.value ?? ''
     }
 
-    return _color
-  })()
+    innerRef = field.ref
+
+    if ((isDirty || isTouched) && invalid) {
+      color = 'danger'
+    }
+  }
+
+  useLayoutEffect(() => {
+    if (!controller?.fieldState) {
+      return
+    }
+
+    const {
+      error,
+      isDirty,
+      isTouched,
+      isValidating,
+    } = controller.fieldState
+
+    setError((isDirty || isTouched) ? error : undefined)
+    setIsValidating(isValidating)
+  }, [controller?.fieldState, setError, setIsValidating])
 
   const className = classNames(nativeProps.className, {
     'input': true,
@@ -130,7 +147,7 @@ const Input: React.FC<Props> = props => {
             <svg viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeMiterlimit="10" fill="none" d="M22.9 3.7l-15.2 16.6-6.6-7.1" />
             </svg>
-            <span>{label ?? children}</span>
+            <span>{label ?? children ?? nativeProps.placeholder}</span>
           </span>
         </label>
       )

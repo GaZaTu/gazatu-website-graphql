@@ -5,7 +5,7 @@ const useDocumentTitle = (title: string, disabled = false) => {
   const previousTitle = documentTitle.innerText
 
   useEffect(() => {
-    if (disabled) {
+    if (disabled || !title) {
       return
     }
 

@@ -1,5 +1,7 @@
 import classNames from 'classnames'
-import React, { useMemo } from 'react'
+import React, { useContext, useEffect, useMemo } from 'react'
+import { useMediaQuery } from 'react-responsive'
+import A from './A'
 import Button from './Button'
 import Control from './Control'
 import Dropdown from './Dropdown'
@@ -11,7 +13,69 @@ import classes from './utils/classes'
 import debounce from './utils/debounce'
 import getChildrenByTypeAndProps from './utils/getChildrenByTypeAndProps'
 import { HTMLProps } from './utils/HTMLProps'
-import { createUseTable, TableOptions, useGlobalFilter, usePagination, useRowSelect, useSortBy } from './utils/react-table-ext'
+import { createUseTable, TableInstance as _TableInstance, TableOptions as _TableOptions, useGlobalFilter, usePagination, useRowSelect, useSortBy } from './utils/react-table-ext'
+
+export const tableIcons = {
+  faSearch: undefined as any,
+  faColumns: undefined as any,
+  faCaretDown: undefined as any,
+  faCaretUp: undefined as any,
+}
+
+export type TableSearchParams = {
+  unusedQueryString?: string
+
+  globalFilter?: string
+  pageSize?: number
+  pageIndex?: number
+  sortBy?: [{ id: string, desc: boolean }]
+}
+
+export const useTableSearchParams = (storeStateInQuery = true) => {
+  const { useLocation } = useContext(A.Context)
+  const location = useLocation()
+
+  const queryInitialState = useMemo(() => {
+    if (!storeStateInQuery || !location?.search) {
+      return {}
+    }
+
+    const result = {} as TableSearchParams
+    const query = new URLSearchParams(location?.search)
+
+    const q = query.get('q')
+    const pS = query.get('pS')
+    const pI = query.get('pI')
+    const sC = query.get('sC')
+    const sD = query.get('sD')
+
+    if (q) {
+      query.delete('q')
+
+      result.globalFilter = q
+    }
+
+    if (pS && pI) {
+      query.delete('pS')
+      query.delete('pI')
+
+      result.pageSize = Number(pS)
+      result.pageIndex = Number(pI)
+    }
+
+    if (sC && sD) {
+      query.delete('sC')
+      query.delete('sD')
+
+      result.sortBy = [{ id: sC, desc: sD === 'desc' }]
+    }
+
+    result.unusedQueryString = query.toString()
+    return result
+  }, [storeStateInQuery, location?.search])
+
+  return queryInitialState
+}
 
 const useTable = createUseTable({
   useGlobalFilter,
@@ -22,7 +86,15 @@ const useTable = createUseTable({
   // useResizeColumns,
 })
 
-const Toolbar: React.FC<{}> = props => {
+export type TableOptions = _TableOptions<typeof useTable>
+export type TableInstance = _TableInstance<typeof useTable>
+export type TableProps = Props
+
+type ToolbarProps = {
+  columnsDropdownLeft?: boolean
+}
+
+const Toolbar: React.FC<ToolbarProps> = props => {
   return (
     <React.Fragment>
       {React.Children.map(props.children, child => (
@@ -34,13 +106,13 @@ const Toolbar: React.FC<{}> = props => {
   )
 }
 
-type ColumnProps = TableOptions<typeof useTable>['columns'][number]
+type ColumnProps = TableOptions['columns'][number]
 
 const Column: React.FC<ColumnProps> = () => null
 
 type Props = HTMLProps<'div'> & {
-  options?: TableOptions<typeof useTable>
-  initialState?: TableOptions<typeof useTable>['initialState']
+  options?: Partial<TableOptions>
+  initialState?: Partial<TableOptions['initialState']>
   data?: any[]
 
   pagination?: boolean
@@ -49,6 +121,10 @@ type Props = HTMLProps<'div'> & {
   canSelectRows?: boolean
   canHideColumns?: boolean
   loading?: boolean
+  storeStateInQuery?: boolean
+  manual?: boolean
+
+  onSelectedRowsChange?: (rows: TableInstance['rows']) => void
 
   bordered?: boolean
   striped?: boolean
@@ -73,6 +149,10 @@ const Table: React.FC<Props> = props => {
     canSelectRows = true,
     canHideColumns = true,
     loading,
+    storeStateInQuery,
+    manual,
+
+    onSelectedRowsChange,
 
     bordered,
     striped,
@@ -99,12 +179,24 @@ const Table: React.FC<Props> = props => {
 
   const columns = useMemo(() => {
     return getChildrenByTypeAndProps(children, [Column], {})
-      .map(child => child.props)
+      .map(child => ({
+        width: undefined,
+        minWidth: undefined,
+        maxWidth: undefined,
+        ...child.props,
+      }))
   }, [children])
+
+  const { useHistory } = useContext(A.Context)
+  const history = useHistory()
+  const queryInitialState = useTableSearchParams(storeStateInQuery ?? false)
 
   const {
     state: {
       pageIndex,
+      pageSize,
+      globalFilter,
+      sortBy,
     },
     getTableProps,
     getTableBodyProps,
@@ -119,21 +211,83 @@ const Table: React.FC<Props> = props => {
     canNextPage,
     gotoPage,
     setGlobalFilter,
+    selectedFlatRows,
   } = useTable<{}>({
+    manualGlobalFilter: manual,
+    manualSortBy: manual,
+    manualPagination: manual,
     ...options,
     initialState: {
       ...options?.initialState,
       ...initialState,
+      ...queryInitialState,
     },
     columns: columns ?? defaultColumns,
     data: data ?? defaultData,
   })
 
+  useEffect(() => {
+    if (!storeStateInQuery || !history) {
+      return
+    }
+
+    const query = new URLSearchParams()
+
+    if (globalFilter) {
+      query.set('q', globalFilter)
+    }
+
+    if (pageSize && pageIndex) {
+      query.set('pS', String(pageSize))
+      query.set('pI', String(pageIndex))
+    }
+
+    if (sortBy && sortBy.length === 1) {
+      query.set('sC', sortBy[0].id)
+      query.set('sD', sortBy[0].desc ? 'desc' : 'asc')
+    }
+
+    let tableQueryString = query.toString()
+    let unusedQueryString = queryInitialState.unusedQueryString
+    let queryString = '?'
+    if (unusedQueryString) {
+      queryString += unusedQueryString
+    }
+    if (tableQueryString) {
+      queryString += `${queryString === '?' ? '' : '&'}${tableQueryString}`
+    }
+
+    history.replace(queryString)
+  }, [storeStateInQuery, history, globalFilter, pageSize, pageIndex, sortBy, queryInitialState.unusedQueryString])
+
   const handleGlobalFilterChange = useMemo(() => {
-    return debounce(e => setGlobalFilter(e.target.value), 500)
-  }, [setGlobalFilter])
+    return debounce(e => {
+      setGlobalFilter(e.target.value)
+      gotoPage(0)
+    }, 500)
+  }, [setGlobalFilter, gotoPage])
 
   const toolbar = getChildrenByTypeAndProps(children, [Toolbar], {})[0]
+
+  useEffect(() => {
+    onSelectedRowsChange?.(selectedFlatRows)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onSelectedRowsChange, selectedFlatRows.length])
+
+  const isDesktop = useMediaQuery({ minWidth: '960px' })
+  const getCellStyle = useMemo(() => {
+    return (column: any) => {
+      if (!isDesktop) {
+        return {}
+      }
+
+      return {
+        width: column.width,
+        minWidth: column.minWidth,
+        maxWidth: column.maxWidth,
+      }
+    }
+  }, [isDesktop])
 
   return (
     <div {...getTableProps()} {...nativeProps} ref={innerRef} className={panelClassName}>
@@ -144,8 +298,8 @@ const Table: React.FC<Props> = props => {
               <Level.Left className={`${classes.spacing.mb2}`}>
                 <Level.Item>
                   <Control loading={loading}>
-                    <Icon i="fas fa-search" />
-                    <Input type="text" onChange={handleGlobalFilterChange} style={{ width: '22rem' }} placeholder="Search..." rounded />
+                    <Icon size="small" icon={tableIcons.faSearch} />
+                    <Input type="text" defaultValue={globalFilter} onChange={handleGlobalFilterChange} style={{ width: '18rem' }} placeholder="Search..." rounded />
                   </Control>
                 </Level.Item>
               </Level.Left>
@@ -155,10 +309,10 @@ const Table: React.FC<Props> = props => {
                 {toolbar}
                 {canHideColumns && (
                   <Level.Item>
-                    <Dropdown narrow right>
+                    <Dropdown narrow right={isDesktop || !toolbar?.props?.columnsDropdownLeft}>
                       <Dropdown.Trigger>
                         <Button>
-                          <Icon i="fas fa-columns" />
+                          <Icon icon={tableIcons.faColumns} />
                         </Button>
                       </Dropdown.Trigger>
                       <Dropdown.Menu>
@@ -193,13 +347,13 @@ const Table: React.FC<Props> = props => {
                   </th>
                 )}
                 {headerGroup.headers.map(column => (
-                  <th {...column.getHeaderProps()}>
+                  <th {...column.getHeaderProps()} style={getCellStyle(column)}>
                     <Button color="link" kind="inverted" {...column.getSortByToggleProps()} labelized={!column.canSort || groupIndex !== headerGroups.length - 1}>
                       <span>
                         {column.render('Header')}
                       </span>
                       {column.isSorted && (
-                        <Icon i={column.isSortedDesc ? 'fas fa-caret-down fa-lg' : 'fas fa-caret-up fa-lg'} />
+                        <Icon icon={column.isSortedDesc ? tableIcons.faCaretDown : tableIcons.faCaretUp} />
                       )}
                     </Button>
                   </th>
@@ -219,7 +373,7 @@ const Table: React.FC<Props> = props => {
                     </td>
                   )}
                   {row.cells.map(cell => (
-                    <td {...cell.getCellProps()}>
+                    <td {...cell.getCellProps()} style={getCellStyle(cell.column)}>
                       {cell.render('Cell')}
                     </td>
                   ))}

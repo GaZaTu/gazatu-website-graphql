@@ -2,12 +2,14 @@ import classNames from 'classnames'
 import React, { useContext, useMemo } from 'react'
 import { HTMLProps } from './utils/HTMLProps'
 
+type UseLocation = () => {
+  pathname: string
+  search: string
+} | undefined
+
 type UseHistory = () => {
   push: (path: string) => void
   replace: (path: string) => void
-  location?: {
-    search?: string
-  }
 } | undefined
 
 type UseRouteMatch = (route: { path: string }) => {
@@ -16,6 +18,7 @@ type UseRouteMatch = (route: { path: string }) => {
 } | undefined
 
 const Context = React.createContext({
+  useLocation: (() => undefined) as UseLocation,
   useHistory: (() => undefined) as UseHistory,
   useRouteMatch: (() => undefined) as UseRouteMatch,
 })
@@ -68,7 +71,7 @@ const A: React.FC<Props> = props => {
     return [`${nativeHref}?${query}`, nativeHref, query] as const
   }, [nativeHref, params])
 
-  const { useHistory, useRouteMatch } = useContext(Context)
+  const { useLocation, useHistory, useRouteMatch } = useContext(Context)
 
   const history = useHistory()
   if (history && href) {
@@ -87,6 +90,7 @@ const A: React.FC<Props> = props => {
     }
   }
 
+  const location = useLocation()
   const match = useRouteMatch({ path: path ?? '' })
   const matchActive = (() => {
     if (!match || !match.path || (match.isExact === !exact)) {
@@ -94,7 +98,7 @@ const A: React.FC<Props> = props => {
     }
 
     if (exactParams) {
-      if (query !== history?.location?.search?.slice(1)) {
+      if (query !== location?.search?.slice(1)) {
         return false
       }
     }

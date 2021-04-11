@@ -7,15 +7,14 @@ import Container from '../bulma/Container'
 import Control from '../bulma/Control'
 import Divider from '../bulma/Divider'
 import Field from '../bulma/Field'
-import Form from '../bulma/Form'
 import Input from '../bulma/Input'
 import Notification from '../bulma/Notification'
 import Section from '../bulma/Section'
 import { H3 } from '../bulma/Text'
 import { graphql } from '../graphql'
 import useMutation from '../graphql/useMutation'
+import AppForm, { useAppForm } from '../lib/AppForm'
 import useAction from '../lib/store/useAction'
-import useAppForm from '../lib/useAppForm'
 import useStoredState from '../lib/useStoredState'
 import { Store } from '../store'
 
@@ -68,7 +67,7 @@ type LoginFormProps = {
 
 const LoginForm: React.FC<LoginFormProps> = props => {
   const { isRegisterForm } = props
-  const { pushError } = useContext(Notification.Context)
+  const { pushError } = useContext(Notification.Portal)
   const history = useHistory()
 
   const [, dispatch] = useContext(Store)
@@ -80,7 +79,7 @@ const LoginForm: React.FC<LoginFormProps> = props => {
     reload: false,
   })
 
-  const isLocked = useMemo(() => {
+  const locked = useMemo(() => {
     const secs = (secs: number) => secs * 1000
     const mins = (mins: number) => secs(mins * 60)
 
@@ -111,18 +110,21 @@ const LoginForm: React.FC<LoginFormProps> = props => {
     query: authenticateQuery,
   })
 
-  const {
-    context,
-    handleSubmit,
-    canSubmit,
-    isLoading,
-  } = useAppForm<AuthData>({
+  const form = useAppForm({
     defaultValues: {
       username: '',
       password: '',
       password2: '',
     },
   })
+  const {
+    handleSubmit,
+    canSubmit,
+    submitting,
+    getValues,
+    setError,
+    clearErrors,
+  } = form
 
   const onSubmit = async (values: AuthData) => {
     try {
@@ -151,16 +153,25 @@ const LoginForm: React.FC<LoginFormProps> = props => {
     }
   }
 
-  const { getValue, setError } = context
-  const password = getValue('password')
-  const password2 = getValue('password2')
+  const [
+    password,
+    password2,
+  ] = getValues(['password', 'password2'])
   useEffect(() => {
-    setError('password2', (password === password2) ? undefined : { type: 'required', message: 'Passwords must be equal' })
-  }, [setError, password, password2])
+    if (!isRegisterForm) {
+      return
+    }
+
+    if (password === password2) {
+      setError('password2', { type: 'validate', message: 'Passwords must be equal' })
+    } else {
+      clearErrors('password2')
+    }
+  }, [isRegisterForm, password, password2, setError, clearErrors])
 
   return (
-    <Form context={context} onSubmit={handleSubmit(onSubmit)} >
-      <H3 kind="title">{isRegisterForm ? 'Register' : 'Login'}</H3>
+    <AppForm form={form} onSubmit={handleSubmit(onSubmit)} >
+      <H3 kind="title" caps>{isRegisterForm ? 'Register' : 'Login'}</H3>
 
       <Field label="Username">
         <Control>
@@ -195,10 +206,10 @@ const LoginForm: React.FC<LoginFormProps> = props => {
 
       <Field>
         <Control>
-          <Button type="submit" color="primary" disabled={!canSubmit} loading={isLoading || isLocked}>{isRegisterForm ? 'Register' : 'Login'}</Button>
+          <Button type="submit" color="primary" disabled={!canSubmit} loading={submitting || locked}>{isRegisterForm ? 'Register' : 'Login'}</Button>
         </Control>
       </Field>
-    </Form>
+    </AppForm>
   )
 }
 

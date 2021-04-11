@@ -1,3 +1,4 @@
+import { faExternalLinkSquareAlt } from '@fortawesome/free-solid-svg-icons'
 import React, { useContext } from 'react'
 import Button from '../../bulma/Button'
 import Container from '../../bulma/Container'
@@ -24,11 +25,11 @@ const changesQuery = graphql`
 `
 
 const EventLogView: React.FC = props => {
-  const { useErrorNotificationEffect } = useContext(Notification.Context)
   const [data, error, loading, retry] = useQuery<Query>({
     query: changesQuery,
   })
 
+  const { useErrorNotificationEffect } = useContext(Notification.Portal)
   useErrorNotificationEffect(error, retry)
 
   return (
@@ -36,7 +37,7 @@ const EventLogView: React.FC = props => {
       <Container>
         <H1 kind="title" documentTitle>Event-Log</H1>
 
-        <Table className="is-unpadded" data={data?.changes} bordered fullwidth loading={loading} initialState={{ pageSize: 25, hiddenColumns: ['targetId'] }} canSelectRows={false}>
+        <Table className="is-unpadded" data={data?.changes} bordered fullwidth loading={loading} initialState={{ pageSize: 25, hiddenColumns: ['targetId'] }} canSelectRows={false} storeStateInQuery>
           <Table.Column Header="" accessor="#0" disableSortBy disableGlobalFilter
             Cell={({ row }) => {
               const { kind, targetEntityName, targetId } = row.original
@@ -52,7 +53,7 @@ const EventLogView: React.FC = props => {
 
               return href && kind !== 'REMOVE' && (
                 <Button as="a" href={href}>
-                  <Icon i="fas fa-lg external-link-square-alt" />
+                  <Icon icon={faExternalLinkSquareAlt} />
                 </Button>
               )
             }}

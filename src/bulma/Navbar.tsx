@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, { useContext, useLayoutEffect, useState } from 'react'
+import React, { useContext, useEffect, useLayoutEffect, useState } from 'react'
 import A from './A'
 import { Color } from './utils/classes'
 import getChildrenByTypeAndProps from './utils/getChildrenByTypeAndProps'
@@ -42,6 +42,16 @@ type BurgerProps = HTMLProps<'a'> & {
 
 const Burger: React.FC<BurgerProps> = props => {
   const { menuActive, setMenuActive } = useContext(Context)
+
+  const { useLocation } = useContext(A.Context)
+  const location = useLocation()
+  useEffect(() => {
+    if (!location) {
+      return
+    }
+
+    setMenuActive(false)
+  }, [setMenuActive, location])
 
   const {
     active = menuActive,

@@ -1,24 +1,25 @@
 import { useMemo } from 'react'
 import { GraphQLFragment, GraphQLScript } from './graphql'
-import usePagination from './usePagination'
+import useRelayPagination from './useRelayPagination'
 
-type UseRelayConnectionResult<T> = [[T[] | undefined, { [key: string]: any }], [number, number, (() => void) | undefined, (() => void) | undefined]]
+type UseRelayConnectionResult<T> = [[T[] | undefined, { [key: string]: any }], [number, number, ((skipPages?: number) => void) | undefined, ((skipPages?: number) => void) | undefined, ((newPage: number) => void)]]
 
 type UseRelayConnection = <T>(args: { resultSet?: any, variables?: { [key: string]: any }, pageSize: number }) => UseRelayConnectionResult<T>
 
 const useRelayConnection: UseRelayConnection = ({ resultSet, variables, pageSize }) => {
-  const [pagination, setPagination, page] = usePagination(pageSize)
+  const [pagination, setPagination, page] = useRelayPagination(pageSize)
   const combinedVariables = useMemo(() => {
     return {
-      ...pagination,
       ...variables,
+      ...pagination,
     }
-  }, [pagination, variables])
+  }, [variables, pagination])
 
   const parsedData = useMemo(() => {
     if (resultSet) {
       return {
         edges: resultSet.edges as { node: any, cursor: string }[],
+        nodes: resultSet.edges.map((edge: any) => edge.node),
         pageInfo: resultSet.pageInfo as { startCursor?: string, endCursor?: string, hasPreviousPage: boolean, hasNextPage: boolean, count: number },
       }
     } else {
@@ -26,32 +27,49 @@ const useRelayConnection: UseRelayConnection = ({ resultSet, variables, pageSize
     }
   }, [resultSet])
 
-  const paginateForward = useMemo(() => {
+  const paginateForwards = useMemo(() => {
     if (parsedData?.pageInfo.hasNextPage) {
-      return () =>
+      return (skipPages?: number) => {
         setPagination({
-          after: parsedData!.edges[parsedData!.edges.length - 1].cursor,
+          after: parsedData!.pageInfo.endCursor,
+          skipPages,
+        })
+      }
+    } else {
+      return undefined
+    }
+  }, [parsedData, setPagination])
+
+  const paginateBackwards = useMemo(() => {
+    if (parsedData?.pageInfo.hasPreviousPage) {
+      return (skipPages?: number) =>
+        setPagination({
+          before: parsedData!.pageInfo.startCursor,
+          skipPages,
         })
     } else {
       return undefined
     }
   }, [parsedData, setPagination])
 
-  const paginateBackward = useMemo(() => {
-    if (parsedData?.pageInfo.hasPreviousPage) {
-      return () =>
-        setPagination({
-          before: parsedData!.edges[0].cursor,
-        })
-    } else {
-      return undefined
+  const paginate = useMemo(() => {
+    return (newPage: number) => {
+      const pages = newPage - page
+
+      if (newPage === 0) {
+        setPagination({})
+      } else if (pages > 0) {
+        paginateForwards?.(pages - 1)
+      } else if (pages < 0) {
+        paginateBackwards?.(Math.abs(pages) - 1)
+      }
     }
-  }, [parsedData, setPagination])
+  }, [page, paginateBackwards, paginateForwards, setPagination])
 
   if (parsedData) {
-    return [[parsedData.edges.map(edge => edge.node), combinedVariables], [parsedData.pageInfo.count, page, paginateForward, paginateBackward]]
+    return [[parsedData.nodes, combinedVariables], [parsedData.pageInfo.count, page, paginateForwards, paginateBackwards, paginate]]
   } else {
-    return [[undefined, combinedVariables], [0, page, undefined, undefined]]
+    return [[undefined, combinedVariables], [0, page, undefined, undefined, () => {}]]
   }
 }
 

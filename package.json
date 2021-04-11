@@ -1,9 +1,11 @@
 {
-  "name": "react-bulma-test",
-  "version": "0.1.0",
+  "name": "gazatu-website-graphql",
+  "version": "0.9.0",
   "private": true,
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.15.3",
+    "@fortawesome/fontawesome-svg-core": "^1.2.35",
+    "@fortawesome/free-solid-svg-icons": "^5.15.3",
+    "@fortawesome/react-fontawesome": "^0.1.14",
     "@testing-library/jest-dom": "^5.11.10",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.8.3",
@@ -22,7 +24,7 @@
     "node-sass": "^5.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-hook-form": "^6.15.5",
+    "react-hook-form": "^7.0.4",
     "react-nanny": "^2.7.0",
     "react-responsive": "^8.2.0",
     "react-router-dom": "^5.2.0",

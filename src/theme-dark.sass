@@ -87,6 +87,9 @@ $dark-red:          hsl(348, 86%, 61%) !default
 // ------------------------------------------------ Derived ------------------------------------------------
 $dark-primary: #8a2be2
 $dark-secondary: #e2b72b
+// #e2b72b -> complementary color
+// #fcc21b -> bee emoji color head
+// #ffb300 -> bee emoji color body
 
 $dark-info: $dark-cyan !default
 $dark-success: $dark-green !default
@@ -658,9 +661,9 @@ $dark-input-disabled-border-color: $dark-background // color
 
 $dark-input-arrow: $dark-link // color
 
-$dark-input-icon-color: $dark-grey-lighter // color
+$dark-input-icon-color: $dark-grey-light // color
 
-$dark-input-icon-active-color: $dark-grey // color
+$dark-input-icon-active-color: $dark-grey-dark // color
 
 // $dark-input-radius: $dark-radius // size
 
@@ -722,6 +725,7 @@ html.dark-theme
     background-color: $dark-button-background-color
     border-color: $dark-button-border-color
     color: $dark-button-color
+    font-weight: 500
     strong
       color: inherit
     &:hover,
@@ -1545,6 +1549,18 @@ html.dark-theme
     border: 2px solid #dbdbdb
     border-right-color: transparent
     border-top-color: transparent
+
+  .control
+    // Modifiers
+    &.has-direct-icons-left,
+    &.has-direct-icons-right
+      .input,
+      .select
+        &:focus
+          & ~ .icon
+            color: $dark-input-icon-active-color
+      > .icon
+        color: $dark-input-icon-color
 
   // ------------------------------------------------ Pageloader ------------------------------------------------
   .pageloader

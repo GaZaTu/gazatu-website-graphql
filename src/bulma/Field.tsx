@@ -1,6 +1,5 @@
 import classNames from 'classnames'
-import React, { useContext, useState } from 'react'
-import Form from './Form'
+import React, { useState } from 'react'
 import { Color } from './utils/classes'
 import getChildrenByTypeAndProps from './utils/getChildrenByTypeAndProps'
 import { HTMLProps } from './utils/HTMLProps'
@@ -21,14 +20,14 @@ const Context = React.createContext({
   id: undefined as string | undefined,
   setId: (id: string | undefined) => {},
 
-  name: undefined as string | undefined,
-  setName: (name: string | undefined) => {},
-
   labelHidden: false as boolean,
   setLabelHidden: (labelHidden: boolean) => { },
 
   required: false as boolean,
   setRequired: (required: boolean) => { },
+
+  error: undefined as any,
+  setError: (error: any) => { },
 })
 
 type LabelProps = HTMLProps<'label'> & {
@@ -89,28 +88,9 @@ const Field: React.FC<Props> = props => {
   const helpColor = helpChild?.color ?? _helpColor
 
   const [id, setId] = useState<string>()
-  const [name, setName] = useState<string>()
   const [labelHidden, setLabelHidden] = useState(false)
   const [required, setRequired] = useState(false)
-
-  const form = useContext(Form.Context)
-  const error = (() => {
-    if (!name) {
-      return undefined
-    }
-
-    const errorResult = form.getError?.(name)
-
-    if (!errorResult) {
-      return undefined
-    }
-
-    if (typeof errorResult === 'object') {
-      return errorResult.message || errorResult.type
-    }
-
-    return errorResult
-  })()
+  const [error, setError] = useState<any>()
 
   const className = classNames(nativeProps.className, {
     'field': true,
@@ -125,7 +105,7 @@ const Field: React.FC<Props> = props => {
   })
 
   const labelAsString = typeof label === 'string' ? label : labelChild?.asString
-  const context = { label, labelAsString, helpColor, id, setId, name, setName, labelHidden, setLabelHidden, required, setRequired }
+  const context = { label, labelAsString, helpColor, id, setId, labelHidden, setLabelHidden, required, setRequired, error, setError }
 
   const labelNode = label && !labelHidden && (
     <label {...labelProps} className="label">{label}</label>
@@ -135,8 +115,31 @@ const Field: React.FC<Props> = props => {
     <p {...helpProps} className={`help is-${helpColor}`}>{help}</p>
   )
 
-  const errorNode = error && (
-    <p {...helpProps} className="help is-danger">{error}</p>
+  const errorMessage = (() => {
+    if (!error) {
+      return undefined
+    }
+
+    if (typeof error === 'string') {
+      return error
+    }
+
+    if (error instanceof Error) {
+      return String(error)
+    }
+
+    if (error.message) {
+      return error.message as string
+    }
+
+    if (error.type) {
+      return error.type as string
+    }
+
+    return undefined
+  })()
+  const errorNode = errorMessage && (
+    <p {...helpProps} className="help is-danger">{errorMessage}</p>
   )
 
   return (

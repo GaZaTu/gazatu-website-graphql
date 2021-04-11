@@ -9,6 +9,9 @@ type Size = 'small' | 'normal' | 'medium' | 'large'
 const Context = React.createContext({
   size: undefined as Size | undefined,
   setSize: (size: Size | undefined) => {},
+
+  isValidating: false as boolean,
+  setIsValidating: (isValidating: boolean) => {},
 })
 
 type Props = HTMLProps<'div'> & {
@@ -25,6 +28,7 @@ const Control: React.FC<Props> = props => {
   } = props
 
   const [size, setSize] = useState<Size>()
+  const [isValidating, setIsValidating] = useState(false)
 
   let iconCount = 0
   let iconsLeft = [] as React.ReactNode[]
@@ -51,16 +55,18 @@ const Control: React.FC<Props> = props => {
 
   const className = classNames(nativeProps.className, {
     'control': true,
-    'has-icons-left': !!iconsLeft.length,
-    'has-icons-right': !!iconsRight.length,
+    'has-direct-icons-left': !!iconsLeft.length,
+    'has-direct-icons-right': !!iconsRight.length,
     'is-expanded': !!expanded,
-    'is-loading': !!loading,
+    'is-loading': !!loading || !!isValidating,
     [`is-${size}`]: !!size,
   })
 
+  const context = { size, setSize, isValidating, setIsValidating }
+
   return (
     <div {...nativeProps} ref={innerRef} className={className}>
-      <Context.Provider value={{ size, setSize }}>
+      <Context.Provider value={context}>
         {children}
         {iconsLeft}
         {iconsRight}

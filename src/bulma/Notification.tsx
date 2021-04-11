@@ -6,6 +6,10 @@ import { Span } from './Text'
 import { Color } from './utils/classes'
 import { HTMLProps } from './utils/HTMLProps'
 
+export const notificationIcons = {
+  faRedo: undefined as any,
+}
+
 type NotificationData = {
   content: React.ReactNode
   options?: {
@@ -17,7 +21,7 @@ type NotificationData = {
 
 type PushFunction = (content: React.ReactNode, options?: NotificationData['options']) => void
 
-const Context = React.createContext({
+const Portal = React.createContext({
   push: ((c, o) => { }) as PushFunction,
   pushPrimary: ((c, o) => { }) as PushFunction,
   pushInfo: ((c, o) => { }) as PushFunction,
@@ -27,7 +31,7 @@ const Context = React.createContext({
   pushError: ((c, o) => { }) as PushFunction,
   useErrorNotificationEffect: (error: Error | undefined, retry?: () => void) => { },
 })
-const ContextProvider = Context.Provider
+const PortalProvider = Portal.Provider
 
 const Provider: React.FC<{}> = props => {
   const { children } = props
@@ -111,7 +115,7 @@ const Provider: React.FC<{}> = props => {
         <Span>
           {retry && (
             <Button size="small" onClick={retry} style={{ marginRight: '1rem' }}>
-              <Icon i="fas fa-lg fa-redo" />
+              <Icon icon={notificationIcons.faRedo} />
             </Button>
           )}
           <Span>{String(error)}</Span>
@@ -135,16 +139,16 @@ const Provider: React.FC<{}> = props => {
   }
 
   return (
-    <ContextProvider value={context}>
+    <PortalProvider value={context}>
       {children}
-      <div className="notifications">
+      <div className={`notifications ${notifications.length ? 'has-children' : ''}`}>
         {notifications.map((notification, i) => (
           <Notification key={i} {...notification.options?.props}>
             {notification.content}
           </Notification>
         ))}
       </div>
-    </ContextProvider>
+    </PortalProvider>
   )
 }
 
@@ -176,7 +180,7 @@ const Notification: React.FC<Props> = props => {
 }
 
 export default Object.assign(React.memo(Notification), {
-  Context: Object.assign(Context, {
+  Portal: Object.assign(Portal, {
     Provider,
   })
 })

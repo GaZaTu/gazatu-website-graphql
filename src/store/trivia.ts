@@ -2,7 +2,6 @@ import { TriviaCounts } from '../graphql/schema.gql'
 
 export type State = {
   counts?: TriviaCounts
-  invalidateCounts?: boolean
 }
 
 export type Action = {
@@ -22,7 +21,7 @@ const reducer: React.Reducer<State, Action> = (state, action) => {
     case '@@TRIVIA/INVALIDATE_COUNTS':
       return {
         ...state,
-        invalidateCounts: !state.invalidateCounts,
+        counts: undefined,
       }
     default:
       return state
