@@ -16,6 +16,10 @@
   }
 }
 
+.is-clipped {
+  padding-right: 10px;
+}
+
 @keyframes tag-pulse {
   0% {
     box-shadow: 0 0 0 0 rgba(204, 169, 44, 0.4);

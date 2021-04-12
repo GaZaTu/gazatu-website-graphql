@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import Container from '../../bulma/Container'
 import Image from '../../bulma/Image'
 import Modal from '../../bulma/Modal'
@@ -22,11 +22,21 @@ const blogEntriesQuery = graphql`
   }
 `
 
-const BlogImage: React.FC<{ entry: BlogEntry }> = props => {
-  const { entry } = props
+type BlogImageProps = {
+  entry: BlogEntry
+  queue: [string[], React.Dispatch<React.SetStateAction<string[]>>]
+}
+
+const BlogImage: React.FC<BlogImageProps> = props => {
+  const {
+    entry,
+    queue: [queue, setQueue],
+  } = props
+
   const { id, imageFileExtension } = entry
-  const imageFileURL = `${process.env.REACT_APP_API_URL}/blog/entries/${id}/image.${imageFileExtension}`
-  const imageFileURLPreview = `${imageFileURL}?width=128&height=128`
+  const createURL = (kind: 'image' | 'preview') => `${process.env.REACT_APP_API_URL}/blog/entries/${id}/${kind}.${imageFileExtension}`
+  const imageFileURL = createURL('image')
+  const imageFileURLPreview = createURL('preview')
 
   const { showModal } = useContext(Modal.Portal)
 
@@ -42,9 +52,31 @@ const BlogImage: React.FC<{ entry: BlogEntry }> = props => {
     }
   }, [showModal, imageFileURL])
 
+  const [loadImg, setLoadImg] = useState(false)
+  useEffect(() => {
+    if (loadImg) {
+      return
+    }
+
+    setQueue(queue => {
+      if (queue.length > 5) {
+        return queue
+      }
+
+      setLoadImg(true)
+      setTimeout(() => {
+        setQueue(queue => queue.filter(o => o !== id))
+      }, 250)
+
+      return [...queue, id!]
+    })
+  }, [id, loadImg, setLoadImg, queue, setQueue])
+
   return (
     <Image dimension="128x128" onClick={handleClick} style={{ display: 'inline-block', margin: '0.2rem', cursor: 'pointer' }}>
-      <img src={imageFileURLPreview} alt="" loading="lazy" />
+      {loadImg && (
+        <img src={imageFileURLPreview} alt="" loading="lazy" />
+      )}
     </Image>
   )
 }
@@ -56,6 +88,8 @@ const BlogGalleryView: React.FC = props => {
 
   const { useErrorNotificationEffect } = useContext(Notification.Portal)
   useErrorNotificationEffect(error, retry)
+
+  const queue = useState([] as string[])
 
   const groups = data?.blogEntries?.reduce((groups, entry) => {
     const date = new Date(entry.createdAt as any)
@@ -76,7 +110,7 @@ const BlogGalleryView: React.FC = props => {
             <P>{dateDay}</P>
             <Div>
               {entries.map(entry => (
-                <BlogImage entry={entry} />
+                <BlogImage key={entry.id} entry={entry} queue={queue} />
               ))}
             </Div>
           </Div>

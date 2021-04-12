@@ -59,6 +59,10 @@ const Image: React.FC<Props> = props => {
   })
 
   const children = React.Children.map(nativeProps.children, (child: any) => {
+    if (!child) {
+      return undefined
+    }
+
     if (typeof child === 'object' && child.type !== 'img' && child.props) {
       return React.cloneElement(child, { className: classNames(child.props.className, 'has-ratio') })
     }
