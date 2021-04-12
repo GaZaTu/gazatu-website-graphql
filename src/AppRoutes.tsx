@@ -8,12 +8,16 @@ import useAuthorization from './store/useAuthorization'
 
 const HomeView = React.lazy(() => import('./views/HomeView'))
 const LoginView = React.lazy(() => import('./views/LoginView'))
+
 const GraphiQLView = React.lazy(() => import('./views/meta/GraphiQLView'))
 const EventLogView = React.lazy(() => import('./views/meta/EventLogView'))
+
 const TriviaQuestionListView = React.lazy(() => import('./views/trivia/TriviaQuestionListView'))
 const TriviaQuestionView = React.lazy(() => import('./views/trivia/TriviaQuestionView'))
 const TriviaCategoryListView = React.lazy(() => import('./views/trivia/TriviaCategoryListView'))
 const TriviaCategoryView = React.lazy(() => import('./views/trivia/TriviaCategoryView'))
+
+const BlogGalleryView = React.lazy(() => import('./views/blog/BlogGalleryView'))
 
 const AppRoutes: React.FC = props => {
   const isAuthenticated = useAuthorization()
@@ -55,6 +59,10 @@ const AppRoutes: React.FC = props => {
           </Route>
           <Route path="/trivia/categories/:id" exact>
             <TriviaCategoryView />
+          </Route>
+
+          <Route path="/blog/gallery" exact>
+            <BlogGalleryView />
           </Route>
 
           <Route>

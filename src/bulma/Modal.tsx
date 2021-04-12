@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, { useMemo, useState } from 'react'
+import React, { useLayoutEffect, useMemo, useState } from 'react'
 import Button from './Button'
 import getChildrenByTypeAndProps from './utils/getChildrenByTypeAndProps'
 import { HTMLProps } from './utils/HTMLProps'
@@ -71,6 +71,19 @@ const Provider: React.FC<{}> = props => {
       return [promise.catch(), resolve, reject]
     }
   }, [confirm])
+
+  useLayoutEffect(() => {
+    const classList = document.documentElement.classList
+    const token = 'is-clipped'
+
+    if (modals.length) {
+      classList.add(token)
+    }
+
+    return () => {
+      classList.remove(token)
+    }
+  }, [modals])
 
   return (
     <PortalProvider value={{ showModal, alert, confirm }}>

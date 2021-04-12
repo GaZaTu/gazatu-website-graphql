@@ -4,11 +4,13 @@ import { HTMLProps } from './utils/HTMLProps'
 
 type Props = HTMLProps<'figure'> & {
   ratio?: number
+  dimension?: '16x16' | '24x24' | '32x32' | '48x48' | '64x64' | '96x96' | '128x128'
 }
 
 const Image: React.FC<Props> = props => {
   const {
     ratio,
+    dimension,
     innerRef,
     ...nativeProps
   } = props
@@ -53,6 +55,7 @@ const Image: React.FC<Props> = props => {
   const className = classNames(nativeProps.className, {
     'image': true,
     [mapRatioToClassName(ratio)]: !!ratio,
+    [`is-${dimension}`]: !!dimension,
   })
 
   const children = React.Children.map(nativeProps.children, (child: any) => {

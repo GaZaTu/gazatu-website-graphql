@@ -155,7 +155,7 @@ const TriviaQuestionListView: React.FC = props => {
           <Field label="Target Category">
             <Control>
               <Icon size="small" icon={faLayerGroup} />
-              <Select options={triviaQuestionsData?.triviaCategories} onChange={v => state.targetCategory = v} required usePortal
+              <Select options={triviaQuestionsData?.triviaCategories} onChange={v => state.targetCategory = v} filterable required usePortal
                 getKey={o => o.id}
                 getLabel={o => o.name}
                 getLabelElement={(l, o) => (
