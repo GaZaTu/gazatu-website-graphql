@@ -101,6 +101,14 @@ const reportTriviaQuestionMutation = graphql`
   }
 `
 
+const removeTriviaReportsMutation = graphql`
+  mutation Mutation($ids: [ID!]!) {
+    removeTriviaReports(ids: $ids) {
+      count
+    }
+  }
+`
+
 type TriviaQuestionReportFormProps = {
   question: TriviaQuestion
   onSubmit: () => void
@@ -276,8 +284,35 @@ const TriviaQuestionView: React.FC = props => {
       )
 
       await modal
+
+      pushSuccess('Trivia Question reported')
     }
-  }, [showModal, values])
+  }, [showModal, values, pushSuccess])
+
+  const [removeTriviaReports] = useMutation<Mutation>({
+    query: removeTriviaReportsMutation,
+  })
+  const deleteReports = useMemo(() => {
+    return async () => {
+      const [modal] = confirm(
+        <Modal.Body head={`Delete Reports?`} />
+      )
+
+      if (await modal !== 'OK') {
+        return
+      }
+
+      try {
+        await removeTriviaReports({
+          ids: values!.reports?.map(report => report.id),
+        })
+
+        retry()
+      } catch (error) {
+        pushError(error)
+      }
+    }
+  }, [removeTriviaReports, retry, pushError, confirm, values])
 
   const [previousCategory, setPreviousCategory] = useStoredState<TriviaCategory>('previousCategory')
   const [previousSubmitter, setPreviousSubmitter] = useStoredState<string | null>('previousSubmitter')
@@ -392,6 +427,13 @@ const TriviaQuestionView: React.FC = props => {
               </Control>
             </Field>
 
+            {/* <Field label="Tags">
+              <Control>
+                <Icon size="small" icon={faTags} />
+                <TagsInput name="tags" readOnly={readOnly} />
+              </Control>
+            </Field> */}
+
             <Field label="Question">
               <Control>
                 <Icon size="small" icon={faQuestion} />
@@ -455,7 +497,13 @@ const TriviaQuestionView: React.FC = props => {
           <Container>
             <H4 size={4} caps>Reports</H4>
 
-            <Table data={values.reports} bordered fullwidth canSelectRows={false} canHideColumns={false} pagination={false} filter={false} hasStickyToolbars={false} initialState={{ sortBy: [{ id: 'updatedAt', desc: true }] }}>
+            <Table data={values.reports} bordered fullwidth canSelectRows={false} pagination={false} filter={false} hasStickyToolbars={false} initialState={{ sortBy: [{ id: 'updatedAt', desc: true }] }}>
+              <Table.Toolbar>
+                <Button type="button" color="danger" onClick={deleteReports} disabled={!values} loading={submitting || loading}>
+                  <Icon icon={faTrash} />
+                </Button>
+              </Table.Toolbar>
+
               <Table.Column Header="Message" accessor="message" />
               <Table.Column Header="Submitter" accessor="submitter" />
               <Table.Column Header="Updated" accessor="updatedAt"

@@ -294,16 +294,17 @@ const Table: React.FC<Props> = props => {
       {(filter || toolbar || canHideColumns) && (
         <div className="table-panel-toolbar">
           <Level className="is-flex-wrap-wrap pt-1" mobile>
-            {filter && (
-              <Level.Left className={`${classes.spacing.mb2}`}>
+            <Level.Left className={`${classes.spacing.mb2}`}>
+              {filter && (
                 <Level.Item>
                   <Control loading={loading}>
                     <Icon size="small" icon={tableIcons.faSearch} />
                     <Input type="text" defaultValue={globalFilter} onChange={handleGlobalFilterChange} style={{ width: '18rem' }} placeholder="Search..." rounded />
                   </Control>
                 </Level.Item>
-              </Level.Left>
-            )}
+              )}
+            </Level.Left>
+
             {(toolbar || canHideColumns) && (
               <Level.Right className={`${classes.spacing.mb2}`}>
                 {toolbar}

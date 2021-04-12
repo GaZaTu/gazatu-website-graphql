@@ -48,15 +48,18 @@ export type UseController = (opts: UseControllerOptions) => UseControllerInstanc
 
 const Context = React.createContext({
   useController: (() => undefined) as UseController,
+  // readOnly: undefined as boolean | undefined,
 })
 
 type Props = HTMLProps<'form'> & {
   context: React.ContextType<typeof Context>
+  // readOnly?: boolean
 }
 
 const Form: React.FC<Props> = props => {
   const {
     context,
+    // readOnly,
     children,
     innerRef,
     ...nativeProps

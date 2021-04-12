@@ -141,7 +141,7 @@ const TagsInput: React.FC<Props> = props => {
         const newTag = inputValue.endsWith('\n') ? inputValue.trim() : undefined
 
         if (!newTag) {
-          if (inputValue === '') {
+          if (inputValue.trim() === '') {
             event.currentTarget.innerText = '\n'
           }
 
