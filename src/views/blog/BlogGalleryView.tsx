@@ -20,6 +20,7 @@ import { graphql } from '../../lib/graphql'
 import useMutation from '../../lib/graphql/useMutation'
 import useQuery from '../../lib/graphql/useQuery'
 import readFile from '../../lib/readFile'
+import { FetchContext } from '../../lib/useFetch'
 import useURLSearchParams from '../../lib/useURLSearchParam'
 import useAuthorization from '../../store/useAuthorization'
 
@@ -85,6 +86,8 @@ const BlogUploadForm: React.FC<BlogUploadFormProps> = props => {
       setImageAsDataURL(imageAsDataURL)
     })()
   }, [files])
+
+  const { fetch } = useContext(FetchContext)
 
   const onSubmit = async (values: BlogEntryInput) => {
     try {
