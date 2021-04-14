@@ -13,8 +13,8 @@ const _GraphQLContext = React.createContext({
 })
 const _GraphQLContextProvider = _GraphQLContext.Provider
 
-const GraphQLContextProvider: React.FC<{ fetchGraphQL: FetchGraphQL }> = props => {
-  const { fetchGraphQL, children } = props
+const GraphQLContextProvider: React.FC<{ value: { fetchGraphQL: FetchGraphQL } }> = props => {
+  const { value: { fetchGraphQL }, children } = props
 
   const [queryCount, setQueryCount] = useState(0)
   const [mutationCount, setMutationCount] = useState(0)
