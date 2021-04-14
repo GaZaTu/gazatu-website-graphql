@@ -1,24 +1,24 @@
 import { faCheckCircle, faClipboardCheck, faExclamation, faExclamationTriangle, faFlag, faLayerGroup, faQuestion, faSave, faTrash } from '@fortawesome/free-solid-svg-icons'
 import React, { useContext, useEffect, useMemo } from 'react'
 import { useHistory } from 'react-router-dom'
-import A from '../../bulma/A'
-import Button from '../../bulma/Button'
-import Container from '../../bulma/Container'
-import Control from '../../bulma/Control'
-import Field from '../../bulma/Field'
-import Icon from '../../bulma/Icon'
-import Input from '../../bulma/Input'
-import Level from '../../bulma/Level'
-import Modal from '../../bulma/Modal'
-import Notification from '../../bulma/Notification'
-import Section from '../../bulma/Section'
-import Select from '../../bulma/Select'
-import Table from '../../bulma/Table'
-import { H1, H4, Span } from '../../bulma/Text'
-import { graphql } from '../../graphql'
-import { Mutation, Query, TriviaCategory, TriviaQuestion, TriviaQuestionInput, TriviaReportInput } from '../../graphql/schema.gql'
-import useMutation from '../../graphql/useMutation'
-import useQuery from '../../graphql/useQuery'
+import A from '../../lib/bulma/A'
+import Button from '../../lib/bulma/Button'
+import Container from '../../lib/bulma/Container'
+import Control from '../../lib/bulma/Control'
+import Field from '../../lib/bulma/Field'
+import Icon from '../../lib/bulma/Icon'
+import Input from '../../lib/bulma/Input'
+import Level from '../../lib/bulma/Level'
+import Modal from '../../lib/bulma/Modal'
+import Notification from '../../lib/bulma/Notification'
+import Section from '../../lib/bulma/Section'
+import Select from '../../lib/bulma/Select'
+import Table from '../../lib/bulma/Table'
+import { H1, H4, Span } from '../../lib/bulma/Text'
+import { graphql } from '../../lib/graphql'
+import { Mutation, Query, TriviaCategory, TriviaQuestion, TriviaQuestionInput, TriviaReportInput } from '../../assets/schema.gql'
+import useMutation from '../../lib/graphql/useMutation'
+import useQuery from '../../lib/graphql/useQuery'
 import AppForm, { useAppForm } from '../../lib/AppForm'
 import useIdParam from '../../lib/useIdParam'
 import useStoredState from '../../lib/useStoredState'
@@ -495,7 +495,7 @@ const TriviaQuestionView: React.FC = props => {
       {values?.reports && (
         <Section>
           <Container>
-            <H4 size={4} caps>Reports</H4>
+            <H4 caps>Reports</H4>
 
             <Table data={values.reports} bordered fullwidth canSelectRows={false} pagination={false} filter={false} hasStickyToolbars={false} initialState={{ sortBy: [{ id: 'updatedAt', desc: true }] }}>
               <Table.Toolbar>

@@ -264,6 +264,30 @@
   padding-left: 2.5em;
 }
 
+.image > .delete {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+}
+
+.image-caption {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 0.25rem;
+  background-color: #00000070;
+}
+
+.is-hashlink > .icon {
+  display: none;
+  position: absolute;
+  left: -1.25rem;
+}
+
+.is-hashlink:hover > .icon {
+  display: inline-block;
+}
+
 @keyframes checkbox-draw {
   0% {
     stroke-dashoffset: 33;

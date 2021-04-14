@@ -7,7 +7,7 @@ type GraphQLResult<T = any> = {
   data?: T
 }
 
-type UseMutationResult<T> = [(variables: { [key: string]: any }) => Promise<T>, [T | undefined, Error | undefined, boolean]]
+type UseMutationResult<T> = [(variables: Record<string, any>) => Promise<T>, [T | undefined, Error | undefined, boolean]]
 
 type UseMutation = <T = any>(args: { query: GraphQLScript }) => UseMutationResult<T>
 
@@ -22,7 +22,7 @@ const useMutation: UseMutation = ({ query }) => {
   const [error, setError] = useState<Error>()
 
   const execute = useMemo(() => {
-    return (variables: { [key: string]: any }) =>
+    return (variables: Record<string, any>) =>
       fetchGraphQL(query?.script, variables)
         .then(graphQLResult => {
           setLoading(false)

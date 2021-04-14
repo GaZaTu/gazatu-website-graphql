@@ -1,5 +1,5 @@
 import React from 'react'
-import { H2 } from '../bulma/Text'
+import { H2 } from './bulma/Text'
 
 const getColor = (str: string, isValue = false) => {
   if (isValue) {

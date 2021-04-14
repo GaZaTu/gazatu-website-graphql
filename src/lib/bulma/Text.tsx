@@ -1,10 +1,15 @@
 import classNames from 'classnames'
 import React from 'react'
+import A from './A'
 import Icon from './Icon'
 import { Color } from './utils/classes'
 import getChildrenByTypeAndProps from './utils/getChildrenByTypeAndProps'
 import { HTMLProps } from './utils/HTMLProps'
 import useDocumentTitleEffect from './utils/useDocumentTitleEffect'
+
+export const textIcons = {
+  faLink: undefined as any,
+}
 
 const defaultDateFormat = new Intl.DateTimeFormat(undefined, {
   year: 'numeric',
@@ -25,27 +30,27 @@ const _Span: React.FC<Omit<SpanProps, 'as'>> = props => (
 )
 
 const _H1: React.FC<Omit<Header1Props, 'as'>> = props => (
-  <Text as="h1" {...props} />
+  <Text as="h1" size={1} {...props} />
 )
 
 const _H2: React.FC<Omit<Header2Props, 'as'>> = props => (
-  <Text as="h2" {...props} />
+  <Text as="h2" size={2} {...props} />
 )
 
 const _H3: React.FC<Omit<Header3Props, 'as'>> = props => (
-  <Text as="h3" {...props} />
+  <Text as="h3" size={3} {...props} />
 )
 
 const _H4: React.FC<Omit<Header4Props, 'as'>> = props => (
-  <Text as="h4" {...props} />
+  <Text as="h4" size={4} {...props} />
 )
 
 const _H5: React.FC<Omit<Header5Props, 'as'>> = props => (
-  <Text as="h5" {...props} />
+  <Text as="h5" size={5} {...props} />
 )
 
 const _H6: React.FC<Omit<Header6Props, 'as'>> = props => (
-  <Text as="h6" {...props} />
+  <Text as="h6" size={6} {...props} />
 )
 
 export const P = React.memo(_P)
@@ -67,6 +72,7 @@ type SharedProps = {
   date?: number | string | Date
   dateFormat?: Intl.DateTimeFormat
   caps?: boolean
+  hashLink?: boolean
 }
 
 type ParagraphProps = SharedProps & HTMLProps<'p', false> & {}
@@ -91,7 +97,7 @@ type Props = ParagraphProps | DivProps | SpanProps | Header1Props | Header2Props
 
 const Text: React.FC<Props> = props => {
   const {
-    as,
+    as: Element,
     kind,
     size,
     color,
@@ -100,6 +106,7 @@ const Text: React.FC<Props> = props => {
     date,
     dateFormat = defaultDateFormat,
     caps,
+    hashLink,
     innerRef,
     ...nativeProps
   } = props
@@ -108,7 +115,7 @@ const Text: React.FC<Props> = props => {
 
   const className = classNames(nativeProps.className, {
     [`${kind}`]: !!kind,
-    [`is-size-${size}`]: !!size,
+    [`is-size-${size}`]: !kind && !!size,
     [`has-text-${color}`]: !!color,
     'is-spaced': !!spaced,
     'icon-text': !!hasIcons,
@@ -144,7 +151,22 @@ const Text: React.FC<Props> = props => {
     dateAsString = dateFormat.format(parsedDate)
   }
 
-  return React.createElement(as, { ...nativeProps, ref: innerRef, className }, dateAsString ?? children)
+  const element = (
+    <Element {...nativeProps} ref={innerRef as any} className={className}>
+      {dateAsString ?? children}
+    </Element>
+  )
+
+  if (hashLink && nativeProps.id) {
+    return (
+      <A href={`#${nativeProps.id}`} className="is-hashlink icon-text" replace>
+        <Icon icon={textIcons.faLink} size="small" />
+        {element}
+      </A>
+    )
+  }
+
+  return element
 }
 
 export default React.memo(Text)

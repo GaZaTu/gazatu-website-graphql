@@ -72,7 +72,7 @@ type SharedProps = {
 
 type SpanProps = SharedProps & HTMLProps<'span', true> & {}
 
-type AnchorProps = SharedProps & Omit<React.ComponentProps<typeof A>, 'as'> & {
+type AnchorProps = SharedProps & React.ComponentProps<typeof A> & {
   as: 'a'
 }
 

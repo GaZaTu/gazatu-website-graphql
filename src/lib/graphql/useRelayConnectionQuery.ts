@@ -5,7 +5,7 @@ import useRelayConnection from './useRelayConnection'
 
 type UseRelayConnectionQueryResult<T> = [[T[] | undefined, Error | undefined, boolean, () => void], [number, number, ((pages?: number) => void) | undefined, ((pages?: number) => void) | undefined, ((newPage: number) => void)]]
 
-type UseRelayConnectionQuery = <T>(args: { query: GraphQLScript, variables?: { [key: string]: any }, pageSize: number }) => UseRelayConnectionQueryResult<T>
+type UseRelayConnectionQuery = <T>(args: { query: GraphQLScript, variables?: Record<string, any>, pageSize: number }) => UseRelayConnectionQueryResult<T>
 
 const useRelayConnectionQuery: UseRelayConnectionQuery = ({ query, variables, pageSize }) => {
   const [resultSet, setResultSet] = useState()

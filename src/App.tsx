@@ -1,17 +1,19 @@
-import { faCaretDown, faCaretUp, faColumns, faRedo, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faCaretDown, faCaretUp, faColumns, faLink, faRedo, faSearch, faUpload } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useContext, useMemo } from 'react'
 import { BrowserRouter, useHistory, useLocation, useRouteMatch } from 'react-router-dom'
 import './App.scss'
 import AppNavbar from './AppNavbar'
 import AppRoutes from './AppRoutes'
-import A from './bulma/A'
-import Dropdown from './bulma/Dropdown'
-import Icon from './bulma/Icon'
-import Modal from './bulma/Modal'
-import Notification, { notificationIcons } from './bulma/Notification'
-import { tableIcons } from './bulma/Table'
-import useFetchGraphQL, { GraphQLContext } from './graphql/useFetchGraphQL'
+import A from './lib/bulma/A'
+import Dropdown from './lib/bulma/Dropdown'
+import { fileIcons } from './lib/bulma/FileInput'
+import Icon from './lib/bulma/Icon'
+import Modal from './lib/bulma/Modal'
+import Notification, { notificationIcons } from './lib/bulma/Notification'
+import { tableIcons } from './lib/bulma/Table'
+import { textIcons } from './lib/bulma/Text'
+import useFetchGraphQL, { GraphQLContext } from './lib/graphql/useFetchGraphQL'
 import useFetch, { FetchContext } from './lib/useFetch'
 import { Store } from './store'
 
@@ -20,6 +22,8 @@ tableIcons.faSearch = faSearch
 tableIcons.faColumns = faColumns
 tableIcons.faCaretDown = faCaretDown
 tableIcons.faCaretUp = faCaretUp
+textIcons.faLink = faLink
+fileIcons.faUpload = faUpload
 
 const App: React.FC = props => {
   const [store] = useContext(Store)

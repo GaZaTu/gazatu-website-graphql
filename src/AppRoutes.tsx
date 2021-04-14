@@ -1,8 +1,8 @@
 import React, { useContext } from 'react'
 import { Route, Switch } from 'react-router-dom'
-import Notification from './bulma/Notification'
-import Pageloader from './bulma/Pageloader'
-import { Span } from './bulma/Text'
+import Notification from './lib/bulma/Notification'
+import Pageloader from './lib/bulma/Pageloader'
+import { Span } from './lib/bulma/Text'
 import ErrorBoundary from './lib/ErrorBoundary'
 import useAuthorization from './store/useAuthorization'
 

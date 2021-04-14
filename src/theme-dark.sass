@@ -675,6 +675,22 @@ $dark-textarea-colors: $dark-colors
 // ------------------------------------------------ Select ------------------------------------------------
 $dark-select-colors: $dark-colors
 
+// ------------------------------------------------ File ------------------------------------------------
+$dark-file-border-color: $dark-border !default
+// $dark-file-radius: $radius !default
+
+$dark-file-cta-background-color: $dark-scheme-main-ter !default
+$dark-file-cta-color: $dark-text !default
+$dark-file-cta-hover-color: $dark-text-strong !default
+$dark-file-cta-active-color: $dark-text-strong !default
+
+$dark-file-name-border-color: $dark-border !default
+// $dark-file-name-border-style: solid !default
+// $dark-file-name-border-width: 1px 1px 1px 0 !default
+// $dark-file-name-max-width: 16em !default
+
+$dark-file-colors: $dark-colors !default
+
 html.dark-theme
   // ------------------------------------------------ Generic ------------------------------------------------
   background-color: $dark-background-color
@@ -1492,6 +1508,61 @@ html.dark-theme
     &.is-disabled
       &::after
         border-color: $dark-input-disabled-color
+
+  // ------------------------------------------------ File ------------------------------------------------
+  .file
+    // Colors
+    @each $name, $pair in $dark-file-colors
+      $color: nth($pair, 1)
+      $color-invert: nth($pair, 2)
+      &.is-#{$name}
+        .file-cta
+          background-color: $color
+          border-color: transparent
+          color: $color-invert
+        &:hover,
+        &.is-hovered
+          .file-cta
+            background-color: bulmaDarken($color, 2.5%)
+            border-color: transparent
+            color: $color-invert
+        &:focus,
+        &.is-focused
+          .file-cta
+            border-color: transparent
+            box-shadow: 0 0 0.5em bulmaRgba($color, 0.25)
+            color: $color-invert
+        &:active,
+        &.is-active
+          .file-cta
+            background-color: bulmaDarken($color, 5%)
+            border-color: transparent
+            color: $color-invert
+
+  .file-label
+    &:hover
+      .file-cta
+        background-color: bulmaDarken($dark-file-cta-background-color, 2.5%)
+        color: $dark-file-cta-hover-color
+      .file-name
+        border-color: bulmaDarken($dark-file-name-border-color, 2.5%)
+    &:active
+      .file-cta
+        background-color: bulmaDarken($dark-file-cta-background-color, 5%)
+        color: $dark-file-cta-active-color
+      .file-name
+        border-color: bulmaDarken($dark-file-name-border-color, 5%)
+
+  .file-cta,
+  .file-name
+    border-color: $dark-file-border-color
+
+  .file-cta
+    background-color: $dark-file-cta-background-color
+    color: $dark-file-cta-color
+
+  .file-name
+    border-color: $dark-file-name-border-color
 
   // ------------------------------------------------ bulma-ext ------------------------------------------------
   @media (min-width: $desktop)

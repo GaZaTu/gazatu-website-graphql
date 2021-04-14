@@ -1,12 +1,12 @@
 import React from 'react'
 import bbFly2x from '../assets/img/bbFly2x.gif'
 import FeelsDankMan from '../assets/img/FeelsDankMan.png'
-import A from '../bulma/A'
-import Button from '../bulma/Button'
-import Container from '../bulma/Container'
-import Content from '../bulma/Content'
-import Section from '../bulma/Section'
-import { H1, P } from '../bulma/Text'
+import A from '../lib/bulma/A'
+import Button from '../lib/bulma/Button'
+import Container from '../lib/bulma/Container'
+import Content from '../lib/bulma/Content'
+import Section from '../lib/bulma/Section'
+import { H1, P } from '../lib/bulma/Text'
 import './HomeView.scss'
 
 const HomeView: React.FC = props => {

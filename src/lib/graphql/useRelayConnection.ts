@@ -2,9 +2,9 @@ import { useMemo } from 'react'
 import { GraphQLFragment, GraphQLScript } from './graphql'
 import useRelayPagination from './useRelayPagination'
 
-type UseRelayConnectionResult<T> = [[T[] | undefined, { [key: string]: any }], [number, number, ((skipPages?: number) => void) | undefined, ((skipPages?: number) => void) | undefined, ((newPage: number) => void)]]
+type UseRelayConnectionResult<T> = [[T[] | undefined, Record<string, any>], [number, number, ((skipPages?: number) => void) | undefined, ((skipPages?: number) => void) | undefined, ((newPage: number) => void)]]
 
-type UseRelayConnection = <T>(args: { resultSet?: any, variables?: { [key: string]: any }, pageSize: number }) => UseRelayConnectionResult<T>
+type UseRelayConnection = <T>(args: { resultSet?: any, variables?: Record<string, any>, pageSize: number }) => UseRelayConnectionResult<T>
 
 const useRelayConnection: UseRelayConnection = ({ resultSet, variables, pageSize }) => {
   const [pagination, setPagination, page] = useRelayPagination(pageSize)

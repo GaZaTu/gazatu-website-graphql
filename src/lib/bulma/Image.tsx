@@ -2,15 +2,37 @@ import classNames from 'classnames'
 import React from 'react'
 import { HTMLProps } from './utils/HTMLProps'
 
+type CaptionProps = HTMLProps<'figcaption'> & {}
+
+const Caption: React.FC<CaptionProps> = props => {
+  const {
+    innerRef,
+    children,
+    ...nativeProps
+  } = props
+
+  const className = classNames(nativeProps.className, {
+    'image-caption': true,
+  })
+
+  return (
+    <figcaption {...nativeProps} ref={innerRef} className={className}>
+      {children}
+    </figcaption>
+  )
+}
+
 type Props = HTMLProps<'figure'> & {
   ratio?: number
   dimension?: '16x16' | '24x24' | '32x32' | '48x48' | '64x64' | '96x96' | '128x128'
+  caption?: string
 }
 
 const Image: React.FC<Props> = props => {
   const {
     ratio,
     dimension,
+    caption,
     innerRef,
     ...nativeProps
   } = props
@@ -72,9 +94,14 @@ const Image: React.FC<Props> = props => {
 
   return (
     <figure {...nativeProps} ref={innerRef} className={className}>
+      {children && caption && (
+        <Caption>{caption}</Caption>
+      )}
       {children}
     </figure>
   )
 }
 
-export default React.memo(Image)
+export default Object.assign(React.memo(Image), {
+  Caption,
+})

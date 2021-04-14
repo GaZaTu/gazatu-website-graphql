@@ -102,7 +102,9 @@ type SharedItemProps = {
   active?: boolean
 }
 
-type AnchorItemProps = SharedItemProps & React.ComponentProps<typeof A> & {}
+type AnchorItemProps = SharedItemProps & React.ComponentProps<typeof A> & {
+  as?: 'a'
+}
 
 type DivItemProps = SharedItemProps & HTMLProps<'div', false> & {}
 

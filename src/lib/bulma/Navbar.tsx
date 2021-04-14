@@ -148,6 +148,7 @@ type ShredItemProps = {
 }
 
 type AnchorItemProps = ShredItemProps & React.ComponentProps<typeof A> & {
+  as?: 'a'
   exact?: boolean
 }
 

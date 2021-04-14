@@ -41,7 +41,7 @@ const Icon: React.FC<Props> = props => {
     [`is-${align}`]: !!align,
   })
 
-  const { Icon } = useContext(Context)
+  const { Icon: I } = useContext(Context)
   const getIconSize = () => {
     if (iconSize) {
       return iconSize
@@ -64,8 +64,8 @@ const Icon: React.FC<Props> = props => {
       {i && (
         <i className={i} />
       )}
-      {icon && Icon && (
-        <Icon icon={icon} size={getIconSize()} />
+      {icon && I && (
+        <I icon={icon} size={getIconSize()} />
       )}
     </span>
   )

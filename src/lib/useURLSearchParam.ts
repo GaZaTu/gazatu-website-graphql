@@ -1,5 +1,7 @@
-const parseURLSearchParams = (queryString = '') => {
-  const object = {} as { [key: string]: string | number | boolean | undefined }
+import { useMemo } from 'react'
+
+export const parseURLSearchParams = (queryString = '') => {
+  const object = {} as Record<string, string | number | boolean | undefined>
   const query = new URLSearchParams(queryString)
 
   for (const [key, valueAsString] of query.entries()) {
@@ -21,4 +23,10 @@ const parseURLSearchParams = (queryString = '') => {
   return object
 }
 
-export default parseURLSearchParams
+const useURLSearchParams = (queryString = '') => {
+  return useMemo(() => {
+    return parseURLSearchParams(queryString)
+  }, [queryString])
+}
+
+export default useURLSearchParams

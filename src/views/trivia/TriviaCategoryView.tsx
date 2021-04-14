@@ -1,22 +1,22 @@
 import { faCheckCircle, faClipboardCheck, faExternalLinkSquareAlt, faSave, faTrash } from '@fortawesome/free-solid-svg-icons'
 import React, { useContext, useEffect, useMemo } from 'react'
 import { useHistory } from 'react-router-dom'
-import Button from '../../bulma/Button'
-import Container from '../../bulma/Container'
-import Control from '../../bulma/Control'
-import Field from '../../bulma/Field'
-import Icon from '../../bulma/Icon'
-import Input from '../../bulma/Input'
-import Level from '../../bulma/Level'
-import Modal from '../../bulma/Modal'
-import Notification from '../../bulma/Notification'
-import Section from '../../bulma/Section'
-import Table from '../../bulma/Table'
-import { H1, H4, Span } from '../../bulma/Text'
-import { graphql } from '../../graphql'
-import { Mutation, Query, TriviaCategoryInput } from '../../graphql/schema.gql'
-import useMutation from '../../graphql/useMutation'
-import useQuery from '../../graphql/useQuery'
+import Button from '../../lib/bulma/Button'
+import Container from '../../lib/bulma/Container'
+import Control from '../../lib/bulma/Control'
+import Field from '../../lib/bulma/Field'
+import Icon from '../../lib/bulma/Icon'
+import Input from '../../lib/bulma/Input'
+import Level from '../../lib/bulma/Level'
+import Modal from '../../lib/bulma/Modal'
+import Notification from '../../lib/bulma/Notification'
+import Section from '../../lib/bulma/Section'
+import Table from '../../lib/bulma/Table'
+import { H1, H4, Span } from '../../lib/bulma/Text'
+import { graphql } from '../../lib/graphql'
+import { Mutation, Query, TriviaCategoryInput } from '../../assets/schema.gql'
+import useMutation from '../../lib/graphql/useMutation'
+import useQuery from '../../lib/graphql/useQuery'
 import AppForm, { useAppForm } from '../../lib/AppForm'
 import useIdParam from '../../lib/useIdParam'
 import useStoredState from '../../lib/useStoredState'
@@ -251,7 +251,7 @@ const TriviaCategoryView: React.FC = props => {
       {values?.questions && (
         <Section>
           <Container>
-            <H4 size={4} caps>Questions</H4>
+            <H4 caps>Questions</H4>
 
             <Table data={values.questions} bordered fullwidth canSelectRows={false} canHideColumns={false} pagination={false} filter={false} hasStickyToolbars={false} initialState={{ sortBy: [{ id: 'updatedAt', desc: true }] }}>
               <Table.Column Header="" accessor="#0" disableSortBy disableGlobalFilter

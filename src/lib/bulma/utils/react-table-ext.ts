@@ -109,7 +109,7 @@ export const usePagination = _usePagination as Plugin<{
 
 export const useRowSelect = _useRowSelect as Plugin<{
   initialState?: {
-    selectedRowIds?: { [key: string]: boolean }
+    selectedRowIds?: Record<string, boolean>
   }
   manualRowSelectedKey?: string
   autoResetSelectedRows?: boolean
@@ -134,7 +134,7 @@ export const useRowSelect = _useRowSelect as Plugin<{
 
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never
 
-export const createUseTable = <P extends { [key: string]: Plugin<any, any, any, any, any> }>(plugins: P) => {
+export const createUseTable = <P extends Record<string, Plugin<any, any, any, any, any>>>(plugins: P) => {
   type Column<D extends Record<string, any>> = _TableOptions<D>['columns'][number] & UnionToIntersection<PluginColumnOptions<P[keyof P]>>
   type Row<D extends Record<string, any>> = _TableInstance<D>['rows'][number] & UnionToIntersection<PluginRowInstance<P[keyof P]>>
   type Header<D extends Record<string, any>> = _TableInstance<D>['headerGroups'][number]['headers'][number] & UnionToIntersection<PluginColumnInstance<P[keyof P]>>

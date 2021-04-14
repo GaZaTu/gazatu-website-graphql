@@ -1,12 +1,11 @@
 import React from 'react'
-import Form from '../bulma/Form'
+import Form from './bulma/Form'
 import { FormContext, useController, UseControllerProps, useForm, UseFormProps, UseFormResult } from './useForm'
 
 export const useAppForm = (opts: UseFormProps) => {
   const form = useForm(opts)
   const {
     formState: {
-      isDirty,
       isValid,
       isValidating,
       isSubmitting,
@@ -15,7 +14,7 @@ export const useAppForm = (opts: UseFormProps) => {
 
   return {
     ...form,
-    canSubmit: isDirty && isValid,
+    canSubmit: isValid,
     submitting: isValidating || isSubmitting,
     reset: form.reset as (values?: any, keepStateOptions?: any) => void,
   }

@@ -3,7 +3,8 @@ import React, { useContext, useEffect, useMemo, useState } from 'react'
 export const FormContext = React.createContext<UseFormResult | undefined>(undefined)
 
 export type UseFormProps = {
-  defaultValues?: { [key: string]: any }
+  defaultValues?: Record<string, any>
+  allowUntouched?: boolean
 }
 
 type UseFormGetValues = (names: string[]) => any[]
@@ -16,15 +17,15 @@ type UseFormTouch = (name: string) => void
 
 type UseFormState = {
   isDirty: boolean
-  dirtyFields: { [key: string]: boolean }
+  dirtyFields: Record<string, boolean>
   isSubmitted: boolean
   isSubmitSuccessful: boolean
   submitCount: number
-  touchedFields: { [key: string]: boolean }
+  touchedFields: Record<string, boolean>
   isSubmitting: boolean
   isValidating: boolean
   isValid: boolean
-  errors: { [key: string]: any }
+  errors: Record<string, any>
   resetCount: number
 }
 
@@ -56,7 +57,7 @@ const defaultUseFormState = (resetCount: number): UseFormState => ({
 })
 
 export const useForm: UseForm = props => {
-  const { defaultValues } = props
+  const { defaultValues, allowUntouched } = props
 
   const [formState, setFormState] = useState(defaultUseFormState(0))
   const [values, setValues] = useState({ ...defaultValues })
@@ -155,7 +156,7 @@ export const useForm: UseForm = props => {
 
   const isDirty = !!Object.values(formState.dirtyFields).find(v => v)
   const hasErrors = !!Object.values(formState.errors).find(v => !!v)
-  const isValid = isDirty && !hasErrors
+  const isValid = (isDirty || !!allowUntouched) && !hasErrors
 
   return {
     getValues,

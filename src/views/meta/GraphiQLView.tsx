@@ -1,8 +1,8 @@
 import GraphiQL from 'graphiql'
 import 'graphiql/graphiql.css'
 import React, { useContext } from 'react'
-import { H1 } from '../../bulma/Text'
-import { GraphQLContext } from '../../graphql/useFetchGraphQL'
+import { H1 } from '../../lib/bulma/Text'
+import { GraphQLContext } from '../../lib/graphql/useFetchGraphQL'
 
 const GraphiQLView: React.FC = props => {
   const { fetchGraphQL } = useContext(GraphQLContext)

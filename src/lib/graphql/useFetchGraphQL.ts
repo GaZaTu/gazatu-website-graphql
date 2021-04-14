@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 
-export type FetchGraphQL = (query: string, variables?: { [key: string]: any }) => Promise<any>
+export type FetchGraphQL = (query: string, variables?: Record<string, any>) => Promise<any>
 
 const _GraphQLContext = React.createContext({
   fetchGraphQL: null as FetchGraphQL | null,
@@ -13,7 +13,7 @@ const _GraphQLContext = React.createContext({
 })
 const _GraphQLContextProvider = _GraphQLContext.Provider
 
-const GraphQLContextProvider: React.FC<{ value: { fetchGraphQL: FetchGraphQL } }> = props => {
+const GraphQLContextProvider = (props => {
   const { value: { fetchGraphQL }, children } = props
 
   const [queryCount, setQueryCount] = useState(0)
@@ -30,14 +30,14 @@ const GraphQLContextProvider: React.FC<{ value: { fetchGraphQL: FetchGraphQL } }
   } as any
 
   return React.createElement(_GraphQLContextProvider, { value }, children)
-}
+}) as React.Provider<{ fetchGraphQL: FetchGraphQL | null }>
 
 export const GraphQLContext = Object.assign(_GraphQLContext, {
   Provider: GraphQLContextProvider,
 })
 
 export const createFetchGraphQL = (init?: RequestInit) =>
-  (query: string, variables?: { [key: string]: any }) =>
+  (query: string, variables?: Record<string, any>) =>
     fetch(process.env.REACT_APP_GRAPHQL_URL!, {
       ...init,
       mode: 'cors',

@@ -10,7 +10,7 @@ type GraphQLResult<T = any> = {
 
 type UseQueryResult<T> = [T | undefined, Error | undefined, boolean, () => void, () => void]
 
-type UseQuery = <T>(args: { query?: GraphQLScript, variables?: { [key: string]: any }, disabled?: boolean }) => UseQueryResult<T>
+type UseQuery = <T>(args: { query?: GraphQLScript, variables?: Record<string, any>, disabled?: boolean }) => UseQueryResult<T>
 
 const useQuery: UseQuery = ({ query, variables, disabled }) => {
   const { fetchGraphQL } = useContext(GraphQLContext)

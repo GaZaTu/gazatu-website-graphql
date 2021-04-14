@@ -2,19 +2,20 @@ import { faDesktop, faMoon, faSun, faUserCircle } from '@fortawesome/free-solid-
 import React, { useContext, useEffect, useLayoutEffect } from 'react'
 import { useMediaQuery } from 'react-responsive'
 import logoPng from './assets/img/gazatu-xyz.png'
-import Button from './bulma/Button'
-import Control from './bulma/Control'
-import Dropdown from './bulma/Dropdown'
-import Field from './bulma/Field'
-import Icon from './bulma/Icon'
-import Navbar from './bulma/Navbar'
-import Notification from './bulma/Notification'
-import Select from './bulma/Select'
-import Tag from './bulma/Tag'
-import { Span } from './bulma/Text'
-import { graphql } from './graphql'
-import { Query } from './graphql/schema.gql'
-import useQuery from './graphql/useQuery'
+import { Query } from './assets/schema.gql'
+import Button from './lib/bulma/Button'
+import Control from './lib/bulma/Control'
+import Dropdown from './lib/bulma/Dropdown'
+import Field from './lib/bulma/Field'
+import Icon from './lib/bulma/Icon'
+import Navbar from './lib/bulma/Navbar'
+import Notification from './lib/bulma/Notification'
+import Select from './lib/bulma/Select'
+import Tag from './lib/bulma/Tag'
+import { Span } from './lib/bulma/Text'
+import { graphql } from './lib/graphql'
+import { GraphQLContext } from './lib/graphql/useFetchGraphQL'
+import useQuery from './lib/graphql/useQuery'
 import useAction from './lib/store/useAction'
 import useStoredState from './lib/useStoredState'
 import { Store } from './store'
@@ -33,7 +34,7 @@ const triviaCountsQuery = graphql`
 `
 
 const AppNavbar: React.FC<{}> = props => {
-  const [store, dispatch] = useContext(Store)
+  const [, dispatch] = useContext(Store)
   const isAuthenticated = useAuthorization()
   const isAdmin = useAuthorization('admin')
   const isTriviaAdmin = useAuthorization('trivia-admin')
@@ -52,8 +53,7 @@ const AppNavbar: React.FC<{}> = props => {
 
   const logout = useAction(dispatch, '@@AUTH/LOGOUT')
 
-  // const { mutationCount } = useContext(GraphQLContext)
-  const [triviaCountsResult, triviaCountsError, loadingTriviaCounts, reloadTriviaCounts] = useQuery<Query>({
+  const [triviaCountsResult, triviaCountsError, triviaCountsLoading, reloadTriviaCounts] = useQuery<Query>({
     query: triviaCountsQuery,
     disabled: !isTriviaAdmin,
   })
@@ -62,16 +62,14 @@ const AppNavbar: React.FC<{}> = props => {
   const { useErrorNotificationEffect } = useContext(Notification.Portal)
   useErrorNotificationEffect(triviaCountsError, reloadTriviaCounts)
 
-  const triviaSetState = useAction(dispatch, '@@TRIVIA/SET_STATE')
+  const { mutationCount } = useContext(GraphQLContext)
   useEffect(() => {
-    triviaSetState({ counts: triviaCounts })
-  }, [triviaSetState, triviaCounts])
-
-  useEffect(() => {
-    if (!store.trivia.counts && !triviaCountsError && !loadingTriviaCounts) {
-      reloadTriviaCounts()
+    if (triviaCountsLoading) {
+      return
     }
-  }, [store.trivia.counts, triviaCountsError, loadingTriviaCounts, reloadTriviaCounts])
+
+    reloadTriviaCounts()
+  }, [reloadTriviaCounts, triviaCountsLoading, mutationCount])
 
   return (
     <Navbar fixed="top" shadow padded>

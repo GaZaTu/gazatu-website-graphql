@@ -1,6 +1,6 @@
 import React from 'react'
 import { FormProvider, KeepStateOptions, useController, useForm, UseFormProps, UseFormReturn } from 'react-hook-form'
-import Form, { UseControllerOptions } from '../bulma/Form'
+import Form, { UseControllerOptions } from './bulma/Form'
 import useIdRef from './useIdRef'
 
 export const useAppForm = (opts: UseFormProps) => {

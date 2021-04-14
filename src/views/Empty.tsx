@@ -1,6 +1,6 @@
 import React from 'react'
-import Container from '../bulma/Container'
-import Section from '../bulma/Section'
+import Container from '../lib/bulma/Container'
+import Section from '../lib/bulma/Section'
 
 const EmptyView: React.FC = props => {
   return (
