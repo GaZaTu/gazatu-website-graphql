@@ -68,7 +68,7 @@ const AppNavbar: React.FC<{}> = props => {
       return
     }
 
-    reloadTriviaCounts()
+    // reloadTriviaCounts()
   }, [reloadTriviaCounts, triviaCountsLoading, mutationCount])
 
   return (
