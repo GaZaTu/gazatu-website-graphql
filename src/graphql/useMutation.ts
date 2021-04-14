@@ -12,10 +12,7 @@ type UseMutationResult<T> = [(variables: { [key: string]: any }) => Promise<T>, 
 type UseMutation = <T = any>(args: { query: GraphQLScript }) => UseMutationResult<T>
 
 const useMutation: UseMutation = ({ query }) => {
-  const context = useContext(GraphQLContext)
-  const { fetchGraphQL } = context
-  const queryScript = query?.script
-
+  const { fetchGraphQL, setMutationCount } = useContext(GraphQLContext)
   if (!fetchGraphQL) {
     throw new Error('Invalid `GraphQLContext`')
   }
@@ -26,7 +23,7 @@ const useMutation: UseMutation = ({ query }) => {
 
   const execute = useMemo(() => {
     return (variables: { [key: string]: any }) =>
-      fetchGraphQL(queryScript, variables)
+      fetchGraphQL(query?.script, variables)
         .then(graphQLResult => {
           setLoading(false)
           setGraphQLResult(graphQLResult)
@@ -39,12 +36,14 @@ const useMutation: UseMutation = ({ query }) => {
             throw graphqlError
           }
 
+          setMutationCount(c => c + 1)
+
           return graphQLResult.data
         }, error => {
           setLoading(false)
           setError(error)
         })
-  }, [fetchGraphQL, queryScript, setError])
+  }, [fetchGraphQL, query?.script, setError, setMutationCount])
 
   if (error) {
     return [execute, [undefined, error, loading]]

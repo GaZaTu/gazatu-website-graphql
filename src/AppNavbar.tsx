@@ -52,6 +52,7 @@ const AppNavbar: React.FC<{}> = props => {
 
   const logout = useAction(dispatch, '@@AUTH/LOGOUT')
 
+  // const { mutationCount } = useContext(GraphQLContext)
   const [triviaCountsResult, triviaCountsError, loadingTriviaCounts, reloadTriviaCounts] = useQuery<Query>({
     query: triviaCountsQuery,
     disabled: !isTriviaAdmin,

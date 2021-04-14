@@ -1,9 +1,39 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 
 export type FetchGraphQL = (query: string, variables?: { [key: string]: any }) => Promise<any>
 
-export const GraphQLContext = React.createContext({
+const _GraphQLContext = React.createContext({
   fetchGraphQL: null as FetchGraphQL | null,
+
+  queryCount: 0,
+  setQueryCount: (count: (v: number) => number) => { },
+
+  mutationCount: 0,
+  setMutationCount: (count: (v: number) => number) => { },
+})
+const _GraphQLContextProvider = _GraphQLContext.Provider
+
+const GraphQLContextProvider: React.FC<{ fetchGraphQL: FetchGraphQL }> = props => {
+  const { fetchGraphQL, children } = props
+
+  const [queryCount, setQueryCount] = useState(0)
+  const [mutationCount, setMutationCount] = useState(0)
+
+  const value = {
+    fetchGraphQL,
+
+    queryCount,
+    setQueryCount,
+
+    mutationCount,
+    setMutationCount,
+  } as any
+
+  return React.createElement(_GraphQLContextProvider, { value }, children)
+}
+
+export const GraphQLContext = Object.assign(_GraphQLContext, {
+  Provider: GraphQLContextProvider,
 })
 
 export const createFetchGraphQL = (init?: RequestInit) =>

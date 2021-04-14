@@ -226,7 +226,7 @@ const TriviaQuestionListView: React.FC = props => {
   const deleteSelectedRows = useMemo(() => {
     return async () => {
       const [modal] = confirm(
-        <Modal.Body head={`Delete ${selectedRows.length} Trivia Categories?`}>
+        <Modal.Body head={`Delete ${selectedRows.length} Trivia Questions?`}>
           {selectedRows.map(r => (
             <TriviaQuestionNameDiv key={r.id} o={r.original} />
           ))}
