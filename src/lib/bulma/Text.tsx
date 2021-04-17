@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React from 'react'
+import React, { useContext } from 'react'
 import A from './A'
 import Icon from './Icon'
 import { Color } from './utils/classes'
@@ -17,6 +17,23 @@ const defaultDateFormat = new Intl.DateTimeFormat(undefined, {
   day: '2-digit',
 })
 
+const LinkifyBulmaADecorator: InnerLinkifyProps['componentDecorator'] = (decoratedHref, decoratedText, key) => {
+  return (
+    <A key={key} href={decoratedHref}>
+      {decoratedText}
+    </A>
+  )
+}
+
+type InnerLinkifyProps = {
+  children: React.ReactNode
+  componentDecorator?: (decoratedHref: string, decoratedText: string, key: number) => React.ReactNode
+}
+
+const Context = React.createContext({
+  Linkify: undefined as React.ComponentType<InnerLinkifyProps> | undefined,
+})
+
 const _P: React.FC<Omit<ParagraphProps, 'as'>> = props => (
   <Text as="p" {...props} />
 )
@@ -27,6 +44,10 @@ const _Div: React.FC<Omit<DivProps, 'as'>> = props => (
 
 const _Span: React.FC<Omit<SpanProps, 'as'>> = props => (
   <Text as="span" {...props} />
+)
+
+const _Pre: React.FC<Omit<PreProps, 'as'>> = props => (
+  <Text as="pre" {...props} />
 )
 
 const _H1: React.FC<Omit<Header1Props, 'as'>> = props => (
@@ -56,6 +77,7 @@ const _H6: React.FC<Omit<Header6Props, 'as'>> = props => (
 export const P = React.memo(_P)
 export const Div = React.memo(_Div)
 export const Span = React.memo(_Span)
+export const Pre = React.memo(_Pre)
 export const H1 = React.memo(_H1)
 export const H2 = React.memo(_H2)
 export const H3 = React.memo(_H3)
@@ -73,6 +95,7 @@ type SharedProps = {
   dateFormat?: Intl.DateTimeFormat
   caps?: boolean
   hashLink?: boolean
+  linkify?: boolean
 }
 
 type ParagraphProps = SharedProps & HTMLProps<'p', false> & {}
@@ -80,6 +103,8 @@ type ParagraphProps = SharedProps & HTMLProps<'p', false> & {}
 type DivProps = SharedProps & HTMLProps<'div', false> & {}
 
 type SpanProps = SharedProps & HTMLProps<'span', false> & {}
+
+type PreProps = SharedProps & HTMLProps<'pre', false> & {}
 
 type Header1Props = SharedProps & HTMLProps<'h1', false> & {}
 
@@ -93,7 +118,7 @@ type Header5Props = SharedProps & HTMLProps<'h5', false> & {}
 
 type Header6Props = SharedProps & HTMLProps<'h6', false> & {}
 
-type Props = ParagraphProps | DivProps | SpanProps | Header1Props | Header2Props | Header3Props | Header4Props | Header5Props | Header6Props
+type Props = ParagraphProps | DivProps | SpanProps | PreProps | Header1Props | Header2Props | Header3Props | Header4Props | Header5Props | Header6Props
 
 const Text: React.FC<Props> = props => {
   const {
@@ -107,6 +132,7 @@ const Text: React.FC<Props> = props => {
     dateFormat = defaultDateFormat,
     caps,
     hashLink,
+    linkify,
     innerRef,
     ...nativeProps
   } = props
@@ -151,9 +177,17 @@ const Text: React.FC<Props> = props => {
     dateAsString = dateFormat.format(parsedDate)
   }
 
+  const { Linkify } = useContext(Context)
+
+  const elementChildren = dateAsString ?? children
   const element = (
-    <Element {...nativeProps} ref={innerRef as any} className={className}>
-      {dateAsString ?? children}
+    <Element {...nativeProps as any} ref={innerRef as any} className={className}>
+      {(linkify && Linkify) && (
+        <Linkify componentDecorator={LinkifyBulmaADecorator}>{elementChildren}</Linkify>
+      )}
+      {!linkify && (
+        elementChildren
+      )}
     </Element>
   )
 
@@ -169,4 +203,6 @@ const Text: React.FC<Props> = props => {
   return element
 }
 
-export default React.memo(Text)
+export default Object.assign(React.memo(Text), {
+  Context,
+})

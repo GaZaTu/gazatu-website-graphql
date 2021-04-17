@@ -1,5 +1,5 @@
-import { faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons'
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { faArrowCircleLeft, faArrowCircleRight, faCamera, faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { BlogEntry, BlogEntryInput, Mutation, Query } from '../../assets/schema.gql'
 import AppForm, { useAppForm } from '../../lib/AppForm'
 import A from '../../lib/bulma/A'
@@ -21,8 +21,11 @@ import useMutation from '../../lib/graphql/useMutation'
 import useQuery from '../../lib/graphql/useQuery'
 import readFile from '../../lib/readFile'
 import { FetchContext } from '../../lib/useFetch'
+import useIntersectionObserver from '../../lib/useIntersectionObserver'
+import useQueue, { QueueContext } from '../../lib/useQueue'
 import useURLSearchParams from '../../lib/useURLSearchParam'
 import useAuthorization from '../../store/useAuthorization'
+import './BlogGalleryView.css'
 
 const blogEntriesQuery = graphql`
   query Query {
@@ -41,6 +44,14 @@ const saveBlogEntriesMutation = graphql`
   mutation Mutation($input: [BlogEntryInput!]!) {
     saveBlogEntries(input: $input) {
       ids
+    }
+  }
+`
+
+const removeBlogEntriesMutation = graphql`
+  mutation Mutation($ids: [ID!]!) {
+    removeBlogEntries(ids: $ids) {
+      count
     }
   }
 `
@@ -116,7 +127,7 @@ const BlogUploadForm: React.FC<BlogUploadFormProps> = props => {
           <AppForm form={form} onSubmit={handleSubmit(onSubmit)}>
             <Field>
               <Control>
-                <FileInput label="Choose a file..." onFilesChange={setFiles} />
+                <FileInput label="Choose an Image..." onFilesChange={setFiles} accept="image/*" capture="environment" icon={faCamera} />
               </Control>
             </Field>
 
@@ -154,14 +165,14 @@ const BlogUploadForm: React.FC<BlogUploadFormProps> = props => {
 }
 
 type BlogImageProps = {
-  entry: BlogEntry
-  queue: [string[], React.Dispatch<React.SetStateAction<string[]>>]
+  entry: PagedBlogEntry
+  reload: () => void
 }
 
 const BlogImage: React.FC<BlogImageProps> = props => {
   const {
     entry,
-    queue: [queue, setQueue],
+    reload,
   } = props
 
   const { id, imageFileExtension } = entry
@@ -171,7 +182,8 @@ const BlogImage: React.FC<BlogImageProps> = props => {
 
   const isAdmin = useAuthorization('admin')
 
-  const imageRef = useRef<HTMLElement>(null)
+  const [image, setImage] = useState<HTMLElement | null>(null)
+  const imageVisible = useIntersectionObserver(image, { once: true })
 
   const { useHistory, useLocation } = useContext(A.Context)
   const history = useHistory()
@@ -180,66 +192,101 @@ const BlogImage: React.FC<BlogImageProps> = props => {
 
   const { showModal } = useContext(Modal.Portal)
   useEffect(() => {
-    if (search.entry !== entry.id) {
+    if (search.entry !== entry.id || !image) {
       return
     }
 
     (async () => {
-      imageRef.current?.scrollIntoView({
+      image?.scrollIntoView({
         // behavior: 'smooth',
         block: 'start',
         inline: 'nearest',
       })
 
-      const [modal] = showModal(
-        <Image>
+      const [modal, resolve] = showModal<string | undefined>(
+        <Image className="blog-entry-image">
           <Image.Caption>
             <H4>{entry.story}</H4>
             <H5>{entry.title}</H5>
-            <P>{entry.message}</P>
+            <P style={{ whiteSpace: 'pre-wrap' }} linkify>{entry.message}</P>
           </Image.Caption>
+          <Button onClick={() => resolve(entry.prevEntryId)} className="go-left" disabled={!entry.prevEntryId}>
+            <Icon icon={faArrowCircleLeft} />
+          </Button>
+          <Button onClick={() => resolve(entry.nextEntryId)} className="go-right" disabled={!entry.nextEntryId}>
+            <Icon icon={faArrowCircleRight} />
+          </Button>
           <img src={imageFileURL} alt="" />
         </Image>
       )
 
-      await modal
-
-      history?.replace('?')
-    })()
-  }, [search.entry, entry, showModal, imageFileURL, history])
-
-  const [loadImg, setLoadImg] = useState(false)
-  useEffect(() => {
-    if (loadImg) {
-      return
-    }
-
-    setQueue(queue => {
-      if (queue.length > 5) {
-        return queue
+      const newEntryId = await modal
+      if (newEntryId) {
+        history?.replace(`?entry=${newEntryId}`)
+      } else {
+        history?.replace(`?`)
       }
+    })()
+  }, [search.entry, entry, showModal, imageFileURL, history, image])
 
-      setLoadImg(true)
-      setTimeout(() => {
-        setQueue(queue => queue.filter(o => o !== id))
-      }, 250)
+  const [imageAllowed, handleLoad] = useQueue(0, !imageVisible)
 
-      return [...queue, id!]
-    })
-  }, [id, loadImg, setLoadImg, queue, setQueue])
+  const [removeBlogEntries] = useMutation<Mutation>({
+    query: removeBlogEntriesMutation,
+  })
+  const handleDeleteClick = useMemo(() => {
+    return async () => {
+      await removeBlogEntries({ ids: [entry.id] })
+
+      reload()
+    }
+  }, [entry, removeBlogEntries, reload])
 
   return (
-    <Image innerRef={imageRef} dimension="128x128" style={{ display: 'inline-block', margin: '0.2rem' }}>
+    <Image innerRef={setImage} dimension="128x128" style={{ display: 'inline-block', margin: '0.2rem' }}>
       {isAdmin && (
-        <Button onClick={() => {}} cross />
+        <Button onClick={handleDeleteClick} cross />
       )}
-      {loadImg && (
+      {imageVisible && imageAllowed && (
         <A href={`?entry=${entry.id}`} replace>
-          <img src={imageFileURLPreview} alt="" loading="lazy" />
+          <img src={imageFileURLPreview} alt="" onLoad={handleLoad} onError={handleLoad} />
         </A>
       )}
     </Image>
   )
+}
+
+type BlogGroupProps = {
+  date: string
+  entries: PagedBlogEntry[]
+  reload: () => void
+}
+
+const BlogGroup: React.FC<BlogGroupProps> = props => {
+  const {
+    date,
+    entries,
+    reload,
+  } = props
+
+  return (
+    <Div>
+      {/* <A href={`?date=${date}`} replace>
+        <H5 date={date} />
+      </A> */}
+      <H5 date={date} />
+      <Div>
+        {entries.map(entry => (
+          <BlogImage key={entry.id} entry={entry} reload={reload} />
+        ))}
+      </Div>
+    </Div>
+  )
+}
+
+type PagedBlogEntry = BlogEntry & {
+  prevEntryId?: string
+  nextEntryId?: string
 }
 
 const BlogGalleryView: React.FC = props => {
@@ -252,18 +299,26 @@ const BlogGalleryView: React.FC = props => {
   const { useErrorNotificationEffect } = useContext(Notification.Portal)
   useErrorNotificationEffect(error, retry)
 
-  const queue = useState([] as string[])
+  const groups = useMemo(() => {
+    return data?.blogEntries
+      ?.map((entry, index, entries) => {
+        return {
+          ...entry,
+          prevEntryId: entries[index - 1]?.id,
+          nextEntryId: entries[index + 1]?.id,
+        }
+      })
+      ?.reduce((groups, entry) => {
+        const date = new Date(entry.createdAt as any)
+        const dateISOString = date.toISOString()
+        const dateDay = dateISOString.slice(0, 'yyyy-MM-dd'.length)
 
-  const groups = data?.blogEntries?.reduce((groups, entry) => {
-    const date = new Date(entry.createdAt as any)
-    const dateISOString = date.toISOString()
-    const dateDay = dateISOString.slice(0, 'xx-xx-xxxx'.length)
+        groups[dateDay] = groups[dateDay] ?? []
+        groups[dateDay].push(entry)
 
-    groups[dateDay] = groups[dateDay] ?? []
-    groups[dateDay].push(entry)
-
-    return groups
-  }, {} as Record<string, BlogEntry[]>)
+        return groups
+      }, {} as Record<string, PagedBlogEntry[]>)
+  }, [data?.blogEntries])
 
   const { showModal } = useContext(Modal.Portal)
   const handleUploadClick = useMemo(() => {
@@ -294,16 +349,11 @@ const BlogGalleryView: React.FC = props => {
           </Level>
         )}
 
-        {Object.entries(groups ?? {}).map(([dateDay, entries]) => (
-          <Div key={dateDay}>
-            <H5 date={dateDay} />
-            <Div>
-              {entries.map(entry => (
-                <BlogImage key={entry.id} entry={entry} queue={queue} />
-              ))}
-            </Div>
-          </Div>
-        ))}
+        <QueueContext.Provider>
+          {Object.entries(groups ?? {}).map(([date, entries]) => (
+            <BlogGroup key={date} date={date} entries={entries} reload={retry} />
+          ))}
+        </QueueContext.Provider>
       </Container>
     </Section>
   )

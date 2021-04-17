@@ -1,0 +1,13 @@
+.blog-entry-image > .go-left,
+.blog-entry-image > .go-right {
+  position: absolute;
+  top: 50%;
+}
+
+.blog-entry-image > .go-left {
+  left: 0.25rem;
+}
+
+.blog-entry-image > .go-right {
+  right: 0.25rem;
+}

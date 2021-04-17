@@ -147,6 +147,10 @@ const AppNavbar: React.FC<{}> = props => {
               </>
             )}
           </Navbar.Item>
+
+          {(process.env.NODE_ENV !== 'production') && (
+            <Navbar.Item label="Test" href="/test" exact />
+          )}
         </Navbar.Start>
 
         <Navbar.End>

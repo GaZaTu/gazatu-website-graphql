@@ -517,3 +517,35 @@
 
   border-color: transparent black transparent transparent;
 }
+
+@keyframes growDownRight {
+  0% {
+    transform: translateX(-50%) translateY(-50%) scaleX(0) scaleY(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0%) translateY(0%) scaleX(1) scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes growDownLeft {
+  0% {
+    transform: translateX(+50%) translateY(-50%) scaleX(0) scaleY(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0%) translateY(0%) scaleX(1) scaleY(1);
+    opacity: 1;
+  }
+}
+
+.dropdown.has-grow-animation > .dropdown-menu,
+.navbar-item.has-dropdown.has-grow-animation > .navbar-dropdown {
+  animation: growDownRight 50ms ease-in-out;
+}
+
+.dropdown.is-right.has-grow-animation > .dropdown-menu,
+.navbar-end > .navbar-item.has-dropdown.has-grow-animation > .navbar-dropdown {
+  animation: growDownLeft 50ms ease-in-out;
+}

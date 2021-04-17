@@ -104,7 +104,7 @@ const InternalButton: React.FC<ButtonProps> = props => {
   )
 }
 
-type AnchorProps = SharedProps & Omit<React.ComponentProps<typeof A>, 'as'> & {
+type AnchorProps = SharedProps & React.ComponentProps<typeof A> & {
   as: 'a'
 }
 

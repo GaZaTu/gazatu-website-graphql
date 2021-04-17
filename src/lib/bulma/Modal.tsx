@@ -90,7 +90,7 @@ const Provider: React.FC<{}> = props => {
       {children}
       <div className="modals">
         {modals.map(({ content, reject }, i) => (
-          <Modal key={i} onClose={reject} active>
+          <Modal key={i} onClose={() => reject()} active>
             {content}
           </Modal>
         ))}

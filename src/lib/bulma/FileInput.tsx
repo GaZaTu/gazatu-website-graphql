@@ -16,6 +16,7 @@ type Props = HTMLProps<'input'> & {
   fullwidth?: boolean
   color?: Color
   size?: 'small' | 'normal' | 'medium' | 'large'
+  icon?: any
 }
 
 const FileInput: React.FC<Props> = props => {
@@ -28,6 +29,7 @@ const FileInput: React.FC<Props> = props => {
     fullwidth,
     color,
     size,
+    icon,
     children,
     innerRef,
     ...nativeProps
@@ -70,7 +72,7 @@ const FileInput: React.FC<Props> = props => {
         <span className="file-cta" style={{ marginLeft: '0' }}>
           {I && (
             <span className="file-icon">
-              <I icon={fileIcons.faUpload} />
+              <I icon={icon ?? fileIcons.faUpload} />
             </span>
           )}
           {label && (

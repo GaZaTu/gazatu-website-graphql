@@ -31,6 +31,7 @@ type Props = HTMLProps<'a'> & {
   exact?: boolean
   exactParams?: boolean
   external?: boolean
+  disabled?: boolean
 }
 
 const A: React.FC<Props> = props => {
@@ -81,6 +82,10 @@ const A: React.FC<Props> = props => {
       }
 
       e.preventDefault()
+
+      if (nativeProps.disabled) {
+        return
+      }
 
       if (replace) {
         history.replace(href)

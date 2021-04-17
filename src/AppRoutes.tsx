@@ -19,10 +19,12 @@ const TriviaCategoryView = React.lazy(() => import('./views/trivia/TriviaCategor
 
 const BlogGalleryView = React.lazy(() => import('./views/blog/BlogGalleryView'))
 
+const TestView = React.lazy(() => import('./views/test/TestView'))
+
 const AppRoutes: React.FC = props => {
   const isAuthenticated = useAuthorization()
-  const isAdmin = useAuthorization('admin')
-  const isTriviaAdmin = useAuthorization('trivia-admin')
+  // const isAdmin = useAuthorization('admin')
+  // const isTriviaAdmin = useAuthorization('trivia-admin')
   const { pushError } = useContext(Notification.Portal)
 
   return (
@@ -64,6 +66,12 @@ const AppRoutes: React.FC = props => {
           <Route path="/blog/gallery" exact>
             <BlogGalleryView />
           </Route>
+
+          {(process.env.NODE_ENV !== 'production') && (
+            <Route path="/test" exact>
+              <TestView />
+            </Route>
+          )}
 
           <Route>
             <Pageloader active>
