@@ -128,12 +128,6 @@ const AppNavbar: React.FC<{}> = props => {
 
           <Navbar.Item label="Blog" href="/blog" as="div" hoverable>
             <Navbar.Item label="Gallery" href="/blog/gallery" exact />
-            {isAdmin && (
-              <>
-                <Navbar.Divider />
-                <Navbar.Item label="New Story" href="/blog/stories/new" exact />
-              </>
-            )}
           </Navbar.Item>
 
           <Navbar.Item label="Meta" href="/meta" as="div" hoverable>

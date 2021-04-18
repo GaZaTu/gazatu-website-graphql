@@ -37,7 +37,7 @@ const EventLogView: React.FC = props => {
       <Container>
         <H1 kind="title" documentTitle>Event-Log</H1>
 
-        <Table className="is-unpadded" data={data?.changes} bordered fullwidth loading={loading} initialState={{ pageSize: 25, hiddenColumns: ['targetId'] }} canSelectRows={false} storeStateInQuery>
+        <Table className="is-unpadded" data={data?.changes} bordered fullwidth loading={loading} initialState={{ pageSize: 25, hiddenColumns: ['targetId'], sortBy: [{ id: 'createdAt', desc: true }] }} canSelectRows={false} storeStateInQuery>
           <Table.Column Header="" accessor="#0" disableSortBy disableGlobalFilter
             Cell={({ row }) => {
               const { kind, targetEntityName, targetId } = row.original
@@ -51,14 +51,22 @@ const EventLogView: React.FC = props => {
                 }
               })()
 
-              return href && kind !== 'REMOVE' && (
-                <Button as="a" href={href}>
+              if (!href || kind === 'REMOVE') {
+                return null
+              }
+
+              return (
+                <Button as="a" href={href} color="link" size="small">
                   <Icon icon={faExternalLinkSquareAlt} />
                 </Button>
               )
             }}
           />
-          <Table.Column Header="Kind" accessor="kind" />
+          <Table.Column Header="Kind" accessor="kind"
+            Cell={({ value: kind }) => (
+              <Span color={kind === 'INSERT' ? 'success' : (kind === 'REMOVE' ? 'danger' : 'warning')}>{kind}</Span>
+            )}
+          />
           <Table.Column Header="Entity" accessor="targetEntityName" />
           <Table.Column Header="ID" accessor="targetId" />
           <Table.Column Header="Column" accessor="targetColumn" />
