@@ -162,7 +162,7 @@ const LoginForm: React.FC<LoginFormProps> = props => {
       return
     }
 
-    if (password === password2) {
+    if (password !== password2) {
       setError('password2', { type: 'validate', message: 'Passwords must be equal' })
     } else {
       clearErrors('password2')
