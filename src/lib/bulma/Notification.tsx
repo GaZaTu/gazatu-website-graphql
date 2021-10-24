@@ -19,7 +19,7 @@ type NotificationData = {
   }
 }
 
-type PushFunction = (content: React.ReactNode, options?: NotificationData['options']) => void
+type PushFunction = (content: any, options?: NotificationData['options']) => void
 
 const Portal = React.createContext({
   push: ((c, o) => { }) as PushFunction,

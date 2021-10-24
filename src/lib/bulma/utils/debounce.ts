@@ -1,4 +1,4 @@
-function debounce<T extends (...args: any[]) => void>(func: T, wait: number): T {
+function debounce<T extends (...args: any[]) => void>(func: T, ms: number): T {
   let timeout = undefined as number | undefined
 
   return ((...args: any[]) => {
@@ -9,7 +9,7 @@ function debounce<T extends (...args: any[]) => void>(func: T, wait: number): T 
 
     const callNow = false && !timeout
     clearTimeout(timeout)
-    timeout = setTimeout(later, wait) as any
+    timeout = setTimeout(later, ms) as any
 
     if (callNow) {
       func.apply(undefined, args)
