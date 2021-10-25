@@ -20,6 +20,7 @@ const TriviaCategoryView = React.lazy(() => import('./views/trivia/TriviaCategor
 const BlogGalleryView = React.lazy(() => import('./views/blog/BlogGalleryView'))
 
 const TestView = React.lazy(() => import('./views/test/TestView'))
+const ChartView = React.lazy(() => import('./views/test/ChartView'))
 
 const AppRoutes: React.FC = props => {
   const isAuthenticated = useAuthorization()
@@ -67,11 +68,12 @@ const AppRoutes: React.FC = props => {
             <BlogGalleryView />
           </Route>
 
-          {(process.env.NODE_ENV !== 'production') && (
-            <Route path="/test" exact>
-              <TestView />
-            </Route>
-          )}
+          <Route path="/test/thing" exact>
+            <TestView />
+          </Route>
+          <Route path="/test/chart" exact>
+            <ChartView />
+          </Route>
 
           <Route>
             <Pageloader active>
