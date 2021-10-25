@@ -1,23 +1,29 @@
 import React from 'react'
 import { H2 } from './bulma/Text'
 
+export const keywordColor = '#569cd6'
+export const numberColor = '#b5cea8'
+export const stringColor = '#ce915b'
+export const symbolColor = '#d4d4d4'
+export const variableColor = '#4fc1ff'
+
 const getColor = (str: string, isValue = false) => {
   if (isValue) {
     if (['null', 'undefined', 'true', 'false'].includes(str)) {
-      return '#569cd6'
+      return keywordColor
     }
 
     if (!isNaN(Number(str))) {
-      return '#b5cea8'
+      return numberColor
     }
 
-    return '#ce915b'
+    return stringColor
   } else {
     if (['?', '&', '='].includes(str)) {
-      return '#d4d4d4'
+      return symbolColor
     }
 
-    return '#4fc1ff'
+    return variableColor
   }
 }
 
