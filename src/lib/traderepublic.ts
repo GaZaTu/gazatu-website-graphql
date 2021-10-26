@@ -259,7 +259,7 @@ export type TraderepublicNeonSearchSub = {
     pageSize: number
     filter: ({
       key: 'type'
-      value: 'stock' | 'fund' | 'crypto'
+      value: 'stock' | 'fund' | 'derivative' | 'crypto'
     } | {
       key: 'jurisdiction'
       value: string
@@ -431,17 +431,17 @@ export class TraderepublicWebsocket {
     }).toPromise()
   }
 
-  search(q: string) {
+  search(q: string, type: 'stock' | 'fund' | 'derivative' | 'crypto' = 'stock', pageSize = 1, page = 1) {
     const sub: TraderepublicNeonSearchSub = {
       type: 'neonSearch',
       data: {
         q,
-        page: 1,
-        pageSize: 1,
+        page,
+        pageSize,
         filter: [
           {
             key: 'type',
-            value: 'stock',
+            value: type,
           },
           {
             key: 'jurisdiction',

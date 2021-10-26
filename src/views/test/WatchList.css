@@ -3037,7 +3037,7 @@ html.is-transparent .tv-embed-widget-wrapper__body:not(.tv-embed-widget-wrapper_
 
 .tv-widget-watch-list__row {
   border-radius: 6px;
-  cursor: default;
+  /* cursor: default; */
   display: flex;
   height: 60px
 }

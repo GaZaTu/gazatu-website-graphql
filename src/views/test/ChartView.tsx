@@ -1,17 +1,20 @@
+import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import { BarData, ColorType, createChart, IChartApi, IPriceLine, LineStyle } from 'lightweight-charts'
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { useDebounce } from 'use-debounce'
+import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import Button from '../../lib/bulma/Button'
 import Column from '../../lib/bulma/Column'
 import Container from '../../lib/bulma/Container'
 import Content from '../../lib/bulma/Content'
-import Input from '../../lib/bulma/Input'
+import Icon from '../../lib/bulma/Icon'
+import Modal from '../../lib/bulma/Modal'
 import Section from '../../lib/bulma/Section'
-import { H1 } from '../../lib/bulma/Text'
+import { H1, Span } from '../../lib/bulma/Text'
 import { Subscription, TraderepublicHomeInstrumentExchangeData, TraderepublicInstrumentData, TraderepublicStockDetailsData, TraderepublicWebsocket } from '../../lib/traderepublic'
 import useStoredState from '../../lib/useStoredState'
 import useURLSearchParamsState from '../../lib/useURLSearchParamsState'
 import './ChartView.css'
 import SymbolInfo from './SymbolInfo'
+import SymbolSearch from './SymbolSearch'
 import WatchList from './WatchList'
 
 const dateFormat = new Intl.DateTimeFormat(undefined, {
@@ -31,13 +34,107 @@ const numberCompactFormat = new Intl.NumberFormat(undefined, {
   notation: 'compact',
 })
 
+const socket = new TraderepublicWebsocket('DE')
+
+type SymbolSearchModalProps = {
+  initialSearch?: string
+  initialFilter?: 'stock' | 'fund' | 'derivative' | 'crypto'
+  resolve: (isin: string) => void
+}
+
+const SymbolSearchModal: React.FC<SymbolSearchModalProps> = props => {
+  const {
+    initialSearch,
+    initialFilter,
+    resolve,
+  } = props
+
+  const [search, setSearch] = useState(initialSearch ?? '')
+  const [filter, setFilter] = useState(initialFilter ?? 'stock')
+
+  const [loading, setLoading] = useState(false)
+  const [symbols, setSymbols] = useState<React.ComponentProps<typeof SymbolSearch>['symbols']>()
+
+  useEffect(() => {
+    const effect = {
+      cancelled: false,
+    }
+
+    setLoading(true)
+
+    ; (async () => {
+      const results = await socket.search(search, filter, 10)
+      const symbols = await Promise.all(
+        results.map(async ({ isin, type }) => {
+          const instrument = await socket.instrument(isin).toPromise()
+          // const exchange = await socket.exchange(instrument).toPromise()
+          const details = await socket.details(instrument)
+
+          return {
+            isin,
+            symbol: instrument?.intlSymbol || instrument?.homeSymbol,
+            description: details?.company.name ?? instrument?.shortName,
+            type,
+          }
+        })
+      )
+
+      if (effect.cancelled) {
+        return
+      }
+
+      setSymbols(symbols)
+      setLoading(false)
+    })()
+
+    return () => {
+      effect.cancelled = true
+
+      setSymbols([])
+      setLoading(false)
+    }
+  }, [search, filter])
+
+  return (
+    <Modal.Body head="Symbol-Search">
+      <SymbolSearch
+        search={search}
+        onSearchChange={setSearch}
+        filters={[
+          {
+            id: 'stock',
+            name: 'Stocks',
+            active: filter === 'stock',
+          },
+          {
+            id: 'fund',
+            name: 'Funds',
+            active: filter === 'fund',
+          },
+          {
+            id: 'derivative',
+            name: 'Derivatives',
+            active: filter === 'derivative',
+          },
+          {
+            id: 'crypto',
+            name: 'Crypto',
+            active: filter === 'crypto',
+          },
+        ]}
+        onFilterChange={filter => setFilter(filter.id as any)}
+        symbols={symbols}
+        onSymbolClick={symbol => resolve(symbol.isin!)}
+        loading={loading}
+      />
+    </Modal.Body>
+  )
+}
+
 const ChartView: React.FC = props => {
   const [search, setSearch] = useURLSearchParamsState({
-    q: '',
+    isin: '',
   })
-  const [searchDebounced] = useDebounce(search, 500)
-
-  const socket = useMemo(() => new TraderepublicWebsocket('DE'), [])
 
   const [instrument, setInstrument] = useState<TraderepublicInstrumentData>()
   const [exchange, setExchange] = useState<TraderepublicHomeInstrumentExchangeData>()
@@ -170,7 +267,7 @@ const ChartView: React.FC = props => {
       effect.cancelled = true
       effect.subscriptions.forEach(s => s.unsubscribe())
     }
-  }, [socket, recentISINs])
+  }, [recentISINs])
 
   // const currencyFormat = useMemo(() => {
   //   return new Intl.NumberFormat(undefined, {
@@ -239,26 +336,12 @@ const ChartView: React.FC = props => {
     let previousClose: IPriceLine | undefined
 
     ; (async () => {
-      if (searchDebounced.q.length < 2) {
-        return
-      }
-
-      let isin = searchDebounced.q
-      if (isin.length !== 12) {
-        const searchResult = await socket.search(isin.trim())
-        if (searchResult.length === 0) {
-          return
-        }
-
-        isin = searchResult[0].isin
-      }
-
-      if (effect.cancelled) {
+      if (search.isin.length !== 12) {
         return
       }
 
       const instrument = await new Promise<TraderepublicInstrumentData>((resolve, reject) => (
-        socket.instrument(isin.trim()).subscribe(instrument => {
+        socket.instrument(search.isin).subscribe(instrument => {
           if (effect.cancelled) {
             reject()
             return
@@ -390,7 +473,24 @@ const ChartView: React.FC = props => {
       effect.cancelled = true
       effect.subscriptions.forEach(s => s.unsubscribe())
     }
-  }, [socket, searchDebounced])
+  }, [search.isin])
+
+  const { showModal } = useContext(Modal.Portal)
+  const handleSearch = async () => {
+    const [modal, resolve] = showModal<string>(
+      <SymbolSearchModal resolve={isin => resolve(isin)} />
+    )
+
+    const isin = await modal
+    if (!isin) {
+      return
+    }
+
+    setSearch(search => ({
+      ...search,
+      isin,
+    }))
+  }
 
   return (
     <Section>
@@ -398,8 +498,10 @@ const ChartView: React.FC = props => {
         <H1 kind="title">Trading-Chart</H1>
 
         <Content>
-          <Input value={search.q} onValueChange={q => setSearch({ q })} style={{ width: 'unset' }} />
-
+          <Button onClick={handleSearch}>
+            <Icon icon={faSearch} />
+            <Span>Search Symbol...</Span>
+          </Button>
 
           <div className="is-unpadded">
             <Column.Row gapless>
@@ -460,7 +562,7 @@ const ChartView: React.FC = props => {
                     <WatchList.Ticker
                       key={i.isin}
                       isin={i.isin}
-                      href={`?q=${i.data?.isin}`}
+                      href={`?isin=${i.data?.isin}`}
                       symbol={i.data?.intlSymbol || i.data?.homeSymbol || i.isin}
                       name={i.details?.company.name ?? i.data?.shortName}
                       open={i.exchange?.open}
