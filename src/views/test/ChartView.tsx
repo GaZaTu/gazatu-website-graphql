@@ -9,7 +9,7 @@ import Icon from '../../lib/bulma/Icon'
 import Modal from '../../lib/bulma/Modal'
 import Section from '../../lib/bulma/Section'
 import Tag from '../../lib/bulma/Tag'
-import { H1, Span } from '../../lib/bulma/Text'
+import { Div, H1, Span } from '../../lib/bulma/Text'
 import { Subscription, TraderepublicHomeInstrumentExchangeData, TraderepublicInstrumentData, TraderepublicStockDetailsData, TraderepublicWebsocket } from '../../lib/traderepublic'
 import useStoredState from '../../lib/useStoredState'
 import useURLSearchParamsState from '../../lib/useURLSearchParamsState'
@@ -514,14 +514,18 @@ const ChartView: React.FC = props => {
         <H1 kind="title">Trading-Chart</H1>
 
         <Content>
-          <Button onClick={handleSearch}>
-            <Icon icon={faSearch} />
-            <Span>Search Symbol...</Span>
-          </Button>
 
-          <div className="is-unpadded">
+
+          <Div className="is-unpadded">
             <Column.Row gapless>
               <Column width={3 / 4}>
+                <Div style={{ background: '#1e222d', padding: '1rem 0 0 1rem' }}>
+                  <Button onClick={handleSearch}>
+                    <Icon icon={faSearch} />
+                    <Span>Search Symbol...</Span>
+                  </Button>
+                </Div>
+
                 <SymbolInfo
                   style={{ height: 'unset' }}
                   name={details?.company.name ?? instrument?.shortName}
@@ -571,12 +575,14 @@ const ChartView: React.FC = props => {
 
                 <div ref={chartContainer} />
 
-                <Tag.Group style={{ background: '#1e222d', paddingLeft: '0.5rem' }}>
-                  <Tag as="a" onClick={() => setTimeRange('1d')} color={timeRange === '1d' ? 'primary' : undefined}>1d</Tag>
-                  <Tag as="a" onClick={() => setTimeRange('5d')} color={timeRange === '5d' ? 'primary' : undefined}>5d</Tag>
-                  <Tag as="a" onClick={() => setTimeRange('1m')} color={timeRange === '1m' ? 'primary' : undefined}>1m</Tag>
-                  <Tag as="a" onClick={() => setTimeRange('1y')} color={timeRange === '1y' ? 'primary' : undefined}>1y</Tag>
-                </Tag.Group>
+                <Div style={{ background: '#1e222d', padding: '0.5rem' }}>
+                  <Tag.Group>
+                    <Tag as="a" onClick={() => setTimeRange('1d')} style={{ background: timeRange === '1d' ? '#3179f52e' : undefined }}>1d</Tag>
+                    <Tag as="a" onClick={() => setTimeRange('5d')} style={{ background: timeRange === '5d' ? '#3179f52e' : undefined }}>5d</Tag>
+                    <Tag as="a" onClick={() => setTimeRange('1m')} style={{ background: timeRange === '1m' ? '#3179f52e' : undefined }}>1m</Tag>
+                    <Tag as="a" onClick={() => setTimeRange('1y')} style={{ background: timeRange === '1y' ? '#3179f52e' : undefined }}>1y</Tag>
+                  </Tag.Group>
+                </Div>
               </Column>
 
               <Column>
@@ -597,27 +603,7 @@ const ChartView: React.FC = props => {
                 </WatchList>
               </Column>
             </Column.Row>
-          </div>
-
-          {/* <div className="is-unpadded" style={{ position: 'relative' }}>
-            <div ref={container} />
-            <div className="legend">
-              <div>{instrument?.shortName}</div>
-            </div>
-          </div> */}
-
-          {/* <div className="is-unpadded">
-            <TickerList
-              tickers={recentInstruments.map(i => ({
-                href: `?q=${i.data?.isin}`,
-                symbol: i.data?.intlSymbol || i.data?.homeSymbol || i.isin,
-                open: i.exchange?.open,
-                value: i.value.current,
-                valueAtPreviousClose: i.value.previous,
-              }))}
-              dark
-            />
-          </div> */}
+          </Div>
         </Content>
       </Container>
     </Section>
