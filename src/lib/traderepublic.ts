@@ -1,8 +1,8 @@
-interface Subscription {
+export interface Subscription {
   unsubscribe(): void
 }
 
-interface Observable<T> {
+export interface Observable<T> {
   subscribe(next: (value: T) => unknown): Subscription
 
   toPromise(): Promise<T>
@@ -364,7 +364,7 @@ export class TraderepublicWebsocket {
       type: 'instrument',
       id: isin,
       jurisdiction,
-    }).toPromise()
+    })
   }
 
   details(isin: string | TraderepublicInstrumentData, jurisdiction: string = this._jurisdiction) {

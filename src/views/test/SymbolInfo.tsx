@@ -1,5 +1,6 @@
 import classNames from 'classnames'
 import React from 'react'
+import A from '../../lib/bulma/A'
 import { HTMLProps } from '../../lib/bulma/utils/HTMLProps'
 import './SymbolInfo.css'
 
@@ -18,7 +19,8 @@ type Props = HTMLProps<'div'> & {
   openStatusSince?: number
   meta?: {
     key: string
-    value?: string
+    value?: unknown
+    href?: string
     title?: string
     width?: string
     highlighted?: boolean
@@ -30,6 +32,7 @@ type Props = HTMLProps<'div'> & {
 const numberUnsignedFormat = new Intl.NumberFormat(undefined, {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
+  signDisplay: 'never',
 })
 
 const numberSignedFormat = new Intl.NumberFormat(undefined, {
@@ -58,6 +61,8 @@ const SymbolInfo: React.FC<Props> = props => {
     dark,
     ...nativeProps
   } = props
+
+  // const previousValue = usePrevious(value)
 
   const valueChange = (value && valueAtPreviousClose) && (value - valueAtPreviousClose)
   const valueChangePercentage = (valueChange) && ((valueChange * 100) / valueAtPreviousClose)
@@ -97,7 +102,7 @@ const SymbolInfo: React.FC<Props> = props => {
                       {(exchange || countryFlag) && (
                         <span className="tv-symbol-header__exchange-container">
                           {countryFlag && (
-                            <img className="tv-circle-logo tv-circle-logo--medium tv-symbol-header__exchange-logo" src={countryFlag} alt="" />
+                            <img className="tv-circle-logo tv-circle-logo--medium tv-symbol-header__exchange-logo" src={countryFlag} alt="" style={{ marginTop: '-2px' }} />
                           )}
                           {!countryFlag && (
                             <span style={{ fontWeight: 'bold', marginRight: '0.5em' }}>@</span>
@@ -127,7 +132,7 @@ const SymbolInfo: React.FC<Props> = props => {
                       {(exchange || countryFlag) && (
                         <span className="tv-symbol-header__exchange-container">
                           {countryFlag && (
-                            <img className="tv-circle-logo tv-circle-logo--small tv-symbol-header__exchange-logo" src={countryFlag} alt="" />
+                            <img className="tv-circle-logo tv-circle-logo--medium tv-symbol-header__exchange-logo" src={countryFlag} alt="" style={{ marginTop: '-2px' }} />
                           )}
                           {!countryFlag && (
                             <span style={{ fontWeight: 'bold', marginRight: '0.5em' }}>@</span>
@@ -150,6 +155,9 @@ const SymbolInfo: React.FC<Props> = props => {
                       {value && (
                         <div className="tv-symbol-price-quote__row">
                           {value && (
+                            // <div className={`tv-symbol-price-quote__value tv-symbol-price-quote__value--${(value && previousValue && (value !== previousValue)) ? (value > previousValue ? 'growing' : 'falling') : ''}`}>
+                            //   <span>{numberUnsignedFormat.format(value)}</span>
+                            // </div>
                             <div className="tv-symbol-price-quote__value">
                               <span>{numberUnsignedFormat.format(value)}</span>
                             </div>
@@ -205,23 +213,51 @@ const SymbolInfo: React.FC<Props> = props => {
                       )}
                     </div>
                     <div className="tv-category-header__fundamentals tv-category-header__fundamentals--price-group">
-                      {meta?.filter(entry => !!entry.value).map(entry => (
-                        <div key={entry.key} className="tv-fundamental-block tv-category-header__fundamentals-block" title={entry.title} style={{ width: entry.width }}>
-                          <div className={`tv-fundamental-block__value ${entry.highlighted ? 'tv-fundamental-block__value--highlighted' : ''} ${entry.upperCase ? 'tv-fundamental-block__value--sentence-cased' : ''}`}>{entry.value}</div>
+                      {meta?.filter(entry => !!entry.value).map(entry => {
+                        const valueDiv = (
+                          <div className={`tv-fundamental-block__value ${entry.highlighted ? 'tv-fundamental-block__value--highlighted' : ''} ${entry.upperCase ? 'tv-fundamental-block__value--sentence-cased' : ''}`}>{String(entry.value)}</div>
+                        )
+                        const keyDiv = (
                           <div className="tv-fundamental-block__title">{entry.key}</div>
-                        </div>
-                      ))}
+                        )
+
+                        return (
+                          <div key={entry.key} className="tv-fundamental-block tv-category-header__fundamentals-block" title={entry.title} style={{ width: entry.width }}>
+                            {entry.href && (
+                              <A href={entry.href}>{valueDiv}</A>
+                            )}
+                            {!entry.href && (
+                              valueDiv
+                            )}
+                            {keyDiv}
+                          </div>
+                        )
+                      })}
                     </div>
                   </div>
                 </div>
               </div>
               <div className="tv-category-header__fundamentals">
-                {meta?.filter(entry => !!entry.value).map(entry => (
-                  <div key={entry.key} className="tv-fundamental-block tv-category-header__fundamentals-block" style={{ width: entry.width }}>
-                    <div className={`tv-fundamental-block__value ${entry.highlighted ? 'tv-fundamental-block__value--highlighted' : ''} ${entry.upperCase ? 'tv-fundamental-block__value--sentence-cased' : ''}`}>{entry.value}</div>
+                {meta?.filter(entry => !!entry.value).map(entry => {
+                  const valueDiv = (
+                    <div className={`tv-fundamental-block__value ${entry.highlighted ? 'tv-fundamental-block__value--highlighted' : ''} ${entry.upperCase ? 'tv-fundamental-block__value--sentence-cased' : ''}`}>{String(entry.value)}</div>
+                  )
+                  const keyDiv = (
                     <div className="tv-fundamental-block__title">{entry.key}</div>
-                  </div>
-                ))}
+                  )
+
+                  return (
+                    <div key={entry.key} className="tv-fundamental-block tv-category-header__fundamentals-block" style={{ width: entry.width }}>
+                      {entry.href && (
+                        <A href={entry.href}>{valueDiv}</A>
+                      )}
+                      {!entry.href && (
+                        valueDiv
+                      )}
+                      {keyDiv}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           </div>
