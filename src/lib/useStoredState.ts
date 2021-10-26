@@ -1,54 +1,57 @@
 import { Dispatch, SetStateAction, useMemo, useState } from 'react'
 
-function useStoredState<S = undefined>(key: string): [S | undefined, Dispatch<SetStateAction<S | undefined>>]
-function useStoredState<S>(key: string, initialState: S | (() => S)): [S, Dispatch<SetStateAction<S>>]
-function useStoredState<S>(key: string, initialState?: S | (() => S)): [S, Dispatch<SetStateAction<S>>] {
-  const [state, setState] = useState<S>(() => {
-    const storedStateJson = localStorage.getItem(key)
-    const storedState = storedStateJson && JSON.parse(storedStateJson)
+export const createUseStoredState = (useStateX: typeof useState) => {
+  function useStoredState<S = undefined>(key: string): [S | undefined, Dispatch<SetStateAction<S | undefined>>]
+  function useStoredState<S>(key: string, initialState: S | (() => S)): [S, Dispatch<SetStateAction<S>>]
+  function useStoredState<S>(key: string, initialState?: S | (() => S)): [S, Dispatch<SetStateAction<S>>] {
+    const [state, setState] = useStateX<S>(() => {
+      const storedStateJson = localStorage.getItem(key)
+      const storedState = storedStateJson && JSON.parse(storedStateJson)
 
-    if (storedState) {
-      return storedState
-    }
+      if (storedState) {
+        return storedState
+      }
 
-    if (initialState === undefined) {
-      return undefined
-    }
+      if (initialState === undefined) {
+        return undefined
+      }
 
-    if (typeof initialState === 'function') {
-      return (initialState as (() => S))()
-    } else {
-      return initialState
-    }
-  })
+      if (typeof initialState === 'function') {
+        return (initialState as (() => S))()
+      } else {
+        return initialState
+      }
+    })
 
-  const setStateAndStore = useMemo<Dispatch<SetStateAction<S>>>(() => {
-    return (setStateAction: any) => {
-      if (typeof setStateAction === 'function') {
-        setState(prevState => {
-          const nextState = setStateAction(prevState)
-
-          if (nextState) {
-            localStorage.setItem(key, JSON.stringify(nextState))
+    const setStateAndStore = useMemo<Dispatch<SetStateAction<S>>>(() => {
+      return (setStateAction: any) => {
+        const storeState = (state: any) => {
+          if (state) {
+            localStorage.setItem(key, JSON.stringify(state))
           } else {
             localStorage.removeItem(key)
           }
-
-          return nextState
-        })
-      } else {
-        if (setStateAction) {
-          localStorage.setItem(key, JSON.stringify(setStateAction))
-        } else {
-          localStorage.removeItem(key)
         }
 
-        setState(setStateAction)
+        if (typeof setStateAction === 'function') {
+          setState(prevState => {
+            const nextState = setStateAction(prevState)
+            storeState(nextState)
+            return nextState
+          })
+        } else {
+          storeState(setStateAction)
+          setState(setStateAction)
+        }
       }
-    }
-  }, [key, setState])
+    }, [key, setState])
 
-  return [state, setStateAndStore]
+    return [state, setStateAndStore]
+  }
+
+  return useStoredState
 }
+
+const useStoredState = createUseStoredState(useState)
 
 export default useStoredState

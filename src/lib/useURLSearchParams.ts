@@ -1,12 +1,16 @@
 import { useMemo } from 'react'
 
-export const parseURLSearchParams = (queryString = '') => {
-  const object = {} as Record<string, string | number | boolean | undefined>
+export type QueryRecord = Record<string, string | number | boolean | undefined>
+
+export const parseURLSearchParams = <T = QueryRecord>(queryString = '') => {
+  const object = {} as T
   const query = new URLSearchParams(queryString)
 
   for (const [key, valueAsString] of query.entries()) {
     const value = (() => {
-      if (valueAsString === 'true') {
+      if (valueAsString === '') {
+        return ''
+      } else if (valueAsString === 'true') {
         return true
       } else if (valueAsString === 'false') {
         return false
@@ -17,15 +21,15 @@ export const parseURLSearchParams = (queryString = '') => {
       }
     })()
 
-    object[key] = value
+    ; (object as any)[key] = value
   }
 
   return object
 }
 
-const useURLSearchParams = (queryString = '') => {
+const useURLSearchParams = <T = QueryRecord>(queryString = '') => {
   return useMemo(() => {
-    return parseURLSearchParams(queryString)
+    return parseURLSearchParams<T>(queryString)
   }, [queryString])
 }
 

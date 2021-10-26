@@ -23,7 +23,7 @@ import readFile from '../../lib/readFile'
 import { FetchContext } from '../../lib/useFetch'
 import useIntersectionObserver from '../../lib/useIntersectionObserver'
 import useQueue, { QueueContext } from '../../lib/useQueue'
-import useURLSearchParams from '../../lib/useURLSearchParam'
+import useURLSearchParams from '../../lib/useURLSearchParams'
 import useAuthorization from '../../store/useAuthorization'
 import './BlogGalleryView.css'
 

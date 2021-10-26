@@ -15,7 +15,7 @@ import { graphql } from '../../lib/graphql'
 import { Mutation, Query, TriviaCategory } from '../../assets/schema.gql'
 import useMutation from '../../lib/graphql/useMutation'
 import useQuery from '../../lib/graphql/useQuery'
-import { parseURLSearchParams } from '../../lib/useURLSearchParam'
+import { parseURLSearchParams } from '../../lib/useURLSearchParams'
 import QueryStringSubtitle from '../../lib/QueryStringSubtitle'
 import useAuthorization from '../../store/useAuthorization'
 
