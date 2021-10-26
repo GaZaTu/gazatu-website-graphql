@@ -312,6 +312,8 @@ const ChartView: React.FC = props => {
         series.update(currentBar)
       }
 
+      chart.current?.timeScale().fitContent()
+
       effect.subscriptions.push(
         socket.ticker(instrument).subscribe(data => {
           if (effect.cancelled) {
