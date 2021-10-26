@@ -8,6 +8,7 @@ import Content from '../../lib/bulma/Content'
 import Icon from '../../lib/bulma/Icon'
 import Modal from '../../lib/bulma/Modal'
 import Section from '../../lib/bulma/Section'
+import Tag from '../../lib/bulma/Tag'
 import { H1, Span } from '../../lib/bulma/Text'
 import { Subscription, TraderepublicHomeInstrumentExchangeData, TraderepublicInstrumentData, TraderepublicStockDetailsData, TraderepublicWebsocket } from '../../lib/traderepublic'
 import useStoredState from '../../lib/useStoredState'
@@ -137,6 +138,8 @@ const ChartView: React.FC = props => {
   const [search, setSearch] = useURLSearchParamsState({
     isin: '',
   })
+
+  const [timeRange, setTimeRange] = useStoredState('CHART_TIME_RANGE', '1d' as '1d' | '5d' | '1m' | '1y')
 
   const [instrument, setInstrument] = useState<TraderepublicInstrumentData>()
   const [exchange, setExchange] = useState<TraderepublicHomeInstrumentExchangeData>()
@@ -377,7 +380,7 @@ const ChartView: React.FC = props => {
       const mapUnixToUTC = (time: number) =>
         Math.floor(time / 1000) + (60 * 60 * timezoneOffset) as any
 
-      const history = await socket.aggregateHistory(instrument, '1d')
+      const history = await socket.aggregateHistory(instrument, timeRange)
 
       if (effect.cancelled) {
         return
@@ -396,6 +399,17 @@ const ChartView: React.FC = props => {
 
         series.update(currentBar)
       }
+
+      const barTimeToLive = (() => {
+        if (history.aggregates.length < 2) {
+          return 10 * 60 // 10 minutes
+        }
+
+        const [{ time: time0 }, { time: time1 }] = history.aggregates
+        const difference = (time1 - time0) / 1000
+
+        return difference
+      })()
 
       chart.current?.timeScale().fitContent()
 
@@ -423,7 +437,7 @@ const ChartView: React.FC = props => {
             }))
           }
 
-          if ((utcTimestamp - (currentBar.time as any)) >= (60 * 10)) {
+          if ((utcTimestamp - (currentBar.time as any)) >= barTimeToLive) {
             currentBar = {
               ...currentBar,
               close: data.last.price,
@@ -475,7 +489,7 @@ const ChartView: React.FC = props => {
       effect.cancelled = true
       effect.subscriptions.forEach(s => s.unsubscribe())
     }
-  }, [search.isin])
+  }, [search.isin, timeRange])
 
   const { showModal } = useContext(Modal.Portal)
   const handleSearch = async () => {
@@ -556,6 +570,13 @@ const ChartView: React.FC = props => {
                 />
 
                 <div ref={chartContainer} />
+
+                <Tag.Group style={{ background: '#1e222d', paddingLeft: '0.5rem' }}>
+                  <Tag as="a" onClick={() => setTimeRange('1d')} color={timeRange === '1d' ? 'primary' : undefined}>1d</Tag>
+                  <Tag as="a" onClick={() => setTimeRange('5d')} color={timeRange === '5d' ? 'primary' : undefined}>5d</Tag>
+                  <Tag as="a" onClick={() => setTimeRange('1m')} color={timeRange === '1m' ? 'primary' : undefined}>1m</Tag>
+                  <Tag as="a" onClick={() => setTimeRange('1y')} color={timeRange === '1y' ? 'primary' : undefined}>1y</Tag>
+                </Tag.Group>
               </Column>
 
               <Column>
