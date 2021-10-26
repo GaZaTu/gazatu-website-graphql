@@ -516,7 +516,7 @@ const ChartView: React.FC = props => {
         <Content>
 
 
-          <Div className="is-unpadded">
+          <Div className="is-unpadded" style={{ boxShadow: '-10px 0px 13px -7px #161616, 10px 0px 13px -7px #161616, 5px 5px 15px 5px rgb(0 0 0 / 0%)' }}>
             <Column.Row gapless>
               <Column width={3 / 4}>
                 <Div style={{ background: '#1e222d', padding: '1rem 0 0 1rem' }}>
