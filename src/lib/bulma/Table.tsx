@@ -119,12 +119,17 @@ type Props = HTMLProps<'div'> & {
   filter?: boolean
   hasStickyToolbars?: boolean
   canSelectRows?: boolean
+  canClickRows?: boolean
+  canSortColumns?: boolean
   canHideColumns?: boolean
   loading?: boolean
   storeStateInQuery?: boolean
   manual?: boolean
 
   onSelectedRowsChange?: (rows: TableInstance['rows']) => void
+  onRowClick?: (row: TableInstance['rows'][number]) => void
+
+  onFilterChange?: (filter: string) => void
 
   bordered?: boolean
   striped?: boolean
@@ -147,17 +152,22 @@ const Table: React.FC<Props> = props => {
     filter = true,
     hasStickyToolbars = true,
     canSelectRows = true,
+    canClickRows = false,
+    canSortColumns = true,
     canHideColumns = true,
     loading,
     storeStateInQuery,
     manual,
 
     onSelectedRowsChange,
+    onRowClick,
+
+    onFilterChange,
 
     bordered,
     striped,
     narrow,
-    hoverable,
+    hoverable = canClickRows,
     fullwidth,
     innerRef,
     ...nativeProps
@@ -260,6 +270,14 @@ const Table: React.FC<Props> = props => {
     history.replace(queryString)
   }, [storeStateInQuery, history, globalFilter, pageSize, pageIndex, sortBy, queryInitialState.unusedQueryString])
 
+  useEffect(() => {
+    if (!onFilterChange) {
+      return
+    }
+
+    onFilterChange(globalFilter)
+  }, [globalFilter, onFilterChange])
+
   const handleGlobalFilterChange = useMemo(() => {
     return debounce(e => {
       setGlobalFilter(e.target.value)
@@ -349,14 +367,21 @@ const Table: React.FC<Props> = props => {
                 )}
                 {headerGroup.headers.map(column => (
                   <th {...column.getHeaderProps()} style={getCellStyle(column)}>
-                    <Button color="link" kind="inverted" {...column.getSortByToggleProps()} labelized={!column.canSort || groupIndex !== headerGroups.length - 1}>
+                    {canSortColumns && (
+                      <Button color="link" kind="inverted" {...column.getSortByToggleProps()} labelized={!column.canSort || groupIndex !== headerGroups.length - 1}>
+                        <span>
+                          {column.render('Header')}
+                        </span>
+                        {column.isSorted && (
+                          <Icon icon={column.isSortedDesc ? tableIcons.faCaretDown : tableIcons.faCaretUp} />
+                        )}
+                      </Button>
+                    )}
+                    {!canSortColumns && (
                       <span>
                         {column.render('Header')}
                       </span>
-                      {column.isSorted && (
-                        <Icon icon={column.isSortedDesc ? tableIcons.faCaretDown : tableIcons.faCaretUp} />
-                      )}
-                    </Button>
+                    )}
                   </th>
                 ))}
               </tr>
@@ -367,7 +392,16 @@ const Table: React.FC<Props> = props => {
               prepareRow(row)
 
               return (
-                <tr {...row.getRowProps()}>
+                <tr {...row.getRowProps(p => {
+                  return {
+                    ...p,
+                    onClick: onRowClick && (() => onRowClick(row)),
+                    style: {
+                      ...p.style,
+                      cursor: onRowClick && 'pointer',
+                    },
+                  }
+                })}>
                   {canSelectRows && (
                     <td className="table-select-column">
                       <Input {...row.getToggleRowSelectedProps()} type="checkbox" indeterminate="false" />

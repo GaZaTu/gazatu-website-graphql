@@ -70,6 +70,10 @@ function getButtonClassName<P extends (SharedProps & { children?: React.ReactNod
     if (i === 0 && childMatches(child, [Icon], {})) {
       circular = true
     }
+
+    if (i !== 0) {
+      circular = false
+    }
   })
 
   const className = classNames(nativeProps.className, {

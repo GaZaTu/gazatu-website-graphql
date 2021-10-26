@@ -202,7 +202,7 @@ const Modal: React.FC<Props> = props => {
   return (
     <div {...nativeProps} ref={innerRef} className={className}>
       <div className="modal-background" onClick={onClose} />
-      { card && (
+      {card && (
         <div className="modal-card">
           {children}
         </div>
