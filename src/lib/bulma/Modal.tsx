@@ -99,12 +99,15 @@ const Provider: React.FC<{}> = props => {
   )
 }
 
-type HeadProps = HTMLProps<'header'> & {}
+type HeadProps = HTMLProps<'header'> & {
+  onClose?: () => void
+}
 
 const Head: React.FC<HeadProps> = props => {
   const {
     children,
     innerRef,
+    onClose,
     ...nativeProps
   } = props
 
@@ -115,18 +118,22 @@ const Head: React.FC<HeadProps> = props => {
   return (
     <header {...nativeProps} ref={innerRef} className={className}>
       <p className="modal-card-title">{children}</p>
-      {/* <Button cross /> */}
+      {onClose && (
+        <Button onClick={onClose} cross />
+      )}
     </header>
   )
 }
 
 type BodyProps = HTMLProps<'section'> & {
   head?: string
+  onClose?: () => void
 }
 
 const Body: React.FC<BodyProps> = props => {
   const {
     head: _head,
+    onClose,
     children,
     innerRef,
     ...nativeProps
@@ -144,7 +151,7 @@ const Body: React.FC<BodyProps> = props => {
 
   if (_head) {
     const head = (
-      <Head>{_head}</Head>
+      <Head onClose={onClose}>{_head}</Head>
     )
 
     return (

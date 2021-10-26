@@ -40,6 +40,7 @@ type SymbolSearchModalProps = {
   initialSearch?: string
   initialFilter?: 'stock' | 'fund' | 'derivative' | 'crypto'
   resolve: (isin: string) => void
+  reject: () => void
 }
 
 const SymbolSearchModal: React.FC<SymbolSearchModalProps> = props => {
@@ -47,6 +48,7 @@ const SymbolSearchModal: React.FC<SymbolSearchModalProps> = props => {
     initialSearch,
     initialFilter,
     resolve,
+    reject,
   } = props
 
   const [search, setSearch] = useState(initialSearch ?? '')
@@ -96,7 +98,7 @@ const SymbolSearchModal: React.FC<SymbolSearchModalProps> = props => {
   }, [search, filter])
 
   return (
-    <Modal.Body head="Symbol-Search">
+    <Modal.Body head="Symbol-Search" onClose={reject}>
       <SymbolSearch
         search={search}
         onSearchChange={setSearch}
@@ -477,8 +479,8 @@ const ChartView: React.FC = props => {
 
   const { showModal } = useContext(Modal.Portal)
   const handleSearch = async () => {
-    const [modal, resolve] = showModal<string>(
-      <SymbolSearchModal resolve={isin => resolve(isin)} />
+    const [modal, resolve, reject] = showModal<string>(
+      <SymbolSearchModal resolve={isin => resolve(isin)} reject={() => reject()} />
     )
 
     const isin = await modal
