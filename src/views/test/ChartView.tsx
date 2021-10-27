@@ -139,7 +139,7 @@ const ChartView: React.FC = props => {
     isin: '',
   })
 
-  const [timeRange, setTimeRange] = useStoredState('CHART_TIME_RANGE', '1d' as '1d' | '5d' | '1m' | '1y')
+  const [timeRange, setTimeRange] = useStoredState('CHART_TIME_RANGE', '1d' as '30s' | '60s' | '1d' | '5d' | '1m' | '1y')
 
   const [instrument, setInstrument] = useState<TraderepublicInstrumentData>()
   const [exchange, setExchange] = useState<TraderepublicHomeInstrumentExchangeData>()
@@ -380,36 +380,38 @@ const ChartView: React.FC = props => {
       const mapUnixToUTC = (time: number) =>
         Math.floor(time / 1000) + (60 * 60 * timezoneOffset) as any
 
-      const history = await socket.aggregateHistory(instrument, timeRange)
+      let barTimeToLive = 10 * 60
 
-      if (effect.cancelled) {
-        return
-      }
+      if (timeRange === '30s') {
+        barTimeToLive = 30
+      } else if (timeRange === '60s') {
+        barTimeToLive = 60
+      } else {
+        const history = await socket.aggregateHistory(instrument, timeRange)
 
-      for (const aggregate of history.aggregates) {
-        let utcTimestamp = mapUnixToUTC(aggregate.time)
-
-        currentBar = {
-          time: utcTimestamp,
-          open: aggregate.open,
-          close: aggregate.close,
-          low: aggregate.low,
-          high: aggregate.high,
+        if (effect.cancelled) {
+          return
         }
 
-        series.update(currentBar)
-      }
+        for (const aggregate of history.aggregates) {
+          let utcTimestamp = mapUnixToUTC(aggregate.time)
 
-      const barTimeToLive = (() => {
-        if (history.aggregates.length < 2) {
-          return 10 * 60 // 10 minutes
+          currentBar = {
+            time: utcTimestamp,
+            open: aggregate.open,
+            close: aggregate.close,
+            low: aggregate.low,
+            high: aggregate.high,
+          }
+
+          series.update(currentBar)
         }
 
         const [{ time: time0 }, { time: time1 }] = history.aggregates
         const difference = (time1 - time0) / 1000
 
-        return difference
-      })()
+        barTimeToLive = difference
+      }
 
       chart.current?.timeScale().fitContent()
 
@@ -514,8 +516,6 @@ const ChartView: React.FC = props => {
         <H1 kind="title">Trading-Chart</H1>
 
         <Content>
-
-
           <Div className="is-unpadded" style={{ boxShadow: '-10px 0px 13px -7px #161616, 10px 0px 13px -7px #161616, 5px 5px 15px 5px rgb(0 0 0 / 0%)' }}>
             <Column.Row gapless>
               <Column width={3 / 4}>
@@ -576,12 +576,30 @@ const ChartView: React.FC = props => {
                 <div ref={chartContainer} />
 
                 <Div style={{ background: '#1e222d', padding: '0.5rem' }}>
-                  <Tag.Group>
-                    <Tag as="a" onClick={() => setTimeRange('1d')} style={{ background: timeRange === '1d' ? '#3179f52e' : undefined }}>1d</Tag>
-                    <Tag as="a" onClick={() => setTimeRange('5d')} style={{ background: timeRange === '5d' ? '#3179f52e' : undefined }}>5d</Tag>
-                    <Tag as="a" onClick={() => setTimeRange('1m')} style={{ background: timeRange === '1m' ? '#3179f52e' : undefined }}>1m</Tag>
-                    <Tag as="a" onClick={() => setTimeRange('1y')} style={{ background: timeRange === '1y' ? '#3179f52e' : undefined }}>1y</Tag>
-                  </Tag.Group>
+                  {(() => {
+                    const tag = (t: typeof timeRange) => ({
+                      as: 'a',
+                      onClick: () => setTimeRange(t),
+                      style: {
+                        background: timeRange === t ? '#3179f52e' : undefined,
+                      },
+                      children: t,
+                    } as const)
+
+                    return (
+                      <Tag.Group>
+                        <Tag {...tag('30s')} />
+                        <Tag {...tag('60s')} />
+
+                        <Tag style={{ background: 'transparent' }}>|</Tag>
+
+                        <Tag {...tag('1d')} />
+                        <Tag {...tag('5d')} />
+                        <Tag {...tag('1m')} />
+                        <Tag {...tag('1y')} />
+                      </Tag.Group>
+                    )
+                  })()}
                 </Div>
               </Column>
 
