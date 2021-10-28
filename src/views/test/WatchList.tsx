@@ -86,7 +86,7 @@ const Ticker: React.FC<TickerProps> = props => {
             <div className="tv-widget-watch-list__last">{numberUnsignedFormat.format(value)}</div>
           </div>
         )}
-        <div className={`tv-widget-watch-list__change ${valueChange ? (valueChange >= 0 ? 'up' : 'down') : ''}`} style={{ width: '69px' }}>
+        <div className={`tv-widget-watch-list__change ${valueChange ? (valueChange >= 0 ? 'up' : 'down') : ''}`} style={{ width: '80px' }}>
           {!!valueChangePercentage && (
             <span className="tv-widget-watch-list__change-inline">{numberSignedFormat.format(valueChangePercentage)}%</span>
           )}

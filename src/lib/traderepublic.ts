@@ -3,7 +3,7 @@ export interface Subscription {
 }
 
 export interface Observable<T> {
-  subscribe(next: (value: T) => unknown): Subscription
+  subscribe(onValue: (value: T) => unknown, onError?: (error: unknown) => unknown): Subscription
 
   toPromise(): Promise<T>
 }
@@ -233,7 +233,7 @@ export type TraderepublicAggregateHistoryLightSub = {
   type: 'aggregateHistoryLight'
   id: string
   exchange: string
-  range: `${number}${'d' | 'w' | 'm' | 'y'}`
+  range: '1d' | '5d' | '1m' | '3m' | '1y' | 'max'
 }
 
 export type TraderepublicAggregateHistoryLightData = {
@@ -293,7 +293,7 @@ export class TraderepublicWebsocket {
     clientVersion: '5582',
   } as const
 
-  private _subscriptions = new Map<number, { sub: any, cb: (payload: any) => void }>()
+  private _subscriptions = new Map<number, { sub: any, onValue: (payload: any) => void, onError?: (error: unknown) => unknown }>()
   private _counter = 24
   private _socket = undefined as undefined | WebSocket
   private _echo = 0 as any
@@ -321,7 +321,7 @@ export class TraderepublicWebsocket {
   private _sub(sub: TraderepublicNeonSearchSub): Observable<TraderepublicNeonSearchData>
   private _sub(sub: TraderepublicInstrumentSub | TraderepublicStockDetailsSub | TraderepublicHomeInstrumentExchangeSub | TraderepublicTickerSub | TraderepublicAggregateHistoryLightSub | TraderepublicNeonSearchSub): Observable<TraderepublicInstrumentData | TraderepublicStockDetailsData | TraderepublicHomeInstrumentExchangeData | TraderepublicTickerData | TraderepublicAggregateHistoryLightData | TraderepublicNeonSearchData> {
     return {
-      subscribe: (next: (data: any) => unknown) => {
+      subscribe: (onValue: (data: any) => unknown, onError?: (error: unknown) => unknown) => {
         if (sub.type === 'ticker' || sub.type === 'aggregateHistoryLight') {
           sub.id = `${sub.id}.${sub.exchange}`
         }
@@ -330,9 +330,8 @@ export class TraderepublicWebsocket {
 
         this._subscriptions.set(number, {
           sub,
-          cb: payload => {
-            next(payload)
-          },
+          onValue,
+          onError,
         })
 
         this.connect()
@@ -349,11 +348,11 @@ export class TraderepublicWebsocket {
         }
       },
       toPromise() {
-        return new Promise<any>(resolve => {
+        return new Promise<any>((resolve, reject) => {
           const sub = this.subscribe(value => {
             sub.unsubscribe()
             resolve(value)
-          })
+          }, reject)
         })
       },
     }
@@ -503,15 +502,21 @@ export class TraderepublicWebsocket {
           if (messageString === 'connected') {
             resolve()
           } else {
-            const regex = /(\d+) A ?(.*)/
+            const regex = /(\d+) (A|E) ?(.*)/
             const match = regex.exec(messageString)
 
             if (match) {
-              const [, number, payload] = match
-
+              const [, number, messageType, payload] = match
               const subscription = this._subscriptions.get(Number(number))
+
               if (subscription) {
-                subscription.cb(JSON.parse(payload))
+                const parsedPayload = JSON.parse(payload)
+
+                if (messageType === 'A') {
+                  subscription.onValue(parsedPayload)
+                } else {
+                  subscription.onError?.(parsedPayload)
+                }
               }
             }
           }
@@ -553,7 +558,7 @@ export class TraderepublicWebsocket {
 
     if (process.env.NODE_ENV !== 'production' && !!globalThis.window) {
       (window as any).trwsSub = (sub: any) =>
-        this._sub(sub).subscribe(console.log)
+        this._sub(sub).subscribe(console.log, console.error)
     }
   }
 

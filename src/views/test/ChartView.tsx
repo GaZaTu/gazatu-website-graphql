@@ -1,16 +1,19 @@
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faBookmark, faSearch } from '@fortawesome/free-solid-svg-icons'
 import { BarData, ColorType, createChart, IChartApi, IPriceLine, LineStyle } from 'lightweight-charts'
-import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import Button from '../../lib/bulma/Button'
 import Column from '../../lib/bulma/Column'
 import Container from '../../lib/bulma/Container'
 import Content from '../../lib/bulma/Content'
+import Divider from '../../lib/bulma/Divider'
 import Icon from '../../lib/bulma/Icon'
+import Level from '../../lib/bulma/Level'
 import Modal from '../../lib/bulma/Modal'
+import Notification from '../../lib/bulma/Notification'
 import Section from '../../lib/bulma/Section'
 import Tag from '../../lib/bulma/Tag'
 import { Div, H1, Span } from '../../lib/bulma/Text'
-import { Subscription, TraderepublicHomeInstrumentExchangeData, TraderepublicInstrumentData, TraderepublicStockDetailsData, TraderepublicWebsocket } from '../../lib/traderepublic'
+import { Subscription, TraderepublicAggregateHistoryLightData, TraderepublicAggregateHistoryLightSub, TraderepublicHomeInstrumentExchangeData, TraderepublicInstrumentData, TraderepublicStockDetailsData, TraderepublicWebsocket } from '../../lib/traderepublic'
 import useStoredState from '../../lib/useStoredState'
 import useURLSearchParamsState from '../../lib/useURLSearchParamsState'
 import './ChartView.css'
@@ -35,9 +38,8 @@ const numberCompactFormat = new Intl.NumberFormat(undefined, {
   notation: 'compact',
 })
 
-const socket = new TraderepublicWebsocket('DE')
-
 type SymbolSearchModalProps = {
+  socket: TraderepublicWebsocket
   initialSearch?: string
   initialFilter?: 'stock' | 'fund' | 'derivative' | 'crypto'
   resolve: (isin: string) => void
@@ -46,6 +48,7 @@ type SymbolSearchModalProps = {
 
 const SymbolSearchModal: React.FC<SymbolSearchModalProps> = props => {
   const {
+    socket,
     initialSearch,
     initialFilter,
     resolve,
@@ -96,7 +99,7 @@ const SymbolSearchModal: React.FC<SymbolSearchModalProps> = props => {
       setSymbols([])
       setLoading(false)
     }
-  }, [search, filter])
+  }, [socket, search, filter])
 
   return (
     <Modal.Body head="Symbol-Search" onClose={reject}>
@@ -139,7 +142,11 @@ const ChartView: React.FC = props => {
     isin: '',
   })
 
-  const [timeRange, setTimeRange] = useStoredState('CHART_TIME_RANGE', '1d' as '30s' | '60s' | '1d' | '5d' | '1m' | '1y')
+  const {
+    pushError,
+  } = useContext(Notification.Portal)
+
+  const [timeRange, setTimeRange] = useStoredState('CHART_TIME_RANGE', '1d' as '30s' | '60s' | TraderepublicAggregateHistoryLightSub['range'])
 
   const [instrument, setInstrument] = useState<TraderepublicInstrumentData>()
   const [exchange, setExchange] = useState<TraderepublicHomeInstrumentExchangeData>()
@@ -149,63 +156,51 @@ const ChartView: React.FC = props => {
     previous: 0,
   })
 
-  const [recentISINs, setRecentISINs] = useStoredState('CHART_MRU', [] as { isin: string, rank: number }[])
+  const intradayHistory = useRef({
+    30: {} as { [isin: string]: TraderepublicAggregateHistoryLightData['aggregates'] | undefined },
+    60: {} as { [isin: string]: TraderepublicAggregateHistoryLightData['aggregates'] | undefined },
+  })
+
+  const socket = useMemo(() => new TraderepublicWebsocket('DE'), [])
   useEffect(() => {
-    if (!instrument?.isin) {
-      return
+    ; (async () => {
+      try {
+        await socket.connect()
+      } catch (error) {
+        pushError(error)
+      }
+    })()
+
+    return () => {
+      socket.close()
     }
+  }, [socket, pushError])
 
-    const MRU_SIZE = 10
+  const [watchList, setWatchList] = useStoredState('CHART_WATCH_LIST', [] as string[])
 
-    setRecentISINs(recentISINs => {
-      const current = recentISINs
-        .find(({ isin }) => isin === instrument.isin)
+  type WatchedInstrument = {
+    isin: string
+    data: typeof instrument
+    exchange: typeof exchange
+    details: typeof details
+    value: typeof value
+  }
 
-      if (current?.rank === MRU_SIZE) {
-        return recentISINs
-      }
-
-      let highestRank = 0
-      let lowestRank = 0
-      for (const { rank } of recentISINs) {
-        highestRank = Math.max(highestRank, rank)
-        lowestRank = Math.min(lowestRank, rank)
-      }
-
-      recentISINs = recentISINs
-        .map(({ isin, rank }) => ({
-          isin,
-          rank: isin === instrument.isin ? highestRank + 1 : rank - 1,
-        }))
-
-      if (recentISINs.length >= MRU_SIZE) {
-        const isinToRemoveIdx = recentISINs
-          .findIndex(({ rank }) => rank === lowestRank)
-
-        recentISINs.splice(isinToRemoveIdx, 1)
-      }
-
-      if (!current) {
-        recentISINs.unshift({
-          isin: instrument.isin,
-          rank: MRU_SIZE,
-        })
-      }
-
-      return recentISINs
-    })
-  }, [instrument?.isin, setRecentISINs])
-
-  const [recentInstruments, setRecentInstruments] = useState([] as { isin: string, data: typeof instrument, exchange: typeof exchange, details: typeof details, value: typeof value }[])
+  const [watchedInstruments, setWatchedInstruments] = useState([] as WatchedInstrument[])
   useLayoutEffect(() => {
     const effect = {
       cancelled: false,
       subscriptions: [] as Subscription[],
     }
 
+    for (const [key, history] of Object.entries(intradayHistory.current)) {
+      (intradayHistory.current as any)[key] = watchList
+        .reduce((o, isin) => { o[isin] = history[isin] ?? []; return o; }, {} as { [key: string]: any })
+    }
+
     ; (async () => {
-      setRecentInstruments(r => {
-        return recentISINs.map(({ isin }) => {
+      setWatchedInstruments(r => {
+        return watchList.map(isin => {
           const current = r.find(i => i.isin === isin)
 
           return {
@@ -217,12 +212,13 @@ const ChartView: React.FC = props => {
               current: 0,
               previous: 0,
             },
+            history: [],
             ...current,
           }
         })
       })
 
-      for (const { isin } of recentISINs) {
+      for (const isin of watchList) {
         const instrument = await socket.instrument(isin).toPromise()
         const exchange = await socket.exchange(instrument).toPromise()
         const details = await socket.details(instrument)
@@ -231,7 +227,7 @@ const ChartView: React.FC = props => {
           return
         }
 
-        setRecentInstruments(r => r.map(i => {
+        setWatchedInstruments(r => r.map(i => {
           if (i.isin !== isin) {
             return i
           }
@@ -250,9 +246,45 @@ const ChartView: React.FC = props => {
               return
             }
 
-            setRecentInstruments(r => r.map(i => {
+            setWatchedInstruments(r => r.map(i => {
               if (i.isin !== isin) {
                 return i
+              }
+
+              for (const [key, history] of Object.entries(intradayHistory.current)) {
+                const barTimeToLive = Number(key)
+                const currentHistory = history[i.isin]
+                if (!currentHistory) {
+                  continue
+                }
+
+                const currentBar = currentHistory[currentHistory.length - 1]
+
+                if ((data.bid.time - (currentBar?.time ?? 0)) >= (barTimeToLive * 1000)) {
+                  if (currentBar) {
+                    currentHistory[currentHistory.length - 1] = {
+                      ...currentBar,
+                      close: data.last.price,
+                    }
+                  }
+
+                  currentHistory.push({
+                    time: data.bid.time,
+                    open: data.bid.price,
+                    high: data.bid.price,
+                    low: data.bid.price,
+                    close: data.bid.price,
+                    volume: 0,
+                    adjValue: 0,
+                  })
+                } else {
+                  currentHistory[currentHistory.length - 1] = {
+                    ...currentBar,
+                    close: data.bid.price,
+                    low: Math.min(currentBar.low, data.bid.price),
+                    high: Math.max(currentBar.high, data.bid.price),
+                  }
+                }
               }
 
               return {
@@ -272,14 +304,7 @@ const ChartView: React.FC = props => {
       effect.cancelled = true
       effect.subscriptions.forEach(s => s.unsubscribe())
     }
-  }, [recentISINs])
-
-  // const currencyFormat = useMemo(() => {
-  //   return new Intl.NumberFormat(undefined, {
-  //     style: exchange?.currency?.id && 'currency',
-  //     currency: exchange?.currency?.id,
-  //   })
-  // }, [exchange?.currency?.id])
+  }, [socket, watchList, timeRange])
 
   const chartContainer = useRef<HTMLDivElement | null>(null)
   const chart = useRef<IChartApi | null>(null)
@@ -292,7 +317,6 @@ const ChartView: React.FC = props => {
 
     if (!chart.current) {
       chart.current = createChart(chartContainer.current!, {
-        // width: 600,
         height: 450,
         layout: {
           background: {
@@ -382,11 +406,7 @@ const ChartView: React.FC = props => {
 
       let barTimeToLive = 10 * 60
 
-      if (timeRange === '30s') {
-        barTimeToLive = 30
-      } else if (timeRange === '60s') {
-        barTimeToLive = 60
-      } else {
+      if (timeRange !== '30s' && timeRange !== '60s') {
         const history = await socket.aggregateHistory(instrument, timeRange)
 
         if (effect.cancelled) {
@@ -411,6 +431,29 @@ const ChartView: React.FC = props => {
         const difference = (time1 - time0) / 1000
 
         barTimeToLive = difference
+      } else {
+        if (timeRange === '30s') {
+          barTimeToLive = 30 as const
+        } else if (timeRange === '60s') {
+          barTimeToLive = 60 as const
+        }
+
+        const history = intradayHistory.current[barTimeToLive as 30 | 60]
+        const currentHistory = history[instrument.isin] ?? []
+
+        for (const aggregate of currentHistory) {
+          let utcTimestamp = mapUnixToUTC(aggregate.time)
+
+          currentBar = {
+            time: utcTimestamp,
+            open: aggregate.open,
+            close: aggregate.close,
+            low: aggregate.low,
+            high: aggregate.high,
+          }
+
+          series.update(currentBar)
+        }
       }
 
       chart.current?.timeScale().fitContent()
@@ -491,39 +534,81 @@ const ChartView: React.FC = props => {
       effect.cancelled = true
       effect.subscriptions.forEach(s => s.unsubscribe())
     }
-  }, [search.isin, timeRange])
+  }, [socket, search.isin, timeRange])
 
   const { showModal } = useContext(Modal.Portal)
-  const handleSearch = async () => {
-    const [modal, resolve, reject] = showModal<string>(
-      <SymbolSearchModal resolve={isin => resolve(isin)} reject={() => reject()} />
-    )
+  const handleSearch = useMemo(() => {
+    return async () => {
+      const [modal, resolve, reject] = showModal<string>(
+        <SymbolSearchModal socket={socket} resolve={isin => resolve(isin)} reject={() => reject()} />
+      )
 
-    const isin = await modal
-    if (!isin) {
-      return
+      const isin = await modal
+      if (!isin) {
+        return
+      }
+
+      setSearch(search => ({
+        ...search,
+        isin,
+      }))
     }
+  }, [socket, setSearch, showModal])
 
-    setSearch(search => ({
-      ...search,
-      isin,
-    }))
-  }
+  const toggleInstrumentInWatchList = useMemo(() => {
+    return () =>
+      setWatchList(l => {
+        if (!instrument) {
+          return l
+        }
+
+        if (l.includes(instrument.isin)) {
+          return l.filter(isin => isin !== instrument.isin)
+        } else {
+          return [instrument.isin, ...l]
+        }
+      })
+  }, [setWatchList, instrument])
+
+  // const manageInstrumentNotifications = useMemo(() => {
+  //   return async () => {
+  //     const permission = await Notification.requestPermission()
+  //     if (permission !== 'granted') {
+  //       return
+  //     }
+  //   }
+  // }, [])
 
   return (
     <Section>
       <Container>
-        <H1 kind="title">Trading-Chart</H1>
+        <H1 kind="title" caps>Trading-Chart</H1>
 
         <Content>
           <Div className="is-unpadded" style={{ boxShadow: '-10px 0px 13px -7px #161616, 10px 0px 13px -7px #161616, 5px 5px 15px 5px rgb(0 0 0 / 0%)' }}>
             <Column.Row gapless>
-              <Column width={3 / 4}>
-                <Div style={{ background: '#1e222d', padding: '1rem 0 0 1rem' }}>
-                  <Button onClick={handleSearch}>
-                    <Icon icon={faSearch} />
-                    <Span>Search Symbol...</Span>
-                  </Button>
+              <Column width={3 / 4} style={{ background: '#1e222d' }}>
+                <Div style={{ background: '#1e222d' }}>
+                  <Level style={{ padding: '1rem 1rem 0.25rem 1rem' }} mobile>
+                    <Level.Left>
+                      <Button onClick={handleSearch}>
+                        <Icon icon={faSearch} />
+                        <Span>Search Symbol...</Span>
+                      </Button>
+                    </Level.Left>
+                    <Level.Right>
+                      {/* <Level.Item>
+                        <Button onClick={manageInstrumentNotifications} disabled={!instrument}>
+                          <Icon icon={faBell} />
+                        </Button>
+                      </Level.Item> */}
+                      <Level.Item>
+                        <Button onClick={toggleInstrumentInWatchList} disabled={!instrument}>
+                          <Icon icon={faBookmark} color={watchList.includes(instrument?.isin ?? '') ? 'danger' : undefined} />
+                        </Button>
+                      </Level.Item>
+                    </Level.Right>
+                  </Level>
                 </Div>
 
                 <SymbolInfo
@@ -587,29 +672,39 @@ const ChartView: React.FC = props => {
                     } as const)
 
                     return (
-                      <Tag.Group>
-                        <Tag {...tag('30s')} />
-                        <Tag {...tag('60s')} />
+                      <Column.Row>
+                        <Column narrow>
+                          <Tag.Group>
+                            <Tag {...tag('30s')} />
+                            <Tag {...tag('60s')} />
+                          </Tag.Group>
+                        </Column>
 
-                        <Tag style={{ background: 'transparent' }}>|</Tag>
+                        <Divider vertical className="is-hidden-mobile" style={{ padding: '1rem' }} />
 
-                        <Tag {...tag('1d')} />
-                        <Tag {...tag('5d')} />
-                        <Tag {...tag('1m')} />
-                        <Tag {...tag('1y')} />
-                      </Tag.Group>
+                        <Column narrow>
+                          <Tag.Group>
+                            <Tag {...tag('1d')} />
+                            <Tag {...tag('5d')} />
+                            <Tag {...tag('1m')} />
+                            <Tag {...tag('3m')} />
+                            <Tag {...tag('1y')} />
+                            <Tag {...tag('max')} />
+                          </Tag.Group>
+                        </Column>
+                      </Column.Row>
                     )
                   })()}
                 </Div>
               </Column>
 
-              <Column>
+              <Column width={1 / 4} style={{ background: '#1e222d' }}>
                 <WatchList dark>
-                  {recentInstruments.map(i => (
+                  {watchedInstruments.map(i => (
                     <WatchList.Ticker
                       key={i.isin}
                       isin={i.isin}
-                      href={`?isin=${i.data?.isin}`}
+                      href={`?isin=${i.isin}`}
                       symbol={i.data?.intlSymbol || i.data?.homeSymbol || i.isin}
                       name={i.details?.company.name ?? i.data?.shortName}
                       open={i.exchange?.open}
