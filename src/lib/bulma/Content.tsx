@@ -4,11 +4,13 @@ import { HTMLProps } from './utils/HTMLProps'
 
 type Props = HTMLProps<'div'> & {
   size?: 'small' | 'medium' | 'large'
+  fullscreen?: boolean
 }
 
 const Content: React.FC<Props> = props => {
   const {
     size,
+    fullscreen,
     children,
     innerRef,
     ...nativeProps
@@ -17,6 +19,7 @@ const Content: React.FC<Props> = props => {
   const className = classNames(nativeProps.className, {
     'content': true,
     [`is-${size}`]: !!size,
+    'is-fullscreen': fullscreen,
   })
 
   return (

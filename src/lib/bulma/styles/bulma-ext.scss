@@ -549,3 +549,18 @@
 .navbar-end > .navbar-item.has-dropdown.has-grow-animation > .navbar-dropdown {
   animation: growDownLeft 50ms ease-in-out;
 }
+
+.content.is-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  z-index: 33;
+  overflow-y: auto;
+
+  > .is-unpadded {
+    margin: 0;
+  }
+}

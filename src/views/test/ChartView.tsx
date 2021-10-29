@@ -1,4 +1,4 @@
-import { faBookmark, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faBookmark, faCompress, faExpand, faSearch } from '@fortawesome/free-solid-svg-icons'
 import { BarData, ColorType, createChart, IChartApi, IPriceLine, LineStyle } from 'lightweight-charts'
 import React, { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import Button from '../../lib/bulma/Button'
@@ -145,6 +145,8 @@ const ChartView: React.FC = props => {
   const {
     pushError,
   } = useContext(Notification.Portal)
+
+  const [fullscreen, setFullscreen] = useState(false)
 
   const [timeRange, setTimeRange] = useStoredState('CHART_TIME_RANGE', '1d' as '30s' | '60s' | TraderepublicAggregateHistoryLightSub['range'])
 
@@ -310,6 +312,9 @@ const ChartView: React.FC = props => {
   const chart = useRef<IChartApi | null>(null)
 
   useLayoutEffect(() => {
+    const CHART_HEIGHT_DEFAULT = 450
+    const CHART_HEIGHT_FULLSCREEN = window.innerHeight - 333
+
     const effect = {
       cancelled: false,
       subscriptions: [] as Subscription[],
@@ -317,7 +322,7 @@ const ChartView: React.FC = props => {
 
     if (!chart.current) {
       chart.current = createChart(chartContainer.current!, {
-        height: 450,
+        height: CHART_HEIGHT_DEFAULT,
         layout: {
           background: {
             type: ColorType.Solid,
@@ -356,6 +361,29 @@ const ChartView: React.FC = props => {
           // timeFormatter: (time: number) => timeFormat.format(new Date(time * 1000)),
         },
       })
+    } else {
+      const { height } = chart.current.options()
+      const newHeight = (() => {
+        console.log('fullscreen', fullscreen)
+        console.log('height', height)
+
+        if (fullscreen && height === CHART_HEIGHT_DEFAULT) {
+          return CHART_HEIGHT_FULLSCREEN
+        }
+
+        if (!fullscreen && height === CHART_HEIGHT_FULLSCREEN) {
+          return CHART_HEIGHT_DEFAULT
+        }
+
+        return undefined
+      })()
+
+      if (newHeight) {
+        const containerWidth = chartContainer.current?.clientWidth ?? 0
+
+        chart.current?.applyOptions({ height: newHeight })
+        chart.current?.resize(containerWidth, newHeight)
+      }
     }
 
     const series = chart.current.addCandlestickSeries({
@@ -534,7 +562,7 @@ const ChartView: React.FC = props => {
       effect.cancelled = true
       effect.subscriptions.forEach(s => s.unsubscribe())
     }
-  }, [socket, search.isin, timeRange])
+  }, [socket, search.isin, timeRange, fullscreen])
 
   const { showModal } = useContext(Modal.Portal)
   const handleSearch = useMemo(() => {
@@ -579,12 +607,17 @@ const ChartView: React.FC = props => {
   //   }
   // }, [])
 
+  const toggleFullscreen = useMemo(() => {
+    return () =>
+      setFullscreen(f => !f)
+  }, [])
+
   return (
     <Section>
       <Container>
         <H1 kind="title" caps>Trading-Chart</H1>
 
-        <Content>
+        <Content style={{ background: '#1e222d' }} fullscreen={fullscreen}>
           <Div className="is-unpadded" style={{ boxShadow: '-10px 0px 13px -7px #161616, 10px 0px 13px -7px #161616, 5px 5px 15px 5px rgb(0 0 0 / 0%)' }}>
             <Column.Row gapless>
               <Column width={3 / 4} style={{ background: '#1e222d' }}>
@@ -597,6 +630,11 @@ const ChartView: React.FC = props => {
                       </Button>
                     </Level.Left>
                     <Level.Right>
+                      <Level.Item>
+                        <Button onClick={toggleFullscreen}>
+                          <Icon icon={fullscreen ? faCompress : faExpand} />
+                        </Button>
+                      </Level.Item>
                       {/* <Level.Item>
                         <Button onClick={manageInstrumentNotifications} disabled={!instrument}>
                           <Icon icon={faBell} />
@@ -698,7 +736,7 @@ const ChartView: React.FC = props => {
                 </Div>
               </Column>
 
-              <Column width={1 / 4} style={{ background: '#1e222d' }}>
+              <Column width={1 / 4}>
                 <WatchList dark>
                   {watchedInstruments.map(i => (
                     <WatchList.Ticker
