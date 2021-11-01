@@ -364,9 +364,6 @@ const ChartView: React.FC = props => {
     } else {
       const { height } = chart.current.options()
       const newHeight = (() => {
-        console.log('fullscreen', fullscreen)
-        console.log('height', height)
-
         if (fullscreen && height === CHART_HEIGHT_DEFAULT) {
           return CHART_HEIGHT_FULLSCREEN
         }
@@ -455,10 +452,12 @@ const ChartView: React.FC = props => {
           series.update(currentBar)
         }
 
-        const [{ time: time0 }, { time: time1 }] = history.aggregates
-        const difference = (time1 - time0) / 1000
+        if (history.aggregates.length >= 2) {
+          const [{ time: time0 }, { time: time1 }] = history.aggregates
+          const difference = (time1 - time0) / 1000
 
-        barTimeToLive = difference
+          barTimeToLive = difference
+        }
       } else {
         if (timeRange === '30s') {
           barTimeToLive = 30 as const
