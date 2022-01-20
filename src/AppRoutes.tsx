@@ -19,12 +19,15 @@ const TriviaCategoryView = React.lazy(() => import('./views/trivia/TriviaCategor
 
 const BlogGalleryView = React.lazy(() => import('./views/blog/BlogGalleryView'))
 
+const UserListView = React.lazy(() => import('./views/users/UserListView'))
+const UserView = React.lazy(() => import('./views/users/UserView'))
+
 const TestView = React.lazy(() => import('./views/test/TestView'))
 const ChartView = React.lazy(() => import('./views/test/ChartView'))
 
 const AppRoutes: React.FC = props => {
   const isAuthenticated = useAuthorization()
-  // const isAdmin = useAuthorization('admin')
+  const isAdmin = useAuthorization('admin')
   // const isTriviaAdmin = useAuthorization('trivia-admin')
   const { pushError } = useContext(Notification.Portal)
 
@@ -67,6 +70,23 @@ const AppRoutes: React.FC = props => {
           <Route path="/blog/gallery" exact>
             <BlogGalleryView />
           </Route>
+
+          {isAuthenticated && (
+            <Route path="/profile" exact>
+              <UserView />
+            </Route>
+          )}
+
+          {isAdmin && (
+            <>
+              <Route path="/meta/users" exact>
+                <UserListView />
+              </Route>
+              <Route path="/meta/users/:id" exact>
+                <UserView />
+              </Route>
+            </>
+          )}
 
           <Route path="/test/thing" exact>
             <TestView />
