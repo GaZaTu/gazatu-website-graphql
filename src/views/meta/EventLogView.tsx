@@ -46,6 +46,8 @@ const EventLogView: React.FC = props => {
                 switch (targetEntityName) {
                   case 'TriviaQuestion':
                     return `/trivia/questions/${targetId}`
+                  case 'TriviaCategory':
+                    return `/trivia/categories/${targetId}`
                   default:
                     return undefined
                 }
