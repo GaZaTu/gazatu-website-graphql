@@ -229,7 +229,7 @@ const BlogImage: React.FC<BlogImageProps> = props => {
     })()
   }, [search.entry, entry, showModal, imageFileURL, history, image])
 
-  const [imageAllowed, handleLoad] = useQueue(0, !imageVisible)
+  const [imageAllowed, handleLoad] = useQueue(25, !imageVisible)
 
   const [removeBlogEntries] = useMutation<Mutation>({
     query: removeBlogEntriesMutation,
