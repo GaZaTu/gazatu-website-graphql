@@ -444,7 +444,7 @@ const TriviaQuestionView: React.FC = props => {
             <Field label="Answer">
               <Control>
                 <Icon size="small" icon={faExclamation} />
-                <Input name="answer" type="text" required minLength={3} readOnly={readOnly} />
+                <Input name="answer" type="text" required minLength={1} readOnly={readOnly} />
               </Control>
             </Field>
 
