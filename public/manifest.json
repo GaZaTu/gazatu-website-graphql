@@ -35,5 +35,17 @@
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#8a2be2",
-  "background_color": "#242424"
+  "background_color": "#242424",
+  "orientation": "any",
+  "categories": ["utilities"],
+  "shortcuts" : [
+    {
+      "name": "Blog",
+      "url": "/blog/gallery"
+    },
+    {
+      "name": "Trading Chard",
+      "url": "/test/chart"
+    }
+  ]
 }
