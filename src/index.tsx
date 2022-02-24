@@ -28,4 +28,10 @@ serviceWorkerRegistration.register({
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-// reportWebVitals()
+// reportWebVitals(metric => {
+//   const body = JSON.stringify(metric)
+//   const url = `${process.env.REACT_APP_API_URL}/analytics`
+
+//   // navigator.sendBeacon(url, body)
+//   console.log(metric)
+// })

@@ -44,8 +44,8 @@
       "url": "/blog/gallery"
     },
     {
-      "name": "Trading Chard",
-      "url": "/test/chart"
+      "name": "Trading Chart",
+      "url": "/test/chart?fullscreen=true"
     }
   ]
 }

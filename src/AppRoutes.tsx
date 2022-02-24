@@ -78,14 +78,15 @@ const AppRoutes: React.FC = props => {
           )}
 
           {isAdmin && (
-            <>
-              <Route path="/meta/users" exact>
-                <UserListView />
-              </Route>
-              <Route path="/meta/users/:id" exact>
-                <UserView />
-              </Route>
-            </>
+            <Route path="/meta/users" exact>
+              <UserListView />
+            </Route>
+          )}
+
+          {isAdmin && (
+            <Route path="/meta/users/:id" exact>
+              <UserView />
+            </Route>
           )}
 
           <Route path="/test/thing" exact>
