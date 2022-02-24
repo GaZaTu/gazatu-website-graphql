@@ -16,6 +16,7 @@ type Props = Omit<HTMLProps<'input'>, 'size'> & {
   validate?: RegisterOptions['validate']
   emptyValue?: '' | 'null' | 'undefined'
   onValueChange?: (value: any) => void
+  filter?: string | ((value: string) => string)
 }
 
 const Input: React.FC<Props> = props => {
@@ -29,6 +30,7 @@ const Input: React.FC<Props> = props => {
     validate,
     emptyValue = 'undefined',
     onValueChange,
+    filter,
     children,
     innerRef: _innerRef,
     ...nativeProps
@@ -55,6 +57,26 @@ const Input: React.FC<Props> = props => {
       } else {
         onValueChange(event.target.value)
       }
+    }
+  }
+
+  if (filter) {
+    const validate = (() => {
+      if (typeof filter === 'string') {
+        return (value: string) => {
+          if (!value) {
+            return value
+          }
+
+          return value.replace(new RegExp(filter), '')
+        }
+      } else {
+        return filter
+      }
+    })()
+
+    nativeProps.onInput = event => {
+      event.currentTarget.value = validate(event.currentTarget.value)
     }
   }
 

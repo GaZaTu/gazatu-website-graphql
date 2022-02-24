@@ -26,6 +26,8 @@ type Props = HTMLProps<'figure'> & {
   ratio?: number
   dimension?: '16x16' | '24x24' | '32x32' | '48x48' | '64x64' | '96x96' | '128x128'
   caption?: string
+  src?: string
+  alt?: string
 }
 
 const Image: React.FC<Props> = props => {
@@ -33,6 +35,8 @@ const Image: React.FC<Props> = props => {
     ratio,
     dimension,
     caption,
+    src,
+    alt,
     innerRef,
     ...nativeProps
   } = props
@@ -86,7 +90,9 @@ const Image: React.FC<Props> = props => {
     }
 
     if (typeof child === 'object' && child.type !== 'img' && child.props) {
-      return React.cloneElement(child, { className: classNames(child.props.className, 'has-ratio') })
+      return React.cloneElement(child, {
+        className: classNames(child.props.className, 'has-ratio'),
+      })
     }
 
     return child
@@ -94,8 +100,11 @@ const Image: React.FC<Props> = props => {
 
   return (
     <figure {...nativeProps} ref={innerRef} className={className}>
-      {children && caption && (
+      {(children || src) && caption && (
         <Caption>{caption}</Caption>
+      )}
+      {src && (
+        <img src={src} alt={alt} />
       )}
       {children}
     </figure>

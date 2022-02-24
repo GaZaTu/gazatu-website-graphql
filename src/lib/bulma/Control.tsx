@@ -55,6 +55,8 @@ const Control: React.FC<Props> = props => {
 
   const className = classNames(nativeProps.className, {
     'control': true,
+    // 'has-icons-left': !!iconsLeft.length,
+    // 'has-icons-right': !!iconsRight.length,
     'has-direct-icons-left': !!iconsLeft.length,
     'has-direct-icons-right': !!iconsRight.length,
     'is-expanded': !!expanded,

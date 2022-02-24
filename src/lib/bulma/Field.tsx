@@ -77,12 +77,12 @@ const Field: React.FC<Props> = props => {
     ...nativeProps
   } = props
 
-  const labelChild = (getChildrenByTypeAndProps(children, [Label], {})[0] as any)?.props as LabelProps | undefined
+  const labelChild = getChildrenByTypeAndProps(children, [Label], {})[0]?.props
   const label = labelChild?.children ?? _label
   const labelProps = objectUnassign({ ...(labelChild ?? _labelProps) }, ['children', 'size', 'asString'])
   const labelSize = labelChild?.size ?? _labelSize
 
-  const helpChild = (getChildrenByTypeAndProps(children, [Help], {})[0] as any)?.props as HelpProps | undefined
+  const helpChild = getChildrenByTypeAndProps(children, [Help], {})[0]?.props
   const help = helpChild?.children ?? _help
   const helpProps = objectUnassign({ ...(helpChild ?? _helpProps) }, ['children', 'color'])
   const helpColor = helpChild?.color ?? _helpColor

@@ -50,27 +50,27 @@ const _Pre: React.FC<Omit<PreProps, 'as'>> = props => (
   <Text as="pre" {...props} />
 )
 
-const _H1: React.FC<Omit<Header1Props, 'as'>> = props => (
+const _H1: React.FC<Omit<H1Props, 'as'>> = props => (
   <Text as="h1" size={1} {...props} />
 )
 
-const _H2: React.FC<Omit<Header2Props, 'as'>> = props => (
+const _H2: React.FC<Omit<H2Props, 'as'>> = props => (
   <Text as="h2" size={2} {...props} />
 )
 
-const _H3: React.FC<Omit<Header3Props, 'as'>> = props => (
+const _H3: React.FC<Omit<H3Props, 'as'>> = props => (
   <Text as="h3" size={3} {...props} />
 )
 
-const _H4: React.FC<Omit<Header4Props, 'as'>> = props => (
+const _H4: React.FC<Omit<H4Props, 'as'>> = props => (
   <Text as="h4" size={4} {...props} />
 )
 
-const _H5: React.FC<Omit<Header5Props, 'as'>> = props => (
+const _H5: React.FC<Omit<H5Props, 'as'>> = props => (
   <Text as="h5" size={5} {...props} />
 )
 
-const _H6: React.FC<Omit<Header6Props, 'as'>> = props => (
+const _H6: React.FC<Omit<H6Props, 'as'>> = props => (
   <Text as="h6" size={6} {...props} />
 )
 
@@ -106,19 +106,19 @@ type SpanProps = SharedProps & HTMLProps<'span', false> & {}
 
 type PreProps = SharedProps & HTMLProps<'pre', false> & {}
 
-type Header1Props = SharedProps & HTMLProps<'h1', false> & {}
+type H1Props = SharedProps & HTMLProps<'h1', false> & {}
 
-type Header2Props = SharedProps & HTMLProps<'h2', false> & {}
+type H2Props = SharedProps & HTMLProps<'h2', false> & {}
 
-type Header3Props = SharedProps & HTMLProps<'h3', false> & {}
+type H3Props = SharedProps & HTMLProps<'h3', false> & {}
 
-type Header4Props = SharedProps & HTMLProps<'h4', false> & {}
+type H4Props = SharedProps & HTMLProps<'h4', false> & {}
 
-type Header5Props = SharedProps & HTMLProps<'h5', false> & {}
+type H5Props = SharedProps & HTMLProps<'h5', false> & {}
 
-type Header6Props = SharedProps & HTMLProps<'h6', false> & {}
+type H6Props = SharedProps & HTMLProps<'h6', false> & {}
 
-type Props = ParagraphProps | DivProps | SpanProps | PreProps | Header1Props | Header2Props | Header3Props | Header4Props | Header5Props | Header6Props
+type Props = ParagraphProps | DivProps | SpanProps | PreProps | H1Props | H2Props | H3Props | H4Props | H5Props | H6Props
 
 const Text: React.FC<Props> = props => {
   const {
