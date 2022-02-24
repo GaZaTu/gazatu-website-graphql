@@ -5,16 +5,18 @@ import { HTMLProps } from '../../lib/bulma/utils/HTMLProps'
 import './SymbolInfo.css'
 
 type Props = HTMLProps<'div'> & {
-  logo?: string // https://s3-symbol-logo.tradingview.com/apple--big.svg
-  name?: string // Apple Inc
+  logo?: string
+  name?: string
   isin?: string
-  symbol?: string // AAPL
-  countryFlag?: string // https://s3-symbol-logo.tradingview.com/country/US.svg
-  country?: string // US
-  exchange?: string // NASDAQ
+  symbol?: string
+  countryFlag?: string
+  country?: string
+  exchange?: string
   value?: number
   currency?: string
   valueAtPreviousClose?: number
+  buyIn?: number
+  shares?: number
   open?: boolean
   openStatusSince?: number
   meta?: {
@@ -55,6 +57,8 @@ const SymbolInfo: React.FC<Props> = props => {
     value,
     currency,
     valueAtPreviousClose,
+    buyIn,
+    shares,
     open,
     openStatusSince,
     meta,
@@ -68,6 +72,9 @@ const SymbolInfo: React.FC<Props> = props => {
   const valueChangePercentage = (valueChange) && ((valueChange * 100) / valueAtPreviousClose)
 
   const openStatusSinceDateString = (openStatusSince) && new Date(openStatusSince).toISOString() // TODO: only time if same date
+
+  const valueSinceBuyInChange = (value && buyIn) && (value - buyIn)
+  const valueSinceBuyInChangePercentage = (valueSinceBuyInChange) && ((valueSinceBuyInChange * 100) / buyIn)
 
   const className = classNames(nativeProps.className, {
     'tv-embed-widget-wrapper': true,
@@ -148,7 +155,7 @@ const SymbolInfo: React.FC<Props> = props => {
               </div>
             </a>
             <div className="tv-category-header__price-line">
-              <div className="tv-category-header__main-price">
+              <div className="tv-category-header__main-price" style={{ height: shares ? '69px' : undefined }}>
                 <div className="tv-scroll-wrap tv-scroll-wrap--horizontal">
                   <div className="tv-category-header__main-price-content">
                     <div className="tv-symbol-price-quote">
@@ -168,7 +175,7 @@ const SymbolInfo: React.FC<Props> = props => {
                               <div className="tv-symbol-price-quote__currency">{currency}</div>
                             </div>
                           )}
-                          {valueChange && (
+                          {!!valueChange && (
                             <div className={`tv-symbol-price-quote__change tv-symbol-price-quote__change--${valueChange >= 0 ? 'growing' : 'falling'}`}>
                               <span className="tv-symbol-price-quote__change-value">{numberSignedFormat.format(valueChange)}</span>
                               <span className="tv-symbol-price-quote__change-value" style={{ marginLeft: '0.25em' }}>({numberSignedFormat.format(valueChangePercentage!)}%)</span>
@@ -176,14 +183,35 @@ const SymbolInfo: React.FC<Props> = props => {
                           )}
                         </div>
                       )}
-                      {(open !== undefined) && (
+                      {(value && shares) && (
+                        <div className="tv-symbol-price-quote__sub-line" style={{ textTransform: 'unset' }}>
+                          <div className="tv-symbol-price-quote__supply">
+                            <div className="tv-symbol-price-quote__currency">x{shares}=</div>
+                          </div>
+                          <div className="tv-symbol-price-quote__value" style={{ fontSize: '28px' }}>
+                            <span>{numberUnsignedFormat.format(value * shares)}</span>
+                          </div>
+                          {currency && (
+                            <div className="tv-symbol-price-quote__supply">
+                              <div className="tv-symbol-price-quote__currency">{currency}</div>
+                            </div>
+                          )}
+                          {!!valueSinceBuyInChange && (
+                            <div className={`tv-symbol-price-quote__change tv-symbol-price-quote__change--${valueSinceBuyInChange >= 0 ? 'growing' : 'falling'}`} style={{ fontSize: '14px' }}>
+                              <span className="tv-symbol-price-quote__change-value">{numberSignedFormat.format(valueSinceBuyInChange * shares)}</span>
+                              <span className="tv-symbol-price-quote__change-value" style={{ marginLeft: '0.25em' }}>({numberSignedFormat.format(valueSinceBuyInChangePercentage!)}%)</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {/* {(open !== undefined) && (
                         <div className="tv-symbol-price-quote__sub-line">
                           <span className={`tv-symbol-price-quote__market-stat tv-symbol-price-quote__market-stat--${open ? 'open' : 'closed'}`}>Market {open ? 'Open' : 'Closed'}</span>
                           {openStatusSinceDateString && (
                             <span>(as of {openStatusSinceDateString})</span>
                           )}
                         </div>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 </div>

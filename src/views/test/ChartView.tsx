@@ -1,12 +1,14 @@
-import { faBookmark, faCompress, faExpand, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faBookmark, faCompress, faEuroSign, faExpand, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { BarData, ColorType, createChart, IChartApi, IPriceLine, LineStyle } from 'lightweight-charts'
 import React, { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import Button from '../../lib/bulma/Button'
 import Column from '../../lib/bulma/Column'
 import Container from '../../lib/bulma/Container'
 import Content from '../../lib/bulma/Content'
+import Control from '../../lib/bulma/Control'
 import Divider from '../../lib/bulma/Divider'
 import Icon from '../../lib/bulma/Icon'
+import Input from '../../lib/bulma/Input'
 import Level from '../../lib/bulma/Level'
 import Modal from '../../lib/bulma/Modal'
 import Notification from '../../lib/bulma/Notification'
@@ -140,13 +142,14 @@ const SymbolSearchModal: React.FC<SymbolSearchModalProps> = props => {
 const ChartView: React.FC = props => {
   const [search, setSearch] = useURLSearchParamsState({
     isin: '',
+    fullscreen: false,
   })
 
   const {
     pushError,
   } = useContext(Notification.Portal)
 
-  const [fullscreen, setFullscreen] = useState(false)
+  const [fullscreen, setFullscreen] = useState(search.fullscreen)
 
   const [timeRange, setTimeRange] = useStoredState('CHART_TIME_RANGE', '1d' as '30s' | '60s' | TraderepublicAggregateHistoryLightSub['range'])
 
@@ -178,7 +181,13 @@ const ChartView: React.FC = props => {
     }
   }, [socket, pushError])
 
-  const [watchList, setWatchList] = useStoredState('CHART_WATCH_LIST', [] as string[])
+  type WatchListEntry = {
+    isin: string
+    buyIn?: number
+    shares?: number
+  }
+
+  const [watchList, setWatchList] = useStoredState('CHART_WATCH_LIST2', [] as WatchListEntry[])
 
   type WatchedInstrument = {
     isin: string
@@ -197,12 +206,12 @@ const ChartView: React.FC = props => {
 
     for (const [key, history] of Object.entries(intradayHistory.current)) {
       (intradayHistory.current as any)[key] = watchList
-        .reduce((o, isin) => { o[isin] = history[isin] ?? []; return o; }, {} as { [key: string]: any })
+        .reduce((o, { isin }) => { o[isin] = history[isin] ?? []; return o; }, {} as { [key: string]: any })
     }
 
     ; (async () => {
       setWatchedInstruments(r => {
-        return watchList.map(isin => {
+        return watchList.map(({ isin }) => {
           const current = r.find(i => i.isin === isin)
 
           return {
@@ -220,7 +229,7 @@ const ChartView: React.FC = props => {
         })
       })
 
-      for (const isin of watchList) {
+      for (const { isin } of watchList) {
         const instrument = await socket.instrument(isin).toPromise()
         const exchange = await socket.exchange(instrument).toPromise()
         const details = await socket.details(instrument)
@@ -307,6 +316,27 @@ const ChartView: React.FC = props => {
       effect.subscriptions.forEach(s => s.unsubscribe())
     }
   }, [socket, watchList, timeRange])
+
+  const portfolio = useMemo(() => {
+    return watchedInstruments
+      .map(instrument => {
+        const { buyIn, shares } = watchList.find(({ isin }) => instrument.isin)!
+
+        return {
+          ...instrument,
+          owned: {
+            buyIn: buyIn ?? 0,
+            shares: shares ?? 0,
+          },
+        }
+      })
+      .filter(({ owned }) => owned.buyIn && owned.shares)
+  }, [watchedInstruments, watchList])
+
+  const portfolioValue = useMemo(() => {
+    return portfolio
+      .reduce((portfolioValue, { value, owned }) => portfolioValue + (value.current * owned.shares), 0)
+  }, [portfolio])
 
   const chartContainer = useRef<HTMLDivElement | null>(null)
   const chart = useRef<IChartApi | null>(null)
@@ -430,6 +460,7 @@ const ChartView: React.FC = props => {
         Math.floor(time / 1000) + (60 * 60 * timezoneOffset) as any
 
       let barTimeToLive = 10 * 60
+      let priceBeforeChart = 0
 
       if (timeRange !== '30s' && timeRange !== '60s') {
         const history = await socket.aggregateHistory(instrument, timeRange)
@@ -457,6 +488,10 @@ const ChartView: React.FC = props => {
           const difference = (time1 - time0) / 1000
 
           barTimeToLive = difference
+        }
+
+        if (barTimeToLive > (10 * 60)) {
+          priceBeforeChart = history.aggregates[0]?.close ?? 0
         }
       } else {
         if (timeRange === '30s') {
@@ -494,8 +529,10 @@ const ChartView: React.FC = props => {
           let utcTimestamp = mapUnixToUTC(data.bid.time)
 
           if (!previousClose) {
+            priceBeforeChart = priceBeforeChart || data.pre.price
+
             previousClose = series.createPriceLine({
-              price: data.pre.price,
+              price: priceBeforeChart,
               color: 'gray',
               lineWidth: 1,
               lineStyle: LineStyle.Dotted,
@@ -505,7 +542,7 @@ const ChartView: React.FC = props => {
 
             setValue(v => ({
               ...v,
-              previous: data.pre.price,
+              previous: priceBeforeChart,
             }))
           }
 
@@ -589,10 +626,10 @@ const ChartView: React.FC = props => {
           return l
         }
 
-        if (l.includes(instrument.isin)) {
-          return l.filter(isin => isin !== instrument.isin)
+        if (l.map(({ isin }) => isin).includes(instrument.isin)) {
+          return l.filter(({ isin }) => isin !== instrument.isin)
         } else {
-          return [instrument.isin, ...l]
+          return [{ isin: instrument.isin }, ...l]
         }
       })
   }, [setWatchList, instrument])
@@ -611,6 +648,47 @@ const ChartView: React.FC = props => {
       setFullscreen(f => !f)
   }, [])
 
+  const instrumentWatchListEntry = useMemo(() => {
+    return watchList
+      .find(({ isin }) => isin === instrument?.isin)
+  }, [instrument, watchList])
+
+  const instrumentBuyIn = instrumentWatchListEntry?.buyIn ?? 0
+  const setInstrumentBuyIn = useMemo(() => {
+    return (value: number) => {
+      setWatchList(l => {
+        return l.map(entry => {
+          if (entry.isin !== instrument?.isin) {
+            return entry
+          }
+
+          return {
+            ...entry,
+            buyIn: value,
+          }
+        })
+      })
+    }
+  }, [instrument, setWatchList])
+
+  const instrumentShares = instrumentWatchListEntry?.shares ?? 0
+  const setInstrumentShares = useMemo(() => {
+    return (value: number) => {
+      setWatchList(l => {
+        return l.map(entry => {
+          if (entry.isin !== instrument?.isin) {
+            return entry
+          }
+
+          return {
+            ...entry,
+            shares: value,
+          }
+        })
+      })
+    }
+  }, [instrument, setWatchList])
+
   return (
     <Section>
       <Container>
@@ -621,7 +699,7 @@ const ChartView: React.FC = props => {
             <Column.Row gapless>
               <Column width={3 / 4} style={{ background: '#1e222d' }}>
                 <Div style={{ background: '#1e222d' }}>
-                  <Level style={{ padding: '1rem 1rem 0.25rem 1rem' }} mobile>
+                  <Level style={{ padding: '1rem 1rem 0.25rem 1rem' }}>
                     <Level.Left>
                       <Button onClick={handleSearch}>
                         <Icon icon={faSearch} />
@@ -630,19 +708,27 @@ const ChartView: React.FC = props => {
                     </Level.Left>
                     <Level.Right>
                       <Level.Item>
-                        <Button onClick={toggleFullscreen}>
-                          <Icon icon={fullscreen ? faCompress : faExpand} />
-                        </Button>
-                      </Level.Item>
-                      {/* <Level.Item>
-                        <Button onClick={manageInstrumentNotifications} disabled={!instrument}>
-                          <Icon icon={faBell} />
-                        </Button>
-                      </Level.Item> */}
-                      <Level.Item>
-                        <Button onClick={toggleInstrumentInWatchList} disabled={!instrument}>
-                          <Icon icon={faBookmark} color={watchList.includes(instrument?.isin ?? '') ? 'danger' : undefined} />
-                        </Button>
+                        <Span style={{ display: 'inline-flex', marginRight: '0.5rem' }}>
+                          <Control style={{ width: '80px' }}>
+                            <Input placeholder="Buy-In" size="small" disabled={!instrumentWatchListEntry} value={instrumentBuyIn} onValueChange={setInstrumentBuyIn} filter="[^\d\.]+" />
+                            <Icon icon={faEuroSign} size="small" />
+                          </Control>
+                          <Control style={{ width: '80px' }}>
+                            <Icon icon={faTimes} size="small" />
+                            <Input placeholder="Shares" size="small" disabled={!instrumentWatchListEntry} value={instrumentShares} onValueChange={setInstrumentShares} filter="[^\d\.]+" />
+                          </Control>
+                        </Span>
+                        <Button.Group>
+                          <Button onClick={toggleFullscreen}>
+                            <Icon icon={fullscreen ? faCompress : faExpand} />
+                          </Button>
+                          {/* <Button onClick={manageInstrumentNotifications} disabled={!instrument}>
+                            <Icon icon={faBell} />
+                          </Button> */}
+                          <Button onClick={toggleInstrumentInWatchList} disabled={!instrument}>
+                            <Icon icon={faBookmark} color={!!instrumentWatchListEntry ? 'danger' : undefined} />
+                          </Button>
+                        </Button.Group>
                       </Level.Item>
                     </Level.Right>
                   </Level>
@@ -658,6 +744,8 @@ const ChartView: React.FC = props => {
                   value={value.current}
                   currency={exchange?.currency.id}
                   valueAtPreviousClose={value.previous}
+                  buyIn={instrumentBuyIn}
+                  shares={instrumentShares}
                   open={exchange?.open}
                   meta={[
                     {
@@ -671,7 +759,7 @@ const ChartView: React.FC = props => {
                     {
                       key: 'UNDERLYING',
                       value: instrument?.derivativeInfo && instrument?.derivativeInfo.underlying.shortName,
-                      href: `/test/chart?q=${instrument?.derivativeInfo?.underlying.isin}`,
+                      href: `/test/chart?isin=${instrument?.derivativeInfo?.underlying.isin}`,
                     },
                     {
                       key: 'TYPE',
@@ -680,11 +768,11 @@ const ChartView: React.FC = props => {
                     },
                     {
                       key: 'LEVERAGE',
-                      value: instrument?.derivativeInfo && instrument?.derivativeInfo.properties.leverage.toFixed(0),
+                      value: instrument?.derivativeInfo && instrument?.derivativeInfo.properties.leverage?.toFixed(0),
                     },
                     {
                       key: 'RATIO',
-                      value: instrument?.derivativeInfo && instrument?.derivativeInfo.properties.size.toFixed(2),
+                      value: instrument?.derivativeInfo && instrument?.derivativeInfo.properties.size?.toFixed(2),
                     },
                     {
                       key: 'EXPIRY',

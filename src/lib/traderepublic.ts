@@ -107,7 +107,7 @@ export type TraderepublicInstrumentData = {
       cap: null
       factor: null
       currency: string
-      size: number
+      size: number | null
       expiry: number | null
       maturity: number | null
       exerciseType: string
@@ -117,7 +117,7 @@ export type TraderepublicInstrumentData = {
       firstTradingDay: string
       lastTradingDay: string | null
       delta: number | null
-      leverage: number
+      leverage: number | null
     }
     mifid: {
       entryCost: number
@@ -334,7 +334,7 @@ export class TraderepublicWebsocket {
           onError,
         })
 
-        this.connect()
+        this.connect().catch(console.error)
         if (this._connected) {
           this._send('sub', number, sub)
         }
@@ -465,7 +465,8 @@ export class TraderepublicWebsocket {
       }
     }
 
-    return this._sub(sub).toPromise().then(data => data.results)
+    return this._sub(sub).toPromise()
+      .then(data => data.results)
   }
 
   async connect() {
@@ -540,7 +541,7 @@ export class TraderepublicWebsocket {
       }
 
       if (!ev.wasClean) {
-        this.connect()
+        this.connect().catch(console.error)
       }
     }
 
