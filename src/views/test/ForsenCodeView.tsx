@@ -17,13 +17,13 @@ const ForsenCodeView: React.FC = props => {
 
   const encode = useMemo(() => {
     return () => {
-      setEncoded(encodeForsenCode(decoded))
+      setEncoded(encodeForsenCode(decoded.trim()))
     }
   }, [decoded])
 
   const decode = useMemo(() => {
     return () => {
-      setDecoded(decodeForsenCode(encoded))
+      setDecoded(decodeForsenCode(encoded.trim()))
     }
   }, [encoded])
 
