@@ -455,7 +455,7 @@ $light-message-colors: $light-colors // map
 
 // ------------------------------------------------ Modal ------------------------------------------------
 // $light-modal-z: 40 //
-$light-modal-background-background-color: bulmaRgba($light-scheme-invert, 0.86) //
+$light-modal-background-background-color: bulmaRgba($light-scheme-invert, 0.50) //
 // $light-modal-content-width: 640px //
 // $light-modal-content-margin-mobile: 20px //
 // $light-modal-content-spacing-mobile: 160px //
@@ -624,6 +624,36 @@ $light-panel-block-active-icon-color: $light-link // color
 $light-panel-icon-color: $light-text-light // color
 
 $light-panel-colors: $light-colors // map
+
+// ------------------------------------------------ Tabs ------------------------------------------------
+
+$light-tabs-border-bottom-color: $light-border !default // color
+// $light-tabs-border-bottom-style: solid !default
+// $light-tabs-border-bottom-width: 1px !default
+$light-tabs-link-color: $light-text !default // color
+$light-tabs-link-hover-border-bottom-color: $light-text-strong !default // color
+$light-tabs-link-hover-color: $light-text-strong !default // color
+$light-tabs-link-active-border-bottom-color: $light-link !default // color
+$light-tabs-link-active-color: $light-link !default // color
+// $light-tabs-link-padding: 0.5em 1em !default
+
+// $light-tabs-boxed-link-radius: $radius !default
+$light-tabs-boxed-link-hover-background-color: $light-background !default // color
+$light-tabs-boxed-link-hover-border-bottom-color: $light-border !default // color
+
+$light-tabs-boxed-link-active-background-color: $light-scheme-main !default // color
+$light-tabs-boxed-link-active-border-color: $light-border !default // color
+$light-tabs-boxed-link-active-border-bottom-color: transparent !default // color
+
+$light-tabs-toggle-link-border-color: $light-border !default // color
+// $light-tabs-toggle-link-border-style: solid !default
+// $light-tabs-toggle-link-border-width: 1px !default
+$light-tabs-toggle-link-hover-background-color: $light-background !default // color
+$light-tabs-toggle-link-hover-border-color: $light-border-hover !default // color
+// $light-tabs-toggle-link-radius: $radius !default
+$light-tabs-toggle-link-active-background-color: $light-link !default // color
+$light-tabs-toggle-link-active-border-color: $light-link !default // color
+$light-tabs-toggle-link-active-color: $light-link-invert !default // color
 
 // ------------------------------------------------ Label ------------------------------------------------
 $light-label-color: $light-grey-darker // color
@@ -1395,6 +1425,46 @@ html.light-theme
   .panel-icon
     color: $light-panel-icon-color
 
+  // ------------------------------------------------ Tabs ------------------------------------------------
+  .tabs
+    a
+      border-bottom-color: $light-tabs-border-bottom-color
+      color: $light-tabs-link-color
+      &:hover
+        border-bottom-color: $light-tabs-link-hover-border-bottom-color
+        color: $light-tabs-link-hover-color
+    li
+      &.is-active
+        a
+          border-bottom-color: $light-tabs-link-active-border-bottom-color
+          color: $light-tabs-link-active-color
+    ul
+      border-bottom-color: $light-tabs-border-bottom-color
+    // Styles
+    &.is-boxed
+      a
+        &:hover
+          background-color: $light-tabs-boxed-link-hover-background-color
+          border-bottom-color: $light-tabs-boxed-link-hover-border-bottom-color
+      li
+        &.is-active
+          a
+            background-color: $light-tabs-boxed-link-active-background-color
+            border-color: $light-tabs-boxed-link-active-border-color
+            border-bottom-color: $light-tabs-boxed-link-active-border-bottom-color !important
+    &.is-toggle
+      a
+        border-color: $light-tabs-toggle-link-border-color
+        &:hover
+          background-color: $light-tabs-toggle-link-hover-background-color
+          border-color: $light-tabs-toggle-link-hover-border-color
+      li
+        &.is-active
+          a
+            background-color: $light-tabs-toggle-link-active-background-color
+            border-color: $light-tabs-toggle-link-active-border-color
+            color: $light-tabs-toggle-link-active-color
+
   // ------------------------------------------------ Label ------------------------------------------------
   .label
     color: $light-label-color
@@ -1418,7 +1488,7 @@ html.light-theme
         color: $light-input-icon-color
 
   // ------------------------------------------------ Input ------------------------------------------------
-  .input
+  %input-textarea
     background-color: $light-input-background-color
     border-color: $light-input-border-color
     color: $light-input-color
@@ -1641,3 +1711,42 @@ html.light-theme
         span[contenteditable]:after
           content: attr(placeholder)
           color: $light-input-placeholder-color
+
+  // ------------------------------------------------ HELPERS ------------------------------------------------
+  @each $name, $pair in $light-colors
+    $color: nth($pair, 1)
+    .has-text-#{$name}
+      color: $color !important
+    a.has-text-#{$name}
+      &:hover,
+      &:focus
+        color: bulmaDarken($color, 10%) !important
+    .has-background-#{$name}
+      background-color: $color !important
+    @if length($pair) >= 4
+      $color-light: nth($pair, 3)
+      $color-dark: nth($pair, 4)
+      // Light
+      .has-text-#{$name}-light
+        color: $color-light !important
+      a.has-text-#{$name}-light
+        &:hover,
+        &:focus
+          color: bulmaDarken($color-light, 10%) !important
+      .has-background-#{$name}-light
+        background-color: $color-light !important
+      // Dark
+      .has-text-#{$name}-dark
+        color: $color-dark !important
+      a.has-text-#{$name}-dark
+        &:hover,
+        &:focus
+          color: bulmaLighten($color-dark, 10%) !important
+      .has-background-#{$name}-dark
+        background-color: $color-dark !important
+
+  @each $name, $shade in $light-shades
+    .has-text-#{$name}
+      color: $shade !important
+    .has-background-#{$name}
+      background-color: $shade !important

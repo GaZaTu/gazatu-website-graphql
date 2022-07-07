@@ -627,6 +627,36 @@ $dark-panel-icon-color: $dark-text-light // color
 
 $dark-panel-colors: $dark-colors // map
 
+// ------------------------------------------------ Tabs ------------------------------------------------
+
+$dark-tabs-border-bottom-color: $dark-border !default // color
+// $dark-tabs-border-bottom-style: solid !default
+// $dark-tabs-border-bottom-width: 1px !default
+$dark-tabs-link-color: $dark-text !default // color
+$dark-tabs-link-hover-border-bottom-color: $dark-text-strong !default // color
+$dark-tabs-link-hover-color: $dark-text-strong !default // color
+$dark-tabs-link-active-border-bottom-color: $dark-link !default // color
+$dark-tabs-link-active-color: $dark-link !default // color
+// $dark-tabs-link-padding: 0.5em 1em !default
+
+// $dark-tabs-boxed-link-radius: $radius !default
+$dark-tabs-boxed-link-hover-background-color: $dark-background !default // color
+$dark-tabs-boxed-link-hover-border-bottom-color: $dark-border !default // color
+
+$dark-tabs-boxed-link-active-background-color: $dark-scheme-main !default // color
+$dark-tabs-boxed-link-active-border-color: $dark-border !default // color
+$dark-tabs-boxed-link-active-border-bottom-color: transparent !default // color
+
+$dark-tabs-toggle-link-border-color: $dark-border !default // color
+// $dark-tabs-toggle-link-border-style: solid !default
+// $dark-tabs-toggle-link-border-width: 1px !default
+$dark-tabs-toggle-link-hover-background-color: $dark-background !default // color
+$dark-tabs-toggle-link-hover-border-color: $dark-border-hover !default // color
+// $dark-tabs-toggle-link-radius: $radius !default
+$dark-tabs-toggle-link-active-background-color: $dark-link !default // color
+$dark-tabs-toggle-link-active-border-color: $dark-link !default // color
+$dark-tabs-toggle-link-active-color: $dark-link-invert !default // color
+
 // ------------------------------------------------ Label ------------------------------------------------
 $dark-label-color: $dark-grey-darker // color
 
@@ -1419,6 +1449,46 @@ html.dark-theme
   .panel-icon
     color: $dark-panel-icon-color
 
+  // ------------------------------------------------ Tabs ------------------------------------------------
+  .tabs
+    a
+      border-bottom-color: $dark-tabs-border-bottom-color
+      color: $dark-tabs-link-color
+      &:hover
+        border-bottom-color: $dark-tabs-link-hover-border-bottom-color
+        color: $dark-tabs-link-hover-color
+    li
+      &.is-active
+        a
+          border-bottom-color: $dark-tabs-link-active-border-bottom-color
+          color: $dark-tabs-link-active-color
+    ul
+      border-bottom-color: $dark-tabs-border-bottom-color
+    // Styles
+    &.is-boxed
+      a
+        &:hover
+          background-color: $dark-tabs-boxed-link-hover-background-color
+          border-bottom-color: $dark-tabs-boxed-link-hover-border-bottom-color
+      li
+        &.is-active
+          a
+            background-color: $dark-tabs-boxed-link-active-background-color
+            border-color: $dark-tabs-boxed-link-active-border-color
+            border-bottom-color: $dark-tabs-boxed-link-active-border-bottom-color !important
+    &.is-toggle
+      a
+        border-color: $dark-tabs-toggle-link-border-color
+        &:hover
+          background-color: $dark-tabs-toggle-link-hover-background-color
+          border-color: $dark-tabs-toggle-link-hover-border-color
+      li
+        &.is-active
+          a
+            background-color: $dark-tabs-toggle-link-active-background-color
+            border-color: $dark-tabs-toggle-link-active-border-color
+            color: $dark-tabs-toggle-link-active-color
+
   // ------------------------------------------------ Label ------------------------------------------------
   .label
     color: $dark-label-color
@@ -1442,7 +1512,7 @@ html.dark-theme
         color: $dark-input-icon-color
 
   // ------------------------------------------------ Input ------------------------------------------------
-  .input
+  %input-textarea
     background-color: $dark-input-background-color
     border-color: $dark-input-border-color
     color: $dark-input-color
@@ -1723,3 +1793,42 @@ html.dark-theme
         span[contenteditable]:after
           content: attr(placeholder)
           color: $dark-input-placeholder-color
+
+  // ------------------------------------------------ HELPERS ------------------------------------------------
+  @each $name, $pair in $dark-colors
+    $color: nth($pair, 1)
+    .has-text-#{$name}
+      color: $color !important
+    a.has-text-#{$name}
+      &:hover,
+      &:focus
+        color: bulmaDarken($color, 10%) !important
+    .has-background-#{$name}
+      background-color: $color !important
+    @if length($pair) >= 4
+      $color-light: nth($pair, 3)
+      $color-dark: nth($pair, 4)
+      // Light
+      .has-text-#{$name}-light
+        color: $color-light !important
+      a.has-text-#{$name}-light
+        &:hover,
+        &:focus
+          color: bulmaDarken($color-light, 10%) !important
+      .has-background-#{$name}-light
+        background-color: $color-light !important
+      // Dark
+      .has-text-#{$name}-dark
+        color: $color-dark !important
+      a.has-text-#{$name}-dark
+        &:hover,
+        &:focus
+          color: bulmaLighten($color-dark, 10%) !important
+      .has-background-#{$name}-dark
+        background-color: $color-dark !important
+
+  @each $name, $shade in $dark-shades
+    .has-text-#{$name}
+      color: $shade !important
+    .has-background-#{$name}
+      background-color: $shade !important
