@@ -142,6 +142,10 @@ const AppNavbar: React.FC<{}> = props => {
             )}
           </Navbar.Item>
 
+          <Navbar.Item label="Stuff" href="/stuff" as="div" hoverable>
+            <Navbar.Item label="ForsenCode" href="/stuff/forsencode" exact />
+          </Navbar.Item>
+
           {isAdmin && (
             <Navbar.Item label="Test" href="/test" as="div" hoverable>
               <Navbar.Item label="Thing" href="/test/thing" exact />

@@ -22,6 +22,8 @@ const BlogGalleryView = React.lazy(() => import('./views/blog/BlogGalleryView'))
 const UserListView = React.lazy(() => import('./views/users/UserListView'))
 const UserView = React.lazy(() => import('./views/users/UserView'))
 
+const ForsenCodeView = React.lazy(() => import('./views/test/ForsenCodeView'))
+
 const TestView = React.lazy(() => import('./views/test/TestView'))
 const ChartView = React.lazy(() => import('./views/test/ChartView'))
 
@@ -88,6 +90,10 @@ const AppRoutes: React.FC = props => {
               <UserView />
             </Route>
           )}
+
+          <Route path="/stuff/forsencode" exact>
+            <ForsenCodeView />
+          </Route>
 
           <Route path="/test/thing" exact>
             <TestView />
