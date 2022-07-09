@@ -1,12 +1,6 @@
 const codeword = 'forsen'
-const codewordSize = codeword.length + 1
-const codewordLimit = Math.pow(2, codewordSize)
-
-const spaceUpper = '\xa0'
-const spaceLower = '\x20'
-
-const spaceAltUpper = '!'
-const spaceAltLower = '?'
+const codewordBitSize = codeword.length + 1
+const codewordLimit = Math.pow(2, codewordBitSize)
 
 export const encodeForsenCode7Bit = (text: string, lenient = true) => {
   text = text.trim()
@@ -28,36 +22,38 @@ export const encodeForsenCode7Bit = (text: string, lenient = true) => {
       if (lenient) {
         try {
           if (decodedChar === ' ' && prevCharWasInvalid) {
-            return ' '
+            return ''
           }
         } finally {
           prevCharWasInvalid = false
         }
       }
 
-      const asciiBitString = ascii.toString(2).padStart(codewordSize, '0')
+      const asciiBitString = ascii.toString(2).padStart(codewordBitSize, '0')
 
-      const encodedChar = [...codeword, spaceLower]
+      let bit = 0
+      const encodedChar = [...codeword]
         .map((cc, i) => {
-          const upper = !!Number(asciiBitString[i])
-
-          if (i === (codewordSize - 1)) {
-            return upper ? spaceUpper : spaceLower
-          } else {
-            return upper ? cc.toUpperCase() : cc.toLowerCase()
+          if (codeword[i] === 'o') {
+            const state = asciiBitString.slice(bit++, ++bit)
+            switch (state) {
+              case '00': return 'Ö'
+              case '01': return 'ö'
+              case '10': return 'O'
+              case '11': return 'o'
+              default: throw new Error()
+            }
           }
+
+          const upper = !!Number(asciiBitString[bit++])
+          return upper ? cc.toUpperCase() : cc.toLowerCase()
         })
         .join('')
 
       return encodedChar
     })
-    .join('')
-
-  if (code.endsWith(spaceUpper)) {
-    code = code.trimRight() + spaceAltUpper
-  } else {
-    code = code.trimRight() + spaceAltLower
-  }
+    .filter(c => !!c)
+    .join(' ')
 
   return code
 }
@@ -65,36 +61,34 @@ export const encodeForsenCode7Bit = (text: string, lenient = true) => {
 export const decodeForsenCode7Bit = (code: string) => {
   code = code.trim()
 
-  const codeInLowercase = code.toLowerCase()
+  const searchableCode = code
+    .toLowerCase()
+    .replaceAll('ö', 'o')
 
   let text = ''
 
   let i = 0
   let b = 0
 
-  for (; (i = codeInLowercase.indexOf(codeword, i)) !== -1;) {
+  for (; (i = searchableCode.indexOf(codeword, i)) !== -1;) {
     text += code.slice(b, i)
     b = i
 
-    const encodedChar = code.slice(i, i + codewordSize)
-    if (
-      (!encodedChar.endsWith(spaceUpper) && !encodedChar.endsWith(spaceAltUpper)) &&
-      (!encodedChar.endsWith(spaceLower) && !encodedChar.endsWith(spaceAltLower))
-    ) {
-      i += encodedChar.length
-      continue
-    }
+    const encodedChar = code.slice(i, i + codeword.length)
 
     const asciiBitString = [...encodedChar]
       .map((bc, i) => {
-        let upper = false
-
-        if (i === (codewordSize - 1)) {
-          upper = (encodedChar.endsWith(spaceUpper) || encodedChar.endsWith(spaceAltUpper))
-        } else {
-          upper = (bc.toUpperCase() === bc)
+        if (codeword[i] === 'o') {
+          switch (bc) {
+            case 'Ö': return '00'
+            case 'ö': return '01'
+            case 'O': return '10'
+            case 'o': return '11'
+            default: throw new Error()
+          }
         }
 
+        const upper = (bc.toUpperCase() === bc)
         return upper ? '1' : '0'
       })
       .join('')
@@ -107,15 +101,17 @@ export const decodeForsenCode7Bit = (code: string) => {
 
     i += encodedChar.length
     b = i
+
+    if (searchableCode[b] === ' ') {
+      b += 1
+    }
+  }
+
+  if (searchableCode[b - 1] === ' ') {
+    b -= 1
   }
 
   text += code.slice(b)
 
   return text
 }
-
-const encoded = encodeForsenCode7Bit('Hello 😎 World! 123')
-console.log(encoded)
-
-const decoded = decodeForsenCode7Bit(encoded)
-console.log(decoded)

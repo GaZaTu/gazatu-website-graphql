@@ -40,6 +40,10 @@ const ForsenCodeView: React.FC = props => {
                   <TextArea value={decoded} onValueChange={setDecoded} />
                 </Control>
               </Field>
+
+              <Button.Group align="right">
+                <Button type="button" onClick={encode} style={{ marginRight: 0 }}>Encode</Button>
+              </Button.Group>
             </Column>
 
             <Divider vertical />
@@ -50,13 +54,12 @@ const ForsenCodeView: React.FC = props => {
                   <TextArea value={encoded} onValueChange={setEncoded} />
                 </Control>
               </Field>
+
+              <Button.Group align="left">
+                <Button type="button" onClick={decode} style={{ marginLeft: 0 }}>Decode</Button>
+              </Button.Group>
             </Column>
           </Column.Row>
-
-          <Button.Group>
-            <Button type="button" onClick={encode}>Encode</Button>
-            <Button type="button" onClick={decode}>Decode</Button>
-          </Button.Group>
         </Content>
       </Container>
     </Section>
