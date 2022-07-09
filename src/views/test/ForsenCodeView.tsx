@@ -9,7 +9,7 @@ import Field from '../../lib/bulma/Field'
 import Section from '../../lib/bulma/Section'
 import { H1 } from '../../lib/bulma/Text'
 import TextArea from '../../lib/bulma/TextArea'
-import { decodeForsenCode, encodeForsenCode } from './forsencode'
+import { decodeForsenCode7Bit, encodeForsenCode7Bit } from './forsencode7bit'
 
 const ForsenCodeView: React.FC = props => {
   const [decoded, setDecoded] = useState('')
@@ -17,20 +17,20 @@ const ForsenCodeView: React.FC = props => {
 
   const encode = useMemo(() => {
     return () => {
-      setEncoded(encodeForsenCode(decoded.trim()))
+      setEncoded(encodeForsenCode7Bit(decoded))
     }
   }, [decoded])
 
   const decode = useMemo(() => {
     return () => {
-      setDecoded(decodeForsenCode(encoded.trim()))
+      setDecoded(decodeForsenCode7Bit(encoded))
     }
   }, [encoded])
 
   return (
     <Section>
       <Container>
-        <H1 kind="title">ForsenCode 6-bit</H1>
+        <H1 kind="title">ForsenCode 7-bit</H1>
 
         <Content>
           <Column.Row>
